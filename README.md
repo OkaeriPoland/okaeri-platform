@@ -20,33 +20,34 @@ Currently the only target (less than 200kB total of additional jar size), integr
 See [bukkit-example](https://github.com/OkaeriPoland/okaeri-platform/tree/master/bukkit-example) for the repository/dependency and the shading guide.
 
 ```java
+@WithBean(TestConfig.class)
 @WithBean(TestCommand.class)
 @WithBean(TestListener.class)
 public class ExamplePlugin extends OkaeriPlugin {
 
-    @Override
-    public void onPlatformEnabled() {
-        System.out.println("enabled!");
-    }
+  @Override
+  public void onPlatformEnabled() {
+    System.out.println("enabled!");
+  }
 
-    @Override
-    public void onPlatformDisabled() {
-        System.out.println("disabled!");
-    }
+  @Override
+  public void onPlatformDisabled() {
+    System.out.println("disabled!");
+  }
 
-    @Bean(value = "testString", register = false)
-    public String configureTestString(JavaPlugin plugin) {
-        return "plugin -> " + plugin.getName();
-    }
+  @Bean(value = "testString", register = false)
+  public String configureTestString(JavaPlugin plugin) {
+    return "plugin -> " + plugin.getName();
+  }
 
-    @Bean("exampleComplexBean")
-    public String configureComplexBean() {
-        StringBuilder builder = new StringBuilder();
-        for (int i = 0; i < 10; i++) {
-            builder.append(i).append(". hi").append("\n");
-        }
-        return builder.toString();
+  @Bean("exampleComplexBean")
+  public String configureComplexBean() {
+    StringBuilder builder = new StringBuilder();
+    for (int i = 0; i < 10; i++) {
+      builder.append(i).append(". hi").append("\n");
     }
+    return builder.toString();
+  }
 }
 ```
 
@@ -54,35 +55,70 @@ public class ExamplePlugin extends OkaeriPlugin {
 @ServiceDescriptor(label = "testcmd", aliases = "testing")
 public class TestCommand implements CommandService {
 
-    @Inject("testString") private String test;
-    @Inject("exampleComplexBean") private String complexContent;
+  @Inject("testString") private String test;
+  @Inject("exampleComplexBean") private String complexContent;
+  @Inject private TestConfig config;
 
-    @Executor
-    public BukkitResponse example(@Label String label) {
-        return SuccessResponse.of("It works! " + label + " [" + this.test + "]");
-    }
+  // testcmd|testing example
+  @Executor
+  public BukkitResponse example(@Label String label) {
+    return SuccessResponse.of("It works! " + label + " [" + this.test + "]");
+  }
 
-    @Executor
-    public BukkitResponse complex() {
-        return RawResponse.of(this.complexContent);
-    }
+  // testcmd|testing complex
+  @Executor(async = true, description = "wow async execution, db calls go brrr")
+  public BukkitResponse complex() {
+    return RawResponse.of(this.complexContent, Thread.currentThread().getName());
+  }
 
-    @Bean(value = "subbean", register = false)
-    public String configureExampleSubbean() {
-        return "BEAN FROM " + this.getClass() + "!!";
-    }
+  // testcmd|testing greet|greeting
+  @Executor(pattern = {"greet", "greeting"}, description = "greets you :O")
+  public BukkitResponse greet() {
+    return RawResponse.of(this.config.getGreeting());
+  }
+
+  @Bean(value = "subbean", register = false)
+  public String configureExampleSubbean() {
+    return "BEAN FROM " + this.getClass() + "!!";
+  }
 }
 ```
 
 ```java
 public class TestListener implements Listener {
 
-    @Inject private ExamplePlugin plugin;
-    @Inject("subbean") private String subbeanString;
+  @Inject private ExamplePlugin plugin;
+  @Inject("subbean") private String subbeanString;
 
-    @EventHandler
-    public void onJoin(PlayerJoinEvent event) {
-        event.setJoinMessage("Willkommen " + event.getPlayer().getName() + "! " + this.plugin.getName() + " is working!\n" + this.subbeanString);
-    }
+  @EventHandler
+  public void onJoin(PlayerJoinEvent event) {
+    event.setJoinMessage("Willkommen " + event.getPlayer().getName() + "! " + this.plugin.getName() + " is working!\n" + this.subbeanString);
+  }
+}
+```
+
+```java
+// automatically created in the plugin dir
+// updates comments and changes automatically
+//
+// Resulting file:
+// # ================================
+// #        Magic Configuration
+// # ================================
+// # Example config value
+// greeting: Hi!!!!!!!!1111oneone
+//
+@Configuration(path = "config.yml")
+@Header("================================")
+@Header("       Magic Configuration      ")
+@Header("================================")
+@Names(strategy = NameStrategy.HYPHEN_CASE, modifier = NameModifier.TO_LOWER_CASE)
+public class TestConfig extends OkaeriConfig {
+
+    @Size(min = 1, max = 64)
+    @Comment("Example config value")
+    private String greeting = "Hi!!!!!!!!1111oneone";
+
+    /* getters/setters or nothing if annotated with lombok */
 }
 ```

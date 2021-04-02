@@ -5,6 +5,7 @@ import eu.okaeri.platform.bukkit.annotation.Bean;
 import eu.okaeri.platform.bukkit.annotation.WithBean;
 import org.bukkit.plugin.java.JavaPlugin;
 
+@WithBean(TestConfig.class)
 @WithBean(TestCommand.class)
 @WithBean(TestListener.class)
 public class ExamplePlugin extends OkaeriPlugin {
