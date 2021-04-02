@@ -1,5 +1,11 @@
 # Okaeri Platform (WIP)
 
+![License](https://img.shields.io/github/license/OkaeriPoland/okaeri-platform)
+![Total lines](https://img.shields.io/tokei/lines/github/OkaeriPoland/okaeri-platform)
+![Repo size](https://img.shields.io/github/repo-size/OkaeriPoland/okaeri-platform)
+![Contributors](https://img.shields.io/github/contributors/OkaeriPoland/okaeri-platform)
+[![Discord](https://img.shields.io/discord/589089838200913930)](https://discord.gg/hASN5eX)
+
 Whole ecosystems built on top of the best okaeri packages.
 
 ## Bukkit
