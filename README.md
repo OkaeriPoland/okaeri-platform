@@ -17,7 +17,7 @@ Currently the only target, integrates:
 
 ### Example
 
-See [bukkit-example](https://github.com/OkaeriPoland/okaeri-platform/tree/master/bukkit-example).
+See [bukkit-example](https://github.com/OkaeriPoland/okaeri-platform/tree/master/bukkit-example) for the repository/dependency and the shading guide.
 
 ```java
 @WithBean(TestCommand.class)
