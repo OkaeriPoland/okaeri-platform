@@ -15,15 +15,24 @@ public class TestCommand implements CommandService {
 
     @Inject("testString") private String test;
     @Inject("exampleComplexBean") private String complexContent;
+    @Inject private TestConfig config;
 
+    // testcmd|testing example
     @Executor
     public BukkitResponse example(@Label String label) {
         return SuccessResponse.of("It works! " + label + " [" + this.test + "]");
     }
 
-    @Executor
+    // testcmd|testing complex
+    @Executor(async = true, description = "wow async execution, db calls go brrr")
     public BukkitResponse complex() {
-        return RawResponse.of(this.complexContent);
+        return RawResponse.of(this.complexContent, Thread.currentThread().getName());
+    }
+
+    // testcmd|testing greet|greeting
+    @Executor(pattern = {"greet", "greeting"}, description = "greets you :O")
+    public BukkitResponse greet() {
+        return RawResponse.of(this.config.getGreeting());
     }
 
     @Bean(value = "subbean", register = false)

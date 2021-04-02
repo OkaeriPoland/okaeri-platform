@@ -6,48 +6,44 @@ import eu.okaeri.commands.bukkit.CommandsBukkit;
 import eu.okaeri.commands.injector.CommandsInjector;
 import eu.okaeri.commands.meta.ServiceMeta;
 import eu.okaeri.commands.service.CommandService;
+import eu.okaeri.configs.ConfigManager;
+import eu.okaeri.configs.OkaeriConfig;
+import eu.okaeri.configs.postprocessor.SectionSeparator;
+import eu.okaeri.configs.validator.okaeri.OkaeriValidator;
+import eu.okaeri.configs.yaml.bukkit.YamlBukkitConfigurer;
 import eu.okaeri.injector.Injectable;
 import eu.okaeri.injector.Injector;
 import eu.okaeri.injector.OkaeriInjector;
 import eu.okaeri.injector.annotation.Inject;
 import eu.okaeri.platform.bukkit.annotation.Bean;
+import eu.okaeri.platform.bukkit.annotation.Configuration;
 import eu.okaeri.platform.bukkit.annotation.WithBean;
 import lombok.Getter;
 import lombok.SneakyThrows;
 import org.bukkit.event.Listener;
-import org.bukkit.plugin.PluginDescriptionFile;
 import org.bukkit.plugin.java.JavaPlugin;
-import org.bukkit.plugin.java.JavaPluginLoader;
 
 import java.io.File;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
-import java.util.*;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+import java.util.Optional;
+import java.util.logging.Level;
 
 
 public class OkaeriPlugin extends JavaPlugin {
 
+    private static final boolean VERBOSE = Boolean.getBoolean("okaeri.debug");
+
     @Getter private Injector injector;
     @Getter private OkaeriCommands commands;
 
-    private List<Listener> awaitingListeners = new ArrayList<>();
-    private List<CommandService> awaitingCommands = new ArrayList<>();
-
-    public OkaeriPlugin() {
-        super();
-        this.postBukkitInitialize();
-    }
-
-    public OkaeriPlugin(JavaPluginLoader loader, PluginDescriptionFile description, File dataFolder, File file) {
-        super(loader, description, dataFolder, file);
-        this.postBukkitInitialize();
-    }
-
     @Override
     public void onEnable() {
-        this.awaitingCommands.forEach(this.commands::register);
-        this.awaitingListeners.forEach(listener -> this.getServer().getPluginManager().registerEvents(listener, this));
+        this.postBukkitInitialize();
         this.onPlatformEnabled();
     }
 
@@ -66,13 +62,13 @@ public class OkaeriPlugin extends JavaPlugin {
         this.commands = CommandsManager.create(CommandsInjector.of(CommandsBukkit.of(this), this.injector));
 
         // load commands/other beans
-        this.postBukkitLoadBeans(this);
+        this.postBukkitLoadBeans(this, VERBOSE);
     }
 
-    private void postBukkitLoadBeans(Object object) {
+    private void postBukkitLoadBeans(Object object, boolean verbose) {
 
         Class<?> objectClazz = object.getClass();
-        this.getLogger().info("Checking " + objectClazz);
+        if (verbose) this.getLogger().info("Checking " + objectClazz);
         Method[] methods = objectClazz.getDeclaredMethods();
 
         // check methods for bean initializers
@@ -120,7 +116,7 @@ public class OkaeriPlugin extends JavaPlugin {
             }
 
             // register bean
-            this.postBukkitRegisterBean(result, beanName, register, method.getName(), method.getReturnType());
+            this.postBukkitRegisterBean(result, beanName, register, method.getName(), method.getReturnType(), verbose);
         }
 
         // check for @WithBean annotation
@@ -140,21 +136,51 @@ public class OkaeriPlugin extends JavaPlugin {
 
             // register bean
             String debugName = "@WithBean from " + objectClazz;
-            this.postBukkitRegisterBean(instance, "", withBean.register(), debugName, beanClazz);
+            this.postBukkitRegisterBean(instance, "", withBean.register(), debugName, beanClazz, verbose);
         }
     }
 
-    private void postBukkitRegisterBean(Object beanObject, String beanName, boolean register, String debugName, Class<?> beanType) {
+    @SuppressWarnings("unchecked")
+    private void postBukkitRegisterBean(Object beanObject, String beanName, boolean register, String debugName, Class<?> beanType, boolean verbose) {
 
         this.injector.registerInjectable(beanName, beanObject);
-        this.getLogger().info("Created @Bean(" + (beanName.isEmpty() ? "~unnamed~" : beanName) + ", " + register + ") " + debugName + " = " + beanType);
+        if (verbose) this.getLogger().info("Created @Bean(" + (beanName.isEmpty() ? "~unnamed~" : beanName) + ", " + register + ") " + debugName + " = " + beanType);
+
+        // register if config
+        if (register && (beanObject instanceof OkaeriConfig)) {
+
+            Class<? extends OkaeriConfig> beanClazz = (Class<? extends OkaeriConfig>) beanObject.getClass();
+            Configuration configuration = beanClazz.getAnnotation(Configuration.class);
+            if (configuration == null) {
+                throw new IllegalArgumentException("Cannot auto-register OkaeriConfig without @Configuration annotation, use register=false to just register an instance");
+            }
+
+            String path = configuration.path();
+            boolean defaultNotNull = configuration.defaultNotNull();
+
+            try {
+                OkaeriConfig config = ConfigManager.create(beanClazz, (it) -> {
+                    it.withBindFile(new File(this.getDataFolder(), path));
+                    it.withConfigurer(new OkaeriValidator(new YamlBukkitConfigurer(SectionSeparator.NONE), defaultNotNull));
+                    it.saveDefaults();
+                    it.load(true);
+                });
+                this.injector.registerInjectable(config);
+                this.getLogger().info("- Loaded configuration: " + path);
+            }
+            catch (Exception exception) {
+                this.getLogger().log(Level.SEVERE, "Failed to load configuration " + path, exception);
+                this.getServer().getPluginManager().disablePlugin(this);
+                throw new RuntimeException("Configuration load failure");
+            }
+        }
 
         // register if command
         if (register && (beanObject instanceof CommandService)) {
 
             CommandService commandService = (CommandService) beanObject;
             ServiceMeta serviceMeta = ServiceMeta.of(commandService);
-            this.awaitingCommands.add(commandService);
+            this.commands.register(commandService);
 
             String metaString = "";
             if (!serviceMeta.getAliases().isEmpty()) {
@@ -172,14 +198,14 @@ public class OkaeriPlugin extends JavaPlugin {
         if (register && (beanObject instanceof Listener)) {
 
             Listener listener = (Listener) beanObject;
-            this.awaitingListeners.add(listener);
+            this.getServer().getPluginManager().registerEvents(listener, this);
 
             this.getLogger().info("- Added listener");
         }
 
         // register subbeans
         if (register) {
-            this.postBukkitLoadBeans(beanObject);
+            this.postBukkitLoadBeans(beanObject, verbose);
         }
     }
 
