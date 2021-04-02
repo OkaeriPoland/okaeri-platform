@@ -117,7 +117,7 @@ public class TestListener implements Listener {
 public class TestConfig extends OkaeriConfig {
 
   @Size(min = 1, max = 64) // validation using okaeri-validator
-  @Variable("APP_GREETING") // use jvm property environment variable if available
+  @Variable("APP_GREETING") // use jvm property or environment variable if available
   @Comment("Example config value") // built-in comment support
   private String greeting = "Hi!!!!!!!!1111oneone"; // default values
 
