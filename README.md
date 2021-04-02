@@ -99,7 +99,8 @@ public class TestListener implements Listener {
 
 ```java
 // automatically created in the plugin dir
-// updates comments and changes automatically
+// updates comments and changes (new keys) automatically
+// manipulate it as pojo and save with #save()
 //
 // Resulting file:
 // # ================================
