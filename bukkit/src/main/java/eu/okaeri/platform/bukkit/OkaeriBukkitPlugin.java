@@ -162,7 +162,7 @@ public class OkaeriBukkitPlugin extends JavaPlugin {
     private void registerBean(Object beanObject, String beanName, boolean register, boolean scan, String debugName, Class<?> beanType, boolean verbose) {
 
         if (verbose) {
-            String beanInfo = "name=" + beanName + ",register=" + register + ",scan" + scan;
+            String beanInfo = "name=" + beanName + ",register=" + register + ",scan=" + scan;
             this.getLogger().info("Created @Bean(" + beanInfo + ") " + debugName + " = " + beanType);
         }
 
@@ -236,7 +236,8 @@ public class OkaeriBukkitPlugin extends JavaPlugin {
 
     private void registerInjectableAndSelfInject(String beanName, Object beanObject) {
         if (beanObject == null) return;
-        if (VERBOSE) this.getLogger().info("#registerInjectableAndSelfInject (" + (beanName.isEmpty() ? "~unnamed~" : beanName) + ", " + beanObject.getClass() + ")");
+        String beanMeta = (beanName.isEmpty() ? "~unnamed~" : beanName);
+        if (VERBOSE) this.getLogger().info("#registerInjectableAndSelfInject (" + beanMeta + ", " + beanObject.getClass().getSimpleName() + ")");
         this.injector.registerInjectable(beanName, beanObject);
         this.selfInjectBean(beanObject);
     }
