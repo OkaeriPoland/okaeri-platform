@@ -46,12 +46,12 @@ public class ExamplePlugin extends OkaeriPlugin {
 
   @Override // do not use onEnable
   public void onPlatformEnabled() {
-    System.out.println("enabled!");
+    this.getLogger().info("Enabled!");
   }
 
   @Override // do not use onDisable
   public void onPlatformDisabled() {
-    System.out.println("disabled!");
+    this.getLogger().info("Disabled!");
   }
 
   @Bean(value = "testString", scan = false)
