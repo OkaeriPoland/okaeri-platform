@@ -226,8 +226,8 @@ public class BeanManifest {
         while (!this.ready(injector) || (this.fullLoad && !this.fullLoadReady(injector))) {
 
             // emergency break
-            if ((System.currentTimeMillis() - start) > TimeUnit.SECONDS.toMillis(5)) {
-                throw new RuntimeException("#execute() timed out after 5 seconds: \n\n" + this + "\n\n");
+            if ((System.currentTimeMillis() - start) > TimeUnit.SECONDS.toMillis(60)) {
+                throw new RuntimeException("#execute() timed out after 60 seconds: \n\n" + this + "\n\n");
             }
 
             this.update(creator, injector);
