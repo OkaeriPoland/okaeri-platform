@@ -12,12 +12,12 @@ public class ExamplePlugin extends OkaeriPlugin {
 
     @Override
     public void onPlatformEnabled() {
-        System.out.println("enabled!");
+        this.getLogger().info("Enabled!");
     }
 
     @Override
     public void onPlatformDisabled() {
-        System.out.println("disabled!");
+        this.getLogger().info("Disabled!");
     }
 
     @Bean(value = "testString", register = false)
