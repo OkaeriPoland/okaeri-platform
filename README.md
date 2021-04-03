@@ -21,7 +21,7 @@ Currently the only target (less than 200kB total of additional jar size), integr
   - [okaeri-commands-bukkit](https://github.com/OkaeriPoland/okaeri-commands/tree/master/bukkit): annotation based command framework (see [okaeri-commands](https://github.com/OkaeriPoland/okaeri-commands))
   - [okaeri-commands-injector](https://github.com/OkaeriPoland/okaeri-commands/tree/master/injector): okaeri-injector integration for the best ecosystem experience
 - **Messages (i18n)**
-  - *Coming Soon*™: currently it is recommended to create @Configuration(path = "messages.yml")
+  - *Coming Soon*™: currently it is recommended to create `@Configuration(path = "messages.yml")`
 
 ### Example
 
