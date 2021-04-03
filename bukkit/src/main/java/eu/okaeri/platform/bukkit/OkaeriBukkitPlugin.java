@@ -230,6 +230,7 @@ public class OkaeriBukkitPlugin extends JavaPlugin {
     }
 
     private void registerInjectableAndSelfInject(String beanName, Object beanObject) {
+        if (beanObject == null) return;
         if (VERBOSE) this.getLogger().info("#registerInjectableAndSelfInject (" + (beanName.isEmpty() ? "~unnamed~" : beanName) + ", " + beanObject.getClass() + ")");
         this.injector.registerInjectable(beanName, beanObject);
         this.selfInjectBean(beanObject);
@@ -238,6 +239,7 @@ public class OkaeriBukkitPlugin extends JavaPlugin {
     @SneakyThrows
     private void selfInjectBean(Object bean) {
 
+        if (bean == null) return;
         Class<?> beanClazz = bean.getClass();
         Field[] fields = beanClazz.getDeclaredFields();
 
