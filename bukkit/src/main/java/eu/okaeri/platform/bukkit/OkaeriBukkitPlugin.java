@@ -162,9 +162,9 @@ public class OkaeriBukkitPlugin extends JavaPlugin {
         }
 
         // register if config class
-        if (register && (beanObject == OkaeriConfig.class)) {
+        if (register && (beanObject instanceof Class) && (OkaeriConfig.class.isAssignableFrom((Class<?>) beanObject))) {
 
-            Class<? extends OkaeriConfig> beanClazz = (Class<? extends OkaeriConfig>) beanObject.getClass();
+            Class<? extends OkaeriConfig> beanClazz = (Class<? extends OkaeriConfig>) beanObject;
             Configuration configuration = beanClazz.getAnnotation(Configuration.class);
             if (configuration == null) {
                 throw new IllegalArgumentException("Cannot auto-register OkaeriConfig without @Configuration annotation, use register=false to just register an instance");
@@ -255,7 +255,7 @@ public class OkaeriBukkitPlugin extends JavaPlugin {
 
             Injectable<?> injectObject = injectable.get();
             field.setAccessible(true);
-            field.set(bean, injectObject);
+            field.set(bean, injectObject.getObject());
         }
     }
 
