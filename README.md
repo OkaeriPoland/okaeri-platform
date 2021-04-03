@@ -59,6 +59,11 @@ public class ExamplePlugin extends OkaeriPlugin {
     return "plugin -> " + plugin.getName();
   }
 
+  // method bean - remember these are not proxied
+  // if TestCommand calls this method using plugin reference
+  // it would be executed uncached! @Bean annotation on method
+  // is used to instruct the okaeri-platform system to invoke
+  // it then register bean/subbeans components and injectable
   @Bean(value = "exampleComplexBean", scan = false)
   public String configureComplexBean() {
     StringBuilder builder = new StringBuilder();

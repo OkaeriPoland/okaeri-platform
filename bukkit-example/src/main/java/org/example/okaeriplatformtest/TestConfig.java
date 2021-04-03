@@ -7,6 +7,17 @@ import eu.okaeri.validator.annotation.Size;
 import lombok.Getter;
 import lombok.Setter;
 
+// automatically created in the plugin dir
+// updates comments and changes (new keys) automatically
+// manipulate it as pojo and save with #save()
+//
+// Resulting file:
+// # ================================
+// #        Magic Configuration
+// # ================================
+// # Example config value
+// greeting: Hi!!!!!!!!1111oneone
+//
 @Getter
 @Setter
 @Configuration(path = "config.yml")
