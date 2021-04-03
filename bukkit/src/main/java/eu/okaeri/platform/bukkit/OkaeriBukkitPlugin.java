@@ -77,6 +77,7 @@ public class OkaeriBukkitPlugin extends JavaPlugin {
         Class<?> objectClazz = object.getClass();
         if (verbose) this.getLogger().info("Checking " + objectClazz);
         Method[] methods = objectClazz.getDeclaredMethods();
+        if (verbose) this.getLogger().info("Methods: " + Arrays.stream(methods).map(Method::getName).collect(Collectors.joining(", ")));
 
         // check methods for bean initializers
         for (Method method : methods) {
