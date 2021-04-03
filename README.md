@@ -26,17 +26,29 @@ Currently the only target (less than 200kB total of additional jar size), integr
 See [bukkit-example](https://github.com/OkaeriPoland/okaeri-platform/tree/master/bukkit-example) for the repository/dependency and the shading guide.
 
 ```java
+// auto registers beans
+// warning: currently there is no smart detection
+// loading order:
+// - method beans (eg. used for mysql connector)
+// - beans added using WithBean annotation
+// beans are inspected for subbeans by default
+// loading starts from the main class
+// platform automatically registers:
+// - okaeri-commands' CommandService
+// - bukkit's Listener
+// - okaeri-configs configs' (@Configuration required)
+// skip registration/scanning for subbeans using register=false
 @WithBean(TestConfig.class)
 @WithBean(TestCommand.class)
 @WithBean(TestListener.class)
 public class ExamplePlugin extends OkaeriPlugin {
 
-  @Override
+  @Override // do not use onEnable
   public void onPlatformEnabled() {
     System.out.println("enabled!");
   }
 
-  @Override
+  @Override // do not use onDisable
   public void onPlatformDisabled() {
     System.out.println("disabled!");
   }
