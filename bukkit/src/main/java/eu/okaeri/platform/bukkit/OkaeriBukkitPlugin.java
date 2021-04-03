@@ -18,6 +18,7 @@ import eu.okaeri.injector.annotation.Inject;
 import eu.okaeri.platform.core.annotation.Bean;
 import eu.okaeri.platform.core.annotation.Configuration;
 import eu.okaeri.platform.core.annotation.WithBean;
+import eu.okaeri.platform.core.exception.BreakException;
 import lombok.Getter;
 import lombok.SneakyThrows;
 import org.bukkit.event.Listener;
@@ -64,7 +65,11 @@ public class OkaeriBukkitPlugin extends JavaPlugin {
         this.commands = CommandsManager.create(CommandsInjector.of(CommandsBukkit.of(this), this.injector));
 
         // load commands/other beans
-        this.loadBeans(this, VERBOSE);
+        try {
+            this.loadBeans(this, VERBOSE);
+        } catch (BreakException exception) {
+            this.getLogger().log(Level.SEVERE, "Stopping initialization, received break signal: " + exception.getMessage());
+        }
     }
 
     private void loadBeans(Object object, boolean verbose) {
@@ -113,6 +118,9 @@ public class OkaeriBukkitPlugin extends JavaPlugin {
                 result = method.invoke(object, call);
             } catch (Exception exception) {
                 if (exception instanceof InvocationTargetException) {
+                    if (exception.getCause() instanceof BreakException) {
+                        throw (BreakException) exception.getCause();
+                    }
                     throw new RuntimeException("Error creating @Bean " + this.renderMethod(method), exception.getCause());
                 }
                 throw new RuntimeException("Error creating @Bean " + this.renderMethod(method), exception);
@@ -142,7 +150,7 @@ public class OkaeriBukkitPlugin extends JavaPlugin {
                     ? beanClazz : this.injector.createInstance(beanClazz);
 
             // register bean
-            String debugName = "@WithBean from " + objectClazz;
+            String debugName = "@WithBean from " + objectClazz.getSimpleName();
             this.registerBean(beanObject, "", withBean.register(), withBean.scan(), debugName, beanClazz, verbose);
 
             // self inject
@@ -154,7 +162,8 @@ public class OkaeriBukkitPlugin extends JavaPlugin {
     private void registerBean(Object beanObject, String beanName, boolean register, boolean scan, String debugName, Class<?> beanType, boolean verbose) {
 
         if (verbose) {
-            this.getLogger().info("Created @Bean(" + (beanName.isEmpty() ? "~unnamed~" : beanName) + ", " + register + ") " + debugName + " = " + beanType);
+            String beanInfo = "name=" + beanName + ",register=" + register + ",scan" + scan;
+            this.getLogger().info("Created @Bean(" + beanInfo + ") " + debugName + " = " + beanType);
         }
 
         // register if config class
