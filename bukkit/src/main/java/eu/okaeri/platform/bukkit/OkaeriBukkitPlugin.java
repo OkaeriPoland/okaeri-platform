@@ -17,6 +17,7 @@ import eu.okaeri.injector.OkaeriInjector;
 import eu.okaeri.injector.annotation.Inject;
 import eu.okaeri.platform.core.annotation.Bean;
 import eu.okaeri.platform.core.annotation.Configuration;
+import eu.okaeri.platform.core.annotation.Order;
 import eu.okaeri.platform.core.annotation.WithBean;
 import eu.okaeri.platform.core.exception.BreakException;
 import lombok.Getter;
@@ -29,10 +30,7 @@ import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.logging.Level;
 import java.util.stream.Collectors;
 
@@ -76,8 +74,19 @@ public class OkaeriBukkitPlugin extends JavaPlugin {
 
         Class<?> objectClazz = object.getClass();
         if (verbose) this.getLogger().info("Checking " + objectClazz);
-        Method[] methods = objectClazz.getDeclaredMethods();
-        if (verbose) this.getLogger().info("Methods: " + Arrays.stream(methods).map(Method::getName).collect(Collectors.joining(", ")));
+
+        List<Method> methods = Arrays.stream(objectClazz.getDeclaredMethods())
+                .sorted(Comparator.comparing(method -> {
+                    Order order = method.getAnnotation(Order.class);
+                    return (order == null) ? -1 : order.value();
+                }))
+                .collect(Collectors.toList());
+
+        if (verbose) {
+            this.getLogger().info("Methods: " + methods.stream()
+                    .map(Method::getName)
+                    .collect(Collectors.joining(", ")));
+        }
 
         // check methods for bean initializers
         for (Method method : methods) {
