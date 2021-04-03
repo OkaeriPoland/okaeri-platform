@@ -26,7 +26,7 @@ public class BeanManifest {
         BeanManifest manifest = new BeanManifest();
         manifest.type = parameter.getType();
         manifest.name = name;
-        manifest.depends = Collections.emptyList(); // hmm
+        manifest.depends = Collections.emptyList();
         manifest.source = BeanSource.INJECT;
 
         return manifest;
@@ -40,13 +40,13 @@ public class BeanManifest {
         BeanManifest manifest = new BeanManifest();
         manifest.name = name;
         manifest.type = field.getType();
-        manifest.depends = Collections.emptyList(); // hmm
+        manifest.depends = Collections.emptyList();
         manifest.source = BeanSource.INJECT;
 
         return manifest;
     }
 
-    public static BeanManifest of(Class<?> clazz, ComponentCreator creator) {
+    public static BeanManifest of(Class<?> clazz, ComponentCreator creator, boolean fullLoad) {
 
         if (!creator.isComponent(clazz)) {
             throw new IllegalArgumentException("Cannot create manifest of non-component " + clazz);
@@ -56,6 +56,7 @@ public class BeanManifest {
         manifest.type = clazz;
         manifest.name = "";
         manifest.source = BeanSource.COMPONENT;
+        manifest.fullLoad = fullLoad;
 
         List<BeanManifest> depends = new ArrayList<>();
         manifest.depends = depends;
@@ -105,7 +106,7 @@ public class BeanManifest {
 
     public static BeanManifest of(Register register, ComponentCreator creator) {
 
-        BeanManifest manifest = of(register.value(), creator);
+        BeanManifest manifest = of(register.value(), creator, false);
         manifest.register = register.register();
 
         return manifest;
@@ -118,7 +119,9 @@ public class BeanManifest {
     private Object parent;
     private Method method;
     private boolean register = true;
+    private boolean fullLoad = false;
     private List<BeanManifest> depends;
+    private Map<Class<?>, Integer> failCounter = new HashMap<>();
 
     public BeanManifest update(ComponentCreator creator, Injector injector) {
 
@@ -126,11 +129,9 @@ public class BeanManifest {
             Optional<? extends Injectable<?>> injectable = injector.getInjectable(this.name, this.type);
             if (injectable.isPresent()) {
                 this.object = injectable.get().getObject();
-//                System.out.println("updating to " + this.object + " by " + this.name + " and " + this.type);
             }
             else if (this.ready(injector) && creator.isComponent(this.type) && (this.source != BeanSource.INJECT)) {
                 this.object = creator.makeObject(this, injector);
-//                System.out.println("registering " + this.object + " " + this.source + " " + this.depends);
                 injector.registerInjectable(this.name, this.object);
             }
         }
@@ -174,16 +175,45 @@ public class BeanManifest {
     private boolean ready(Injector injector) {
 
         for (BeanManifest depend : this.depends) {
+
             if ((depend.getObject() == null) && (depend.getSource() == BeanSource.INJECT)) {
+
                 Optional<? extends Injectable<?>> injectable = injector.getInjectable(depend.getName(), depend.getType());
+
                 if (!injectable.isPresent()) {
-//                    System.out.println(depend.getName() + " of " + depend.getType() + " not present");
+
+                    Class<?> dependClass = depend.getType();
+                    int newValue = this.failCounter.getOrDefault(dependClass, 0) + 1;
+                    this.failCounter.put(dependClass, newValue);
+
+                    if (newValue > 100) {
+                        throw new RuntimeException("Failed to resolve component/bean " + dependClass + " (" + depend.getName() + "=" + depend.getSource() + ")");
+                    }
+
                     return false;
                 }
+
                 Object injectObject = injectable.get().getObject();
                 depend.setObject(injectObject);
-//                System.out.println("present -> " + injectObject);
             }
+        }
+
+        return true;
+    }
+
+    private boolean fullLoadReady(Injector injector) {
+
+        for (BeanManifest depend : this.depends) {
+
+            if (depend.getSource() != BeanSource.COMPONENT) {
+                continue;
+            }
+
+            if (depend.getObject() != null) {
+                continue;
+            }
+
+            return false;
         }
 
         return true;
@@ -193,21 +223,11 @@ public class BeanManifest {
 
         long start = System.currentTimeMillis();
 
-        while (!this.ready(injector)) {
+        while (!this.ready(injector) || (this.fullLoad && !this.fullLoadReady(injector))) {
 
-            if ((System.currentTimeMillis() - start) > TimeUnit.SECONDS.toMillis(10)) {
-
-                String data = "";
-                for (BeanManifest bean : this.depends) {
-                    String missing = bean.getDepends().stream()
-                            .filter(depend -> depend.getObject() == null)
-                            .map(depend -> depend.getSource() + "(" + depend.getName() + "=" + depend.getType().getSimpleName() + ")")
-                            .collect(Collectors.joining(", "));
-                    data = bean.getSource() + " [" + bean.getName() + "=" + bean.getType().getSimpleName() + "] = "
-                            + bean.getObject() + " [" + missing + "] ready=" + bean.ready(injector);
-                }
-
-                throw new RuntimeException("#execute() timed out after 10 seconds: \n\n" + data + "\n\n" + this + "\n\n");
+            // emergency break
+            if ((System.currentTimeMillis() - start) > TimeUnit.SECONDS.toMillis(5)) {
+                throw new RuntimeException("#execute() timed out after 5 seconds: \n\n" + this + "\n\n");
             }
 
             this.update(creator, injector);
