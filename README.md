@@ -32,7 +32,7 @@ See [bukkit-example](https://github.com/OkaeriPoland/okaeri-platform/tree/master
 // warning: currently there is no smart detection
 // loading order:
 // - method beans (eg. used for mysql connector)
-// - beans added using WithBean annotation
+// - beans added using Register annotation
 // beans are inspected for subbeans by default
 // loading starts from the main class
 // field injects are updated every time method bean is created
@@ -41,10 +41,9 @@ See [bukkit-example](https://github.com/OkaeriPoland/okaeri-platform/tree/master
 // - bukkit's Listener
 // - okaeri-configs configs' (@Configuration required)
 // skip registration using register=false
-// skip scanning for subbeans using scan=false
-@WithBean(TestConfig.class)
-@WithBean(TestCommand.class)
-@WithBean(TestListener.class)
+@Register(TestConfig.class)
+@Register(TestCommand.class)
+@Register(TestListener.class)
 public class ExamplePlugin extends OkaeriBukkitPlugin {
 
   @Override // do not use onEnable (especially without calling super)
@@ -57,7 +56,7 @@ public class ExamplePlugin extends OkaeriBukkitPlugin {
     this.getLogger().info("Disabled!");
   }
 
-  @Bean(value = "testString", scan = false)
+  @Bean(value = "testString")
   public String configureTestString(JavaPlugin plugin) {
     return "plugin -> " + plugin.getName();
   }
@@ -67,7 +66,7 @@ public class ExamplePlugin extends OkaeriBukkitPlugin {
   // it would be executed uncached! @Bean annotation on method
   // is used to instruct the okaeri-platform system to invoke
   // it then register bean/subbeans components and injectable
-  @Bean(value = "exampleComplexBean", scan = false)
+  @Bean(value = "exampleComplexBean")
   public String configureComplexBean() {
     StringBuilder builder = new StringBuilder();
     for (int i = 0; i < 10; i++) {
@@ -104,7 +103,7 @@ public class TestCommand implements CommandService {
     return RawResponse.of(this.config.getGreeting(), diExample.getName(), namedDiExample);
   }
 
-  @Bean(value = "subbean", scan = false)
+  @Bean(value = "subbean")
   public String configureExampleSubbean() {
     return "BEAN FROM " + this.getClass() + "!!";
   }
