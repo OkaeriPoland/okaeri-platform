@@ -101,11 +101,7 @@ public class OkaeriBukkitPlugin extends JavaPlugin {
 
                 Optional<? extends Injectable<?>> injectable = this.injector.getInjectable(name, paramType);
                 if (!injectable.isPresent()) {
-                    String beanDefinition = method.getReturnType().getSimpleName() + "->" + method.getName()
-                            + "(" + Arrays.stream(method.getParameters())
-                            .map(parameter -> parameter.getType().getSimpleName())
-                            .collect(Collectors.joining(", ")) + ")";
-                    throw new RuntimeException("Cannot create @Bean " + beanDefinition + ", no injectable of type " + paramType + " [" + name + "] found");
+                    throw new RuntimeException("Cannot create @Bean " + this.renderMethod(method) + ", no injectable of type " + paramType + " [" + name + "] found");
                 }
 
                 call[i] = paramType.cast(injectable.get().getObject());
@@ -117,9 +113,9 @@ public class OkaeriBukkitPlugin extends JavaPlugin {
                 result = method.invoke(object, call);
             } catch (Exception exception) {
                 if (exception instanceof InvocationTargetException) {
-                    throw new RuntimeException("Error creating @Bean " + method, exception.getCause());
+                    throw new RuntimeException("Error creating @Bean " + this.renderMethod(method), exception.getCause());
                 }
-                throw new RuntimeException("Error creating @Bean " + method, exception);
+                throw new RuntimeException("Error creating @Bean " + this.renderMethod(method), exception);
             }
 
             // register bean
@@ -259,6 +255,13 @@ public class OkaeriBukkitPlugin extends JavaPlugin {
             field.setAccessible(true);
             field.set(bean, injectObject.getObject());
         }
+    }
+
+    private String renderMethod(Method method) {
+        return  method.getReturnType().getSimpleName() + "->" + method.getName()
+                + "(" + Arrays.stream(method.getParameters())
+                .map(parameter -> parameter.getType().getSimpleName())
+                .collect(Collectors.joining(", ")) + ")";
     }
 
     public void onPlatformEnabled() {
