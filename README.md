@@ -99,8 +99,8 @@ public class TestCommand implements CommandService {
 
   // testcmd|testing greet|greeting
   @Executor(pattern = {"greet", "greeting"}, description = "greets you :O")
-  public BukkitResponse greet() {
-    return RawResponse.of(this.config.getGreeting());
+  public BukkitResponse greet(ExamplePlugin diExample, @Inject("testString") String namedDiExample) {
+    return RawResponse.of(this.config.getGreeting(), diExample.getName(), namedDiExample);
   }
 
   @Bean(value = "subbean", scan = false)
