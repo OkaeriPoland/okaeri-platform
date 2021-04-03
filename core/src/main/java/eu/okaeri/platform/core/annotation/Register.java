@@ -4,16 +4,15 @@ import java.lang.annotation.*;
 
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
-@Repeatable(WithBean.List.class)
-public @interface WithBean {
+@Repeatable(Register.List.class)
+public @interface Register {
 
     Class<?> value();
     boolean register() default true;
-    boolean scan() default true;
 
     @Target(ElementType.TYPE)
     @Retention(RetentionPolicy.RUNTIME)
     @interface List {
-        WithBean[] value();
+        Register[] value();
     }
 }

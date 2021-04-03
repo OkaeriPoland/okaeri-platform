@@ -1,10 +1,12 @@
 package org.example.okaeriplatformtest;
 
 import eu.okaeri.injector.annotation.Inject;
+import eu.okaeri.platform.core.annotation.Component;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
 
+@Component
 public class TestListener implements Listener {
 
     @Inject private ExamplePlugin plugin;

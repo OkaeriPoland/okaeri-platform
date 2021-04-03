@@ -1,15 +1,16 @@
 package org.example.okaeriplatformtest;
 
+import eu.okaeri.injector.annotation.Inject;
 import eu.okaeri.platform.bukkit.OkaeriBukkitPlugin;
 import eu.okaeri.platform.core.annotation.Bean;
-import eu.okaeri.platform.core.annotation.WithBean;
+import eu.okaeri.platform.core.annotation.Register;
 import org.bukkit.plugin.java.JavaPlugin;
 
 // auto registers beans
 // warning: currently there is no smart detection
 // loading order:
 // - method beans (eg. used for mysql connector)
-// - beans added using WithBean annotation
+// - beans added using With annotation
 // beans are inspected for subbeans by default
 // loading starts from the main class
 // platform automatically registers:
@@ -17,11 +18,13 @@ import org.bukkit.plugin.java.JavaPlugin;
 // - bukkit's Listener
 // - okaeri-configs configs' (@Configuration required)
 // skip registration using register=false
-// skip scanning for subbeans using scan=false
-@WithBean(TestConfig.class)
-@WithBean(TestCommand.class)
-@WithBean(TestListener.class)
+@Register(TestConfig.class)
+@Register(TestCommand.class)
+@Register(TestListener.class)
 public class ExamplePlugin extends OkaeriBukkitPlugin {
+
+    @Inject("subbean")
+    private String subbeanStr;
 
     @Override // do not use onEnable (especially without calling super)
     public void onPlatformEnabled() {
@@ -34,7 +37,7 @@ public class ExamplePlugin extends OkaeriBukkitPlugin {
     }
 
     // method beans can use DI
-    @Bean(value = "testString", scan = false)
+    @Bean(value = "testString")
     public String configureTestString(JavaPlugin plugin) {
         return "plugin -> " + plugin.getName();
     }
@@ -44,11 +47,11 @@ public class ExamplePlugin extends OkaeriBukkitPlugin {
     // it would be executed uncached! @Bean annotation on method
     // is used to instruct the okaeri-platform system to invoke
     // it then register bean/subbeans components and injectable
-    @Bean(value = "exampleComplexBean", scan = false)
+    @Bean(value = "exampleComplexBean")
     public String configureComplexBean() {
         StringBuilder builder = new StringBuilder();
         for (int i = 0; i < 10; i++) {
-            builder.append(i).append(". hi").append("\n");
+            builder.append(i).append(". hi").append("-");
         }
         return builder.toString();
     }
