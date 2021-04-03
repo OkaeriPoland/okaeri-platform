@@ -6,6 +6,7 @@ import eu.okaeri.commands.bukkit.CommandsBukkit;
 import eu.okaeri.commands.injector.CommandsInjector;
 import eu.okaeri.injector.Injector;
 import eu.okaeri.injector.OkaeriInjector;
+import eu.okaeri.platform.core.component.ComponentHelper;
 import eu.okaeri.platform.core.component.manifest.BeanManifest;
 import eu.okaeri.platform.core.exception.BreakException;
 import lombok.Getter;
@@ -43,10 +44,20 @@ public class OkaeriBukkitPlugin extends JavaPlugin {
 
         // load commands/other beans
         try {
-            BeanManifest.of(this.getClass(), creator).execute(creator, this.injector);
-        } catch (BreakException exception) {
+            // scan starting from the current class
+            BeanManifest.of(this.getClass(), creator, true).execute(creator, this.injector);
+            // sub-components do not require manual injecting because
+            // these are filled at the initialization by the DI itself
+            // plugin instance however is not, so here it goes
+            ComponentHelper.injectComponentFields(this, this.injector);
+        }
+        // handle break signal
+        catch (BreakException exception) {
             this.getLogger().log(Level.SEVERE, "Stopping initialization, received break signal: " + exception.getMessage());
         }
+
+        // woah
+        this.getLogger().info("Done loading!");
     }
 
     public void onPlatformEnabled() {
