@@ -86,6 +86,7 @@ public class OkaeriPlugin extends JavaPlugin {
             // read bean name and method params
             String beanName = bean.value();
             boolean register = bean.register();
+            boolean scan = bean.scan();
             Parameter[] parameters = method.getParameters();
 
             // check for injectable parameters
@@ -116,7 +117,7 @@ public class OkaeriPlugin extends JavaPlugin {
             }
 
             // register bean
-            this.postBukkitRegisterBean(result, beanName, register, method.getName(), method.getReturnType(), verbose);
+            this.postBukkitRegisterBean(result, beanName, register, scan, method.getName(), method.getReturnType(), verbose);
         }
 
         // check for @WithBean annotation
@@ -136,12 +137,12 @@ public class OkaeriPlugin extends JavaPlugin {
 
             // register bean
             String debugName = "@WithBean from " + objectClazz;
-            this.postBukkitRegisterBean(instance, "", withBean.register(), debugName, beanClazz, verbose);
+            this.postBukkitRegisterBean(instance, "", withBean.register(), withBean.scan(), debugName, beanClazz, verbose);
         }
     }
 
     @SuppressWarnings("unchecked")
-    private void postBukkitRegisterBean(Object beanObject, String beanName, boolean register, String debugName, Class<?> beanType, boolean verbose) {
+    private void postBukkitRegisterBean(Object beanObject, String beanName, boolean register, boolean scan, String debugName, Class<?> beanType, boolean verbose) {
 
         this.injector.registerInjectable(beanName, beanObject);
         if (verbose) this.getLogger().info("Created @Bean(" + (beanName.isEmpty() ? "~unnamed~" : beanName) + ", " + register + ") " + debugName + " = " + beanType);
@@ -203,8 +204,8 @@ public class OkaeriPlugin extends JavaPlugin {
             this.getLogger().info("- Added listener");
         }
 
-        // register subbeans
-        if (register) {
+        // scan subbeans
+        if (scan) {
             this.postBukkitLoadBeans(beanObject, verbose);
         }
     }

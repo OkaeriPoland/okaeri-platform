@@ -25,7 +25,7 @@ public class ExamplePlugin extends OkaeriPlugin {
         return "plugin -> " + plugin.getName();
     }
 
-    @Bean("exampleComplexBean")
+    @Bean(value = "exampleComplexBean", scan = false)
     public String configureComplexBean() {
         StringBuilder builder = new StringBuilder();
         for (int i = 0; i < 10; i++) {

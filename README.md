@@ -37,7 +37,8 @@ See [bukkit-example](https://github.com/OkaeriPoland/okaeri-platform/tree/master
 // - okaeri-commands' CommandService
 // - bukkit's Listener
 // - okaeri-configs configs' (@Configuration required)
-// skip registration/scanning for subbeans using register=false
+// skip registration using register=false
+// skip scanning for subbeans using scan=false
 @WithBean(TestConfig.class)
 @WithBean(TestCommand.class)
 @WithBean(TestListener.class)
@@ -53,12 +54,12 @@ public class ExamplePlugin extends OkaeriPlugin {
     System.out.println("disabled!");
   }
 
-  @Bean(value = "testString", register = false)
+  @Bean(value = "testString", scan = false)
   public String configureTestString(JavaPlugin plugin) {
     return "plugin -> " + plugin.getName();
   }
 
-  @Bean("exampleComplexBean")
+  @Bean(value = "exampleComplexBean", scan = false)
   public String configureComplexBean() {
     StringBuilder builder = new StringBuilder();
     for (int i = 0; i < 10; i++) {
@@ -95,7 +96,7 @@ public class TestCommand implements CommandService {
     return RawResponse.of(this.config.getGreeting());
   }
 
-  @Bean(value = "subbean", register = false)
+  @Bean(value = "subbean", scan = false)
   public String configureExampleSubbean() {
     return "BEAN FROM " + this.getClass() + "!!";
   }

@@ -9,6 +9,7 @@ public @interface WithBean {
 
     Class<?> value();
     boolean register() default true;
+    boolean scan() default true;
 
     @Target(ElementType.TYPE)
     @Retention(RetentionPolicy.RUNTIME)
