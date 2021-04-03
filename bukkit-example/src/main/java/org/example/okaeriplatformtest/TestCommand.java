@@ -8,7 +8,7 @@ import eu.okaeri.commands.bukkit.response.RawResponse;
 import eu.okaeri.commands.bukkit.response.SuccessResponse;
 import eu.okaeri.commands.service.CommandService;
 import eu.okaeri.injector.annotation.Inject;
-import eu.okaeri.platform.bukkit.annotation.Bean;
+import eu.okaeri.platform.core.annotation.Bean;
 
 @ServiceDescriptor(label = "testcmd", aliases = "testing")
 public class TestCommand implements CommandService {
