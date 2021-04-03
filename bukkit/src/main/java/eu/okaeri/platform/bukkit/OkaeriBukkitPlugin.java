@@ -15,9 +15,9 @@ import eu.okaeri.injector.Injectable;
 import eu.okaeri.injector.Injector;
 import eu.okaeri.injector.OkaeriInjector;
 import eu.okaeri.injector.annotation.Inject;
-import eu.okaeri.platform.bukkit.annotation.Bean;
-import eu.okaeri.platform.bukkit.annotation.Configuration;
-import eu.okaeri.platform.bukkit.annotation.WithBean;
+import eu.okaeri.platform.core.annotation.Bean;
+import eu.okaeri.platform.core.annotation.Configuration;
+import eu.okaeri.platform.core.annotation.WithBean;
 import lombok.Getter;
 import lombok.SneakyThrows;
 import org.bukkit.event.Listener;
@@ -34,7 +34,7 @@ import java.util.Optional;
 import java.util.logging.Level;
 
 
-public class OkaeriPlugin extends JavaPlugin {
+public class OkaeriBukkitPlugin extends JavaPlugin {
 
     private static final boolean VERBOSE = Boolean.getBoolean("okaeri.debug");
 

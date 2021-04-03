@@ -1,4 +1,4 @@
-package eu.okaeri.platform.bukkit.annotation;
+package eu.okaeri.platform.core.annotation;
 
 import java.lang.annotation.*;
 

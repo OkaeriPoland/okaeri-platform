@@ -44,7 +44,7 @@ See [bukkit-example](https://github.com/OkaeriPoland/okaeri-platform/tree/master
 @WithBean(TestConfig.class)
 @WithBean(TestCommand.class)
 @WithBean(TestListener.class)
-public class ExamplePlugin extends OkaeriPlugin {
+public class ExamplePlugin extends OkaeriBukkitPlugin {
 
   @Override // do not use onEnable (especially without calling super)
   public void onPlatformEnabled() {

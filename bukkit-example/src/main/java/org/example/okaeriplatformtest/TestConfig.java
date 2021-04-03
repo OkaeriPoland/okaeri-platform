@@ -2,7 +2,7 @@ package org.example.okaeriplatformtest;
 
 import eu.okaeri.configs.OkaeriConfig;
 import eu.okaeri.configs.annotation.*;
-import eu.okaeri.platform.bukkit.annotation.Configuration;
+import eu.okaeri.platform.core.annotation.Configuration;
 import eu.okaeri.validator.annotation.Size;
 import lombok.Getter;
 import lombok.Setter;
