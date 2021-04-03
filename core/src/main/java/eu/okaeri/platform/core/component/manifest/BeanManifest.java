@@ -24,10 +24,10 @@ public class BeanManifest {
         String name = (inject == null) ? "" : inject.value();
 
         BeanManifest manifest = new BeanManifest();
-        manifest.type = parameter.getType();
-        manifest.name = name;
-        manifest.depends = Collections.emptyList();
-        manifest.source = BeanSource.INJECT;
+        manifest.setType(parameter.getType());
+        manifest.setName(name);
+        manifest.setDepends(Collections.emptyList());
+        manifest.setSource(BeanSource.INJECT);
 
         return manifest;
     }
@@ -38,10 +38,10 @@ public class BeanManifest {
         String name = (inject == null) ? "" : inject.value();
 
         BeanManifest manifest = new BeanManifest();
-        manifest.name = name;
-        manifest.type = field.getType();
-        manifest.depends = Collections.emptyList();
-        manifest.source = BeanSource.INJECT;
+        manifest.setName(name);
+        manifest.setType(field.getType());
+        manifest.setDepends(Collections.emptyList());
+        manifest.setSource(BeanSource.INJECT);
 
         return manifest;
     }
@@ -53,13 +53,13 @@ public class BeanManifest {
         }
 
         BeanManifest manifest = new BeanManifest();
-        manifest.type = clazz;
-        manifest.name = "";
-        manifest.source = BeanSource.COMPONENT;
-        manifest.fullLoad = fullLoad;
+        manifest.setType(clazz);
+        manifest.setName("");
+        manifest.setSource(BeanSource.COMPONENT);
+        manifest.setFullLoad(fullLoad);
 
         List<BeanManifest> depends = new ArrayList<>();
-        manifest.depends = depends;
+        manifest.setDepends(depends);
 
         depends.addAll(Arrays.stream(clazz.getDeclaredFields())
                 .filter(field -> field.getAnnotation(Inject.class) != null)
@@ -92,14 +92,14 @@ public class BeanManifest {
         }
 
         BeanManifest manifest = new BeanManifest();
-        manifest.type = method.getReturnType();
-        manifest.name = annotation.value();
-        manifest.depends = Arrays.stream(method.getParameters())
+        manifest.setType(method.getReturnType());
+        manifest.setName(annotation.value());
+        manifest.setDepends(Arrays.stream(method.getParameters())
                 .map(BeanManifest::of)
-                .collect(Collectors.toList());
-        manifest.source = BeanSource.METHOD;
-        manifest.method = method;
-        manifest.register = annotation.register();
+                .collect(Collectors.toList()));
+        manifest.setSource(BeanSource.METHOD);
+        manifest.setMethod(method);
+        manifest.setRegister(annotation.register());
 
         return manifest;
     }
@@ -107,10 +107,11 @@ public class BeanManifest {
     public static BeanManifest of(Register register, ComponentCreator creator) {
 
         BeanManifest manifest = of(register.value(), creator, false);
-        manifest.register = register.register();
+        manifest.setRegister(register.register());
 
         return manifest;
     }
+
 
     private String name;
     private Object object;
@@ -153,9 +154,9 @@ public class BeanManifest {
             if ((this.object == null) || !depend.ready(injector) || (depend.getSource() != BeanSource.METHOD)) {
                 continue;
             }
-            depend.parent = this.object;
-            depend.object = creator.makeObject(depend, injector);
-            injector.registerInjectable(depend.name, depend.object);
+            depend.setParent(this.object);
+            depend.setObject(creator.makeObject(depend, injector));
+            injector.registerInjectable(depend.getName(), depend.getObject());
         }
     }
 
@@ -164,7 +165,7 @@ public class BeanManifest {
             if (depend.getSource() != BeanSource.INJECT) {
                 continue;
             }
-            Optional<? extends Injectable<?>> injectable = injector.getInjectable(depend.name, depend.type);
+            Optional<? extends Injectable<?>> injectable = injector.getInjectable(depend.getName(), depend.getType());
             if (!injectable.isPresent()) {
                 continue;
             }
