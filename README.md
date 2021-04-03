@@ -35,6 +35,7 @@ See [bukkit-example](https://github.com/OkaeriPoland/okaeri-platform/tree/master
 // - beans added using WithBean annotation
 // beans are inspected for subbeans by default
 // loading starts from the main class
+// field injects are updated every time method bean is created
 // platform automatically registers:
 // - okaeri-commands' CommandService
 // - bukkit's Listener
