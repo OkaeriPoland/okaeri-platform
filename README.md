@@ -106,6 +106,7 @@ public class TestCommand implements CommandService {
 ```
 
 ```java
+@Component
 public class TestListener implements Listener {
 
   @Inject private ExamplePlugin plugin;
