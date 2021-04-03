@@ -10,4 +10,5 @@ import java.lang.annotation.Target;
 public @interface Bean {
     String value() default "";
     boolean register() default true;
+    boolean scan() default true;
 }
