@@ -33,6 +33,7 @@ public class ExamplePlugin extends OkaeriPlugin {
         this.getLogger().info("Disabled!");
     }
 
+    // method beans can use DI
     @Bean(value = "testString", scan = false)
     public String configureTestString(JavaPlugin plugin) {
         return "plugin -> " + plugin.getName();
