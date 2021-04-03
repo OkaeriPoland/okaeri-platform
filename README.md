@@ -44,12 +44,12 @@ See [bukkit-example](https://github.com/OkaeriPoland/okaeri-platform/tree/master
 @WithBean(TestListener.class)
 public class ExamplePlugin extends OkaeriPlugin {
 
-  @Override // do not use onEnable
+  @Override // do not use onEnable (especially without calling super)
   public void onPlatformEnabled() {
     this.getLogger().info("Enabled!");
   }
 
-  @Override // do not use onDisable
+  @Override // do not use onDisable (especially without calling super)
   public void onPlatformDisabled() {
     this.getLogger().info("Disabled!");
   }
