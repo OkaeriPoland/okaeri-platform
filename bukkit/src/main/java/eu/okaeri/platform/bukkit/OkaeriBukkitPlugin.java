@@ -24,6 +24,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.io.File;
+import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
@@ -32,6 +33,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.logging.Level;
+import java.util.stream.Collectors;
 
 
 public class OkaeriBukkitPlugin extends JavaPlugin {
@@ -62,10 +64,10 @@ public class OkaeriBukkitPlugin extends JavaPlugin {
         this.commands = CommandsManager.create(CommandsInjector.of(CommandsBukkit.of(this), this.injector));
 
         // load commands/other beans
-        this.postBukkitLoadBeans(this, VERBOSE);
+        this.loadBeans(this, VERBOSE);
     }
 
-    private void postBukkitLoadBeans(Object object, boolean verbose) {
+    private void loadBeans(Object object, boolean verbose) {
 
         Class<?> objectClazz = object.getClass();
         if (verbose) this.getLogger().info("Checking " + objectClazz);
@@ -99,7 +101,11 @@ public class OkaeriBukkitPlugin extends JavaPlugin {
 
                 Optional<? extends Injectable<?>> injectable = this.injector.getInjectable(name, paramType);
                 if (!injectable.isPresent()) {
-                    throw new RuntimeException("Cannot create @Bean " + method + ", no injectable of type " + paramType + " [" + name + "] found");
+                    String beanDefinition = method.getReturnType().getSimpleName() + "->" + method.getName()
+                            + "(" + Arrays.stream(method.getParameters())
+                            .map(parameter -> parameter.getType().getSimpleName())
+                            .collect(Collectors.joining(", ")) + ")";
+                    throw new RuntimeException("Cannot create @Bean " + beanDefinition + ", no injectable of type " + paramType + " [" + name + "] found");
                 }
 
                 call[i] = paramType.cast(injectable.get().getObject());
@@ -117,7 +123,10 @@ public class OkaeriBukkitPlugin extends JavaPlugin {
             }
 
             // register bean
-            this.postBukkitRegisterBean(result, beanName, register, scan, method.getName(), method.getReturnType(), verbose);
+            this.registerBean(result, beanName, register, scan, method.getName(), method.getReturnType(), verbose);
+
+            // self inject
+            this.selfInjectBean(object);
         }
 
         // check for @WithBean annotation
@@ -131,24 +140,29 @@ public class OkaeriBukkitPlugin extends JavaPlugin {
         // register all beans
         for (WithBean withBean : withBeanList) {
 
-            // create instance using DI provider
+            // create instance using DI provider or pass class if config
             Class<?> beanClazz = withBean.value();
-            Object instance = this.injector.createInstance(beanClazz);
+            Object beanObject = OkaeriConfig.class.isAssignableFrom(beanClazz)
+                    ? beanClazz : this.injector.createInstance(beanClazz);
 
             // register bean
             String debugName = "@WithBean from " + objectClazz;
-            this.postBukkitRegisterBean(instance, "", withBean.register(), withBean.scan(), debugName, beanClazz, verbose);
+            this.registerBean(beanObject, "", withBean.register(), withBean.scan(), debugName, beanClazz, verbose);
+
+            // self inject
+            this.selfInjectBean(object);
         }
     }
 
     @SuppressWarnings("unchecked")
-    private void postBukkitRegisterBean(Object beanObject, String beanName, boolean register, boolean scan, String debugName, Class<?> beanType, boolean verbose) {
+    private void registerBean(Object beanObject, String beanName, boolean register, boolean scan, String debugName, Class<?> beanType, boolean verbose) {
 
-        this.injector.registerInjectable(beanName, beanObject);
-        if (verbose) this.getLogger().info("Created @Bean(" + (beanName.isEmpty() ? "~unnamed~" : beanName) + ", " + register + ") " + debugName + " = " + beanType);
+        if (verbose) {
+            this.getLogger().info("Created @Bean(" + (beanName.isEmpty() ? "~unnamed~" : beanName) + ", " + register + ") " + debugName + " = " + beanType);
+        }
 
-        // register if config
-        if (register && (beanObject instanceof OkaeriConfig)) {
+        // register if config class
+        if (register && (beanObject == OkaeriConfig.class)) {
 
             Class<? extends OkaeriConfig> beanClazz = (Class<? extends OkaeriConfig>) beanObject.getClass();
             Configuration configuration = beanClazz.getAnnotation(Configuration.class);
@@ -166,7 +180,7 @@ public class OkaeriBukkitPlugin extends JavaPlugin {
                     it.saveDefaults();
                     it.load(true);
                 });
-                this.injector.registerInjectable(config);
+                beanObject = beanClazz.cast(config);
                 this.getLogger().info("- Loaded configuration: " + path);
             }
             catch (Exception exception) {
@@ -192,6 +206,7 @@ public class OkaeriBukkitPlugin extends JavaPlugin {
                 metaString += " [description: " + serviceMeta.getDescription() + "]";
             }
 
+            beanObject = commandService;
             this.getLogger().info("- Added command: " + serviceMeta.getLabel() + metaString);
         }
 
@@ -201,12 +216,46 @@ public class OkaeriBukkitPlugin extends JavaPlugin {
             Listener listener = (Listener) beanObject;
             this.getServer().getPluginManager().registerEvents(listener, this);
 
+            beanObject = listener;
             this.getLogger().info("- Added listener");
         }
 
+        // save injectable
+        this.registerInjectableAndSelfInject(beanName, beanObject);
+
         // scan subbeans
         if (scan) {
-            this.postBukkitLoadBeans(beanObject, verbose);
+            this.loadBeans(beanObject, verbose);
+        }
+    }
+
+    private void registerInjectableAndSelfInject(String beanName, Object beanObject) {
+        if (VERBOSE) this.getLogger().info("#registerInjectableAndSelfInject (" + (beanName.isEmpty() ? "~unnamed~" : beanName) + ", " + beanObject.getClass() + ")");
+        this.injector.registerInjectable(beanName, beanObject);
+        this.selfInjectBean(beanObject);
+    }
+
+    @SneakyThrows
+    private void selfInjectBean(Object bean) {
+
+        Class<?> beanClazz = bean.getClass();
+        Field[] fields = beanClazz.getDeclaredFields();
+
+        for (Field field : fields) {
+
+            Inject inject = field.getAnnotation(Inject.class);
+            if (inject == null) {
+                continue;
+            }
+
+            Optional<? extends Injectable<?>> injectable = this.injector.getInjectable(inject.value(), field.getType());
+            if (!injectable.isPresent()) {
+                continue;
+            }
+
+            Injectable<?> injectObject = injectable.get();
+            field.setAccessible(true);
+            field.set(bean, injectObject);
         }
     }
 
