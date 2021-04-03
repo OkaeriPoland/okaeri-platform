@@ -7,16 +7,12 @@ import eu.okaeri.platform.core.annotation.Register;
 import org.bukkit.plugin.java.JavaPlugin;
 
 // auto registers beans
-// warning: currently there is no smart detection
-// loading order:
-// - method beans (eg. used for mysql connector)
-// - beans added using With annotation
-// beans are inspected for subbeans by default
 // loading starts from the main class
 // platform automatically registers:
 // - okaeri-commands' CommandService
-// - bukkit's Listener
+// - bukkit's Listener (@Component required)
 // - okaeri-configs configs' (@Configuration required)
+// - any beans located in class with @Component
 // skip registration using register=false
 @Register(TestConfig.class)
 @Register(TestCommand.class)
