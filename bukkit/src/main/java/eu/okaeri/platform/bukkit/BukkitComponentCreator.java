@@ -21,7 +21,7 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
-import org.bukkit.plugin.java.JavaPlugin;
+import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitScheduler;
 import org.bukkit.scheduler.BukkitTask;
 
@@ -36,7 +36,7 @@ import static eu.okaeri.platform.core.component.ComponentHelper.invokeMethod;
 @RequiredArgsConstructor
 public class BukkitComponentCreator implements ComponentCreator {
 
-    private final JavaPlugin plugin;
+    private final Plugin plugin;
     private final OkaeriCommands commands;
 
     @Getter private List<OkaeriConfig> loadedConfigs = new ArrayList<>();

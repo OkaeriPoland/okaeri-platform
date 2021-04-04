@@ -1,20 +1,20 @@
 package eu.okaeri.platform.bukkit.commons.teleport;
 
-import org.bukkit.plugin.java.JavaPlugin;
+import org.bukkit.plugin.Plugin;
 
 import java.util.Queue;
 
 public class QueuedTeleportsTask implements Runnable {
 
     private final Queue<TeleportAction> queue;
-    private final JavaPlugin plugin;
+    private final Plugin plugin;
     private final int teleportsPerRun;
 
-    public QueuedTeleportsTask(QueuedTeleports queuedTeleports, JavaPlugin plugin) {
+    public QueuedTeleportsTask(QueuedTeleports queuedTeleports, Plugin plugin) {
         this(queuedTeleports, plugin, 1);
     }
 
-    public QueuedTeleportsTask(QueuedTeleports queuedTeleports, JavaPlugin plugin, int teleportsPerRun) {
+    public QueuedTeleportsTask(QueuedTeleports queuedTeleports, Plugin plugin, int teleportsPerRun) {
         if (queuedTeleports == null) throw new IllegalArgumentException("queuedTeleports cannot be null");
         if (plugin == null) throw new IllegalArgumentException("plugin cannot be null");
         this.queue = queuedTeleports.getTeleportQueue();

@@ -20,10 +20,22 @@ import lombok.Setter;
 //
 @Getter
 @Setter
+// automatically manages file inside plugin's directory
 @Configuration(path = "config.yml")
+// adds header, supports multiline strings or multiple annotations
+// string array can be passed as an argument too, same with @Comment
 @Header("================================")
 @Header("       Magic Configuration      ")
 @Header("================================")
+// automatically applies name transformations:
+// strategies:
+// - IDENTITY: do not change (default)
+// - SNAKE_CASE: exampleValue -> example_Value
+// - HYPHEN_CASE: exampleValue -> example-Value
+// modifiers:
+// - NONE: do not change (default)
+// - TO_LOWER_CASE: e.g. example-Value -> example-value
+// - TO_UPPER_CASE: e.g. example_Value -> EXAMPLE_VALUE
 @Names(strategy = NameStrategy.HYPHEN_CASE, modifier = NameModifier.TO_LOWER_CASE)
 public class TestConfig extends OkaeriConfig {
 
@@ -31,4 +43,7 @@ public class TestConfig extends OkaeriConfig {
     @Variable("APP_GREETING") // use jvm property environment variable if available
     @Comment("Example config value") // built-in comment support
     private String greeting = "Hi!!!!!!!!1111oneone"; // default values
+
+    @Comment("Example command")
+    private String repeatingCommand = "say from the config for {name}!";
 }

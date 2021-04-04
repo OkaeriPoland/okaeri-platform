@@ -9,13 +9,16 @@ import eu.okaeri.platform.bukkit.commons.teleport.QueuedTeleportsTask;
 import eu.okaeri.platform.bukkit.commons.time.MinecraftTimeEquivalent;
 import eu.okaeri.platform.core.annotation.Bean;
 import eu.okaeri.platform.core.annotation.Register;
+import eu.okaeri.platform.core.persistence.Cached;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.plugin.java.JavaPlugin;
+import org.bukkit.plugin.Plugin;
 
+import java.time.Duration;
+import java.time.Instant;
 import java.util.concurrent.atomic.AtomicInteger;
 
 // auto registers beans
@@ -24,11 +27,13 @@ import java.util.concurrent.atomic.AtomicInteger;
 // - okaeri-commands' CommandService
 // - bukkit's Listener (@Component required)
 // - okaeri-configs configs' (@Configuration required)
+// - Runnables (@Timer required)
 // - any beans located in class with @Component
 // skip registration using register=false
 @Register(TestConfig.class)
 @Register(TestCommand.class)
 @Register(TestListener.class)
+@Register(TestTask.class)
 public class ExamplePlugin extends OkaeriBukkitPlugin {
 
     @Inject("subbean")
@@ -46,7 +51,7 @@ public class ExamplePlugin extends OkaeriBukkitPlugin {
 
     // method beans can use DI
     @Bean("testString")
-    public String configureTestString(JavaPlugin plugin) {
+    public String configureTestString(Plugin plugin) {
         return "plugin -> " + plugin.getName();
     }
 
@@ -116,5 +121,16 @@ public class ExamplePlugin extends OkaeriBukkitPlugin {
                 .makeUnbreakable() // wow no breaking :O
                 .manipulate((item) -> item) // manipulate item manually without breaking out of the builder
                 .get(); // gotta resolve that stack
+    }
+
+    // built-in cache abstraction
+    // se usage in the TestTask
+    @Bean("cachedDbData")
+    public Cached<String> loadDataFromDbWithCache(TestConfig config) {
+        // resolves only once at the beginning and then only after ttl expires (using 2nd arg supplier)
+        // it is possible to use Cached.of(supplier) to disable ttl completely
+        // getting value is done using #get(), it is possible to force update using #update()
+        // remember however that if supplier is blocking it would affect your current thread
+        return Cached.of(Duration.ofMinutes(1), () -> config.getGreeting() + " [" + Instant.now() + "]");
     }
 }
