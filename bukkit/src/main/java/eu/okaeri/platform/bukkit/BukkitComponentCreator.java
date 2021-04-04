@@ -23,10 +23,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 import java.io.File;
 import java.lang.reflect.Method;
-import java.util.Arrays;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.logging.Level;
 import java.util.stream.Collectors;
 
@@ -36,9 +33,9 @@ public class BukkitComponentCreator implements ComponentCreator {
     private final JavaPlugin plugin;
     private final OkaeriCommands commands;
 
-    @Getter private List<OkaeriConfig> loadedConfigs;
-    @Getter private List<CommandService> loadedCommands;
-    @Getter private List<Listener> loadedListeners;
+    @Getter private List<OkaeriConfig> loadedConfigs = new ArrayList<>();
+    @Getter private List<CommandService> loadedCommands = new ArrayList<>();
+    @Getter private List<Listener> loadedListeners = new ArrayList<>();
 
     @Override
     public boolean isComponent(Class<?> type) {
