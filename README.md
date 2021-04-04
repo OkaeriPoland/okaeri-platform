@@ -132,7 +132,7 @@ public class ExamplePlugin extends OkaeriBukkitPlugin {
   }
 
   // built-in cache abstraction
-  // se usage in the TestTask
+  // see usage in the TestTask
   @Bean("cachedDbData")
   public Cached<String> loadDataFromDbWithCache(TestConfig config) {
     // resolves only once at the beginning and then only after ttl expires (using 2nd arg supplier)
@@ -219,20 +219,32 @@ public class TestListener implements Listener {
 @Timer(rate = MinecraftTimeEquivalent.MINUTES_5, async = true)
 public class TestTask implements Runnable {
 
-    @Inject private TestConfig config;
-    @Inject private Server server;
-    @Inject private Plugin plugin;
+  @Inject private TestConfig config;
+  @Inject private Server server;
+  @Inject private Plugin plugin;
 
-    @Override
-    public void run() {
-        // built-in CommandRunner for easy exectution
-        // of commands e.g. from the configuration/web/other source
-        CommandRunner.of(this.plugin, this.server.getOnlinePlayers()) // accepts any single element or collection
-                .forceMainThread(true) // forces execution on the main thread
-                .withField("{ending}", "hmmm..")
-                .withField("{name}", HumanEntity::getName) // dynamic replaces based on current element or static values
-                .execute(Arrays.asList("say how are you {name}? {ending}", this.config.getRepeatingCommand())); // pass single element or collection of commands
-    }
+  @Inject("cachedDbData")
+  private Cached<String> cachedData;
+
+  @Override
+  public void run() {
+
+    // built-in CommandRunner for easy exectution
+    // of commands e.g. from the configuration/web/other source
+    CommandRunner.of(this.plugin, this.server.getOnlinePlayers()) // accepts any single element or collection
+            .forceMainThread(true) // forces execution on the main thread
+            .withField("{ending}", "hmmm..")
+            .withField("{name}", HumanEntity::getName) // dynamic replaces based on current element or static values
+            .execute(Arrays.asList("say how are you {name}? {ending}", this.config.getRepeatingCommand())); // pass single element or collection of commands
+
+    // accessing Cached<T>
+    String cachedValue = this.cachedData.get();
+    Bukkit.broadcastMessage(cachedValue);
+
+    // accessing Cached<T> with forced update
+    String updatedValue = this.cachedData.update();
+    Bukkit.broadcastMessage(updatedValue);
+  }
 }
 ```
 
