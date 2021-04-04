@@ -47,7 +47,8 @@ public class OkaeriBukkitPlugin extends JavaPlugin {
         this.getLogger().info("= (" +
                 "configs: " + creator.getLoadedConfigs().size() + ", " +
                 "commands: " + creator.getLoadedCommands().size() + ", " +
-                "listeners: " + creator.getLoadedListeners().size() + ")");
+                "listeners: " + creator.getLoadedListeners().size() + ", " +
+                "timers: " + creator.getLoadedTimers().size() + ")");
 
         // call custom enable method
         this.onPlatformEnabled();

@@ -35,7 +35,7 @@ public class TestCommand implements CommandService {
         return RawResponse.of(this.config.getGreeting(), diExample.getName(), namedDiExample);
     }
 
-    @Bean(value = "subbean")
+    @Bean("subbean")
     public String configureExampleSubbean() {
         return "BEAN FROM " + this.getClass() + "!!";
     }

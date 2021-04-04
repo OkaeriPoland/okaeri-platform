@@ -77,29 +77,29 @@ public class BeanManifest {
                 .collect(Collectors.toList()));
 
         depends.addAll(Arrays.stream(clazz.getDeclaredMethods())
-                .filter(method -> method.getAnnotation(Bean.class) != null)
-                .map(BeanManifest::of)
+                .filter(creator::isComponentMethod)
+                .map(method -> BeanManifest.of(method, creator))
                 .collect(Collectors.toList()));
 
         return manifest;
     }
 
-    public static BeanManifest of(Method method) {
+    public static BeanManifest of(Method method, ComponentCreator creator) {
 
         Bean annotation = method.getAnnotation(Bean.class);
-        if (annotation == null) {
+        if ((annotation == null) && !creator.isComponentMethod(method)) {
             throw new IllegalArgumentException("cannot create BeanManifest from method without @Bean: " + method);
         }
 
         BeanManifest manifest = new BeanManifest();
         manifest.setType(method.getReturnType());
-        manifest.setName(annotation.value());
+        manifest.setName((annotation == null) ? "" : annotation.value());
         manifest.setDepends(Arrays.stream(method.getParameters())
                 .map(BeanManifest::of)
                 .collect(Collectors.toList()));
         manifest.setSource(BeanSource.METHOD);
         manifest.setMethod(method);
-        manifest.setRegister(annotation.register());
+        manifest.setRegister((annotation == null) || annotation.register());
 
         return manifest;
     }
@@ -151,7 +151,7 @@ public class BeanManifest {
 
     private void invokeMethodDependencies(ComponentCreator creator, Injector injector) {
         for (BeanManifest depend : this.depends) {
-            if ((this.object == null) || !depend.ready(injector) || (depend.getSource() != BeanSource.METHOD)) {
+            if ((this.object == null) || !depend.ready(injector) || (depend.getSource() != BeanSource.METHOD) || (depend.getObject() != null)) {
                 continue;
             }
             depend.setParent(this.object);
@@ -162,7 +162,7 @@ public class BeanManifest {
 
     private void invokeInjectDependencies(Injector injector) {
         for (BeanManifest depend : this.depends) {
-            if (depend.getSource() != BeanSource.INJECT) {
+            if ((depend.getSource() != BeanSource.INJECT) || (depend.getObject() != null)) {
                 continue;
             }
             Optional<? extends Injectable<?>> injectable = injector.getInjectable(depend.getName(), depend.getType());
@@ -203,21 +203,7 @@ public class BeanManifest {
     }
 
     private boolean fullLoadReady(Injector injector) {
-
-        for (BeanManifest depend : this.depends) {
-
-            if (depend.getSource() != BeanSource.COMPONENT) {
-                continue;
-            }
-
-            if (depend.getObject() != null) {
-                continue;
-            }
-
-            return false;
-        }
-
-        return true;
+        return this.depends.stream().noneMatch(depend -> depend.getObject() == null);
     }
 
     public BeanManifest execute(ComponentCreator creator, Injector injector) {

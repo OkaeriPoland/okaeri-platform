@@ -3,7 +3,7 @@ package eu.okaeri.platform.core.component;
 import eu.okaeri.injector.Injectable;
 import eu.okaeri.injector.Injector;
 import eu.okaeri.injector.annotation.Inject;
-import eu.okaeri.platform.core.annotation.Bean;
+import eu.okaeri.platform.core.component.manifest.BeanManifest;
 import eu.okaeri.platform.core.exception.BreakException;
 import lombok.SneakyThrows;
 
@@ -17,23 +17,17 @@ import java.util.stream.Collectors;
 
 public final class ComponentHelper {
 
-    public static Object invokeMethod(Object object, Method method, Injector injector) {
+    public static Object invokeMethod(BeanManifest manifest, Injector injector) {
+        return invokeMethod(manifest.getParent(), manifest.getMethod(), injector);
+    }
 
-        // get bean
-        Bean bean = method.getAnnotation(Bean.class);
-        if (bean == null) {
-            throw new IllegalArgumentException("Cannot invoke method not annotated with @Bean");
-        }
+    public static Object invokeMethod(Object object, Method method, Injector injector) {
 
         // gain access *hackerman*
         method.setAccessible(true);
 
-        // read bean name and method params
-        String beanName = bean.value();
-        boolean register = bean.register();
-        Parameter[] parameters = method.getParameters();
-
         // check for injectable parameters
+        Parameter[] parameters = method.getParameters();
         Object[] call = new Object[parameters.length];
         for (int i = 0; i < parameters.length; i++) {
 
@@ -49,7 +43,7 @@ public final class ComponentHelper {
             call[i] = paramType.cast(injectable.get().getObject());
         }
 
-        // invoke bean creator
+        // let's make a call :dab:
         Object result;
         try {
             result = method.invoke(object, call);

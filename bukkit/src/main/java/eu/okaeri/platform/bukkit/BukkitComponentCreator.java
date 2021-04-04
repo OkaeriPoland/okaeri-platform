@@ -9,6 +9,8 @@ import eu.okaeri.configs.postprocessor.SectionSeparator;
 import eu.okaeri.configs.validator.okaeri.OkaeriValidator;
 import eu.okaeri.configs.yaml.bukkit.YamlBukkitConfigurer;
 import eu.okaeri.injector.Injector;
+import eu.okaeri.platform.bukkit.annotation.Timer;
+import eu.okaeri.platform.core.annotation.Bean;
 import eu.okaeri.platform.core.annotation.Component;
 import eu.okaeri.platform.core.annotation.Configuration;
 import eu.okaeri.platform.core.component.ComponentCreator;
@@ -20,12 +22,16 @@ import lombok.RequiredArgsConstructor;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.bukkit.scheduler.BukkitScheduler;
+import org.bukkit.scheduler.BukkitTask;
 
 import java.io.File;
 import java.lang.reflect.Method;
 import java.util.*;
 import java.util.logging.Level;
 import java.util.stream.Collectors;
+
+import static eu.okaeri.platform.core.component.ComponentHelper.invokeMethod;
 
 @RequiredArgsConstructor
 public class BukkitComponentCreator implements ComponentCreator {
@@ -36,6 +42,7 @@ public class BukkitComponentCreator implements ComponentCreator {
     @Getter private List<OkaeriConfig> loadedConfigs = new ArrayList<>();
     @Getter private List<CommandService> loadedCommands = new ArrayList<>();
     @Getter private List<Listener> loadedListeners = new ArrayList<>();
+    @Getter private List<BukkitTask> loadedTimers = new ArrayList<>();
 
     @Override
     public boolean isComponent(Class<?> type) {
@@ -43,6 +50,12 @@ public class BukkitComponentCreator implements ComponentCreator {
                 || (type.getAnnotation(Configuration.class) != null)
                 || CommandService.class.isAssignableFrom(type)
                 || OkaeriBukkitPlugin.class.isAssignableFrom(type);
+    }
+
+    @Override
+    public boolean isComponentMethod(Method method) {
+        return (method.getAnnotation(Bean.class) != null)
+                || (method.getAnnotation(Timer.class) != null);
     }
 
     @Override
@@ -93,8 +106,34 @@ public class BukkitComponentCreator implements ComponentCreator {
         // create instance generic way
         if (!changed) {
             if (manifest.getSource() == BeanSource.METHOD) {
-                beanObject = ComponentHelper.invokeMethod(manifest.getParent(), manifest.getMethod(), injector);
-            } else if (manifest.getSource() == BeanSource.COMPONENT) {
+                // register timer
+                Timer timer = manifest.getMethod().getAnnotation(Timer.class);
+                if (timer != null) {
+
+                    manifest.setName(timer.name());
+                    int delay = (timer.delay() == -1) ? timer.rate() : timer.delay();
+
+                    BukkitScheduler scheduler = this.plugin.getServer().getScheduler();
+                    Runnable runnable = Runnable.class.isAssignableFrom(manifest.getType())
+                            ? (Runnable) invokeMethod(manifest, injector)
+                            : () -> invokeMethod(manifest, injector);
+
+                    BukkitTask task = timer.async()
+                            ? scheduler.runTaskTimerAsynchronously(this.plugin, runnable, delay, timer.rate())
+                            : scheduler.runTaskTimer(this.plugin, runnable, delay, timer.rate());
+
+                    this.loadedTimers.add(task);
+                    String timerMeta = "delay = " + delay + ", rate = " + timer.rate() + ", async = " + timer.async();
+                    this.plugin.getLogger().info("- Added timer: " + manifest.getMethod().getName() + " { " + timerMeta + " }");
+
+                    beanObject = task;
+                }
+                // normal bean
+                else {
+                    beanObject = invokeMethod(manifest, injector);
+                }
+            }
+            else if (manifest.getSource() == BeanSource.COMPONENT) {
                 if (!this.isComponent(manifestType)) {
                     throw new RuntimeException("Cannot create instance of non-component class " + manifestType);
                 }
