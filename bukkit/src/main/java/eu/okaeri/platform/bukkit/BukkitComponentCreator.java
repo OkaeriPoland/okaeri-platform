@@ -15,7 +15,8 @@ import eu.okaeri.platform.core.component.ComponentCreator;
 import eu.okaeri.platform.core.component.ComponentHelper;
 import eu.okaeri.platform.core.component.manifest.BeanManifest;
 import eu.okaeri.platform.core.component.manifest.BeanSource;
-import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -23,14 +24,21 @@ import org.bukkit.plugin.java.JavaPlugin;
 import java.io.File;
 import java.lang.reflect.Method;
 import java.util.Arrays;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.stream.Collectors;
 
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class BukkitComponentCreator implements ComponentCreator {
 
     private final JavaPlugin plugin;
     private final OkaeriCommands commands;
+
+    @Getter private List<OkaeriConfig> loadedConfigs;
+    @Getter private List<CommandService> loadedCommands;
+    @Getter private List<Listener> loadedListeners;
 
     @Override
     public boolean isComponent(Class<?> type) {
@@ -73,8 +81,9 @@ public class BukkitComponentCreator implements ComponentCreator {
                     it.saveDefaults();
                     it.load(true);
                 });
-                this.plugin.getLogger().info("- Loaded configuration: " + path);
-                beanObject = config;
+                this.plugin.getLogger().info("- Loaded configuration: " + beanClazz.getSimpleName() + " { path = " + path + " }");
+                this.loadedConfigs.add(config);
+                beanObject = config;;
                 changed = true;
             }
             catch (Exception exception) {
@@ -103,17 +112,19 @@ public class BukkitComponentCreator implements ComponentCreator {
             ServiceMeta serviceMeta = ServiceMeta.of(commandService);
             this.commands.register(commandService);
 
-            String metaString = "";
-            if (!serviceMeta.getAliases().isEmpty()) {
-                metaString += " [aliases: " + String.join(", ", serviceMeta.getAliases()) + "]";
-            }
-
-            if (!serviceMeta.getDescription().isEmpty()) {
-                metaString += " [description: " + serviceMeta.getDescription() + "]";
-            }
+            Map<String, String> commandMeta = new LinkedHashMap<>();
+            commandMeta.put("label", serviceMeta.getLabel());
+            if (!serviceMeta.getAliases().isEmpty()) commandMeta.put("aliases", "[" + String.join(", ", serviceMeta.getAliases()) + "]");
+            if (!serviceMeta.getDescription().isEmpty()) commandMeta.put("description", serviceMeta.getDescription());
 
             beanObject = commandService;
-            this.plugin.getLogger().info("- Added command: " + serviceMeta.getLabel() + metaString);
+            this.loadedCommands.add(commandService);
+
+            String commandMetaString = commandMeta.entrySet().stream()
+                    .map(entry -> entry.getKey() + " = " + entry.getValue())
+                    .collect(Collectors.joining(", "));
+
+            this.plugin.getLogger().info("- Added command: " + commandService.getClass().getSimpleName() + " { " + commandMetaString + " }");
         }
 
         // register if listener
@@ -123,12 +134,14 @@ public class BukkitComponentCreator implements ComponentCreator {
             this.plugin.getServer().getPluginManager().registerEvents(listener, this.plugin);
 
             beanObject = listener;
+            this.loadedListeners.add(listener);
+
             String listenerMethods = Arrays.stream(listener.getClass().getDeclaredMethods())
                     .filter(method -> method.getAnnotation(EventHandler.class) != null)
                     .map(Method::getName)
                     .collect(Collectors.joining(", "));
 
-            this.plugin.getLogger().info("- Added listener: " + listenerMethods);
+            this.plugin.getLogger().info("- Added listener: " + listener.getClass().getSimpleName() + " { " + listenerMethods + " }");
         }
 
         // inject

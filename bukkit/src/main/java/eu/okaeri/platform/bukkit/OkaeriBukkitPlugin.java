@@ -10,7 +10,6 @@ import eu.okaeri.platform.core.component.ComponentHelper;
 import eu.okaeri.platform.core.component.manifest.BeanManifest;
 import eu.okaeri.platform.core.exception.BreakException;
 import lombok.Getter;
-import lombok.SneakyThrows;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.util.logging.Level;
@@ -23,18 +22,6 @@ public class OkaeriBukkitPlugin extends JavaPlugin {
 
     @Override
     public void onEnable() {
-        this.postBukkitInitialize();
-        this.onPlatformEnabled();
-    }
-
-    @Override
-    public void onDisable() {
-        this.onPlatformDisabled();
-    }
-
-    @SneakyThrows
-    @SuppressWarnings("unchecked")
-    private void postBukkitInitialize() {
 
         // initialize system
         this.getLogger().info("Initializing " + this.getClass());
@@ -57,7 +44,18 @@ public class OkaeriBukkitPlugin extends JavaPlugin {
         }
 
         // woah
-        this.getLogger().info("Done loading!");
+        this.getLogger().info("= (" +
+                "configs: " + creator.getLoadedConfigs().size() + ", " +
+                "commands: " + creator.getLoadedCommands().size() + ", " +
+                "listeners: " + creator.getLoadedListeners().size() + ")");
+
+        // call custom enable method
+        this.onPlatformEnabled();
+    }
+
+    @Override
+    public void onDisable() {
+        this.onPlatformDisabled();
     }
 
     public void onPlatformEnabled() {
