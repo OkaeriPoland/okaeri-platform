@@ -265,10 +265,12 @@ public class TestTask implements Runnable {
 @Configuration(path = "config.yml")
 // adds header, supports multiline strings or multiple annotations
 // string array can be passed as an argument too, same with @Comment
+// it is possible to create empty line with "" and empty comment with " "
 @Header("================================")
 @Header("       Magic Configuration      ")
 @Header("================================")
-// automatically applies name transformations:
+// automatically applies name transformations (by default)
+// config keys can be also individually changed using @CustomKey
 // strategies: 
 // - IDENTITY: do not change (default)
 // - SNAKE_CASE: exampleValue -> example_Value

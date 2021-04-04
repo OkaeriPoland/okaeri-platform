@@ -25,15 +25,15 @@ public class OkaeriBukkitPlugin extends JavaPlugin {
 
         // initialize system
         this.getLogger().info("Initializing " + this.getClass());
+        this.commands = CommandsManager.create(CommandsInjector.of(CommandsBukkit.of(this), this.injector));
+        BukkitComponentCreator creator = new BukkitComponentCreator(this, this.commands);
         this.injector = OkaeriInjector.create(true)
                 .registerInjectable("server", this.getServer())
                 .registerInjectable("platformCommands", this.getCommands())
-                .registerInjectable("platformInjector", this.getInjector())
                 .registerInjectable("dataFolder", this.getDataFolder())
                 .registerInjectable("pluginLogger", this.getLogger())
                 .registerInjectable("plugin", this);
-        this.commands = CommandsManager.create(CommandsInjector.of(CommandsBukkit.of(this), this.injector));
-        BukkitComponentCreator creator = new BukkitComponentCreator(this, this.commands);
+        this.injector.registerInjectable("platformInjector", this.getInjector());
 
         // load commands/other beans
         try {
