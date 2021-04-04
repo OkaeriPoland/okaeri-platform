@@ -36,7 +36,7 @@ public class OkaeriBukkitPlugin extends JavaPlugin {
                 .registerInjectable("scheduler", this.getServer().getScheduler())
                 .registerInjectable("scoreboardManager", this.getServer().getScoreboardManager())
                 .registerInjectable("pluginManager", this.getServer().getPluginManager());
-        this.injector.registerInjectable("platformInjector", this.getInjector());
+        this.injector.registerInjectable("injector", this.getInjector());
 
         // load commands/other beans
         try {

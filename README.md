@@ -317,4 +317,4 @@ Internals mainly used inside of the platform, but available for manual use. For 
 | Inject Name | Type | Description |
 |-|-|-|
 | `commands` | eu.okaeri.commands.`OkaeriCommands` | instance of `okaeri-commands` used for registering commands internally |
-| `platformInjector` | eu.okaeri.injector.`Injector` | instance of `okaeri-injector` used internally |
+| `injector` | eu.okaeri.injector.`Injector` | instance of `okaeri-injector` used internally |
