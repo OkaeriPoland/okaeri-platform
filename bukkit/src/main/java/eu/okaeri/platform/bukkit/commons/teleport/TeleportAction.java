@@ -4,10 +4,12 @@ import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
+import org.bukkit.event.player.PlayerTeleportEvent;
 
 import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
 import java.lang.invoke.MethodType;
+import java.lang.reflect.Method;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Consumer;
 
@@ -50,29 +52,49 @@ public class TeleportAction {
             this.callback.teleported(this.player);
         };
 
-        if (teleportAsync == null) {
-            this.player.teleport(this.target);
-            consumer.accept(true);
-            return;
+        if (paperTeleportAsync != null) {
+            try {
+                ((CompletableFuture<Boolean>) paperTeleportAsync.invoke(this.player, this.target)).thenAccept(consumer);
+                return;
+            } catch (Throwable ignored) {
+            }
         }
 
-        try {
-            ((CompletableFuture<Boolean>) teleportAsync.invoke(this.player, this.target)).thenAccept(consumer);
-        } catch (Throwable throwable) {
-            consumer.accept(false);
+        if (entityTeleportAsync != null) {
+            try {
+                entityTeleportAsync.invoke(this.player, PlayerTeleportEvent.TeleportCause.PLUGIN);
+                return;
+            } catch (Throwable ignored) {
+            }
         }
+
+        this.player.teleport(this.target);
+        consumer.accept(true);
     }
 
-    private static MethodHandle teleportAsync;
+    private void teleport() {
+
+    }
+
+    private static MethodHandle paperTeleportAsync;
+    private static MethodHandle entityTeleportAsync;
 
     static {
         try {
             Class<?> paperLib = Class.forName("io.papermc.lib.PaperLib");
             MethodHandles.Lookup lookup = MethodHandles.publicLookup();
             MethodType handleType = MethodType.methodType(Entity.class, Location.class);
-            teleportAsync = lookup.findStatic(paperLib, "teleportAsync", handleType);
+            paperTeleportAsync = lookup.findStatic(paperLib, "teleportAsync", handleType);
         }
         catch (ClassNotFoundException | NoSuchMethodException | IllegalAccessException ignored) {
+            // try fallback 1.13+ method
+            try {
+                MethodHandles.Lookup lookup = MethodHandles.publicLookup();
+                Method teleportAsyncEntity = Entity.class.getMethod("teleportAsync", Location.class, PlayerTeleportEvent.TeleportCause.class);
+                entityTeleportAsync = lookup.unreflect(teleportAsyncEntity);
+            }
+            catch (NoSuchMethodException | IllegalAccessException ignored1) {
+            }
         }
     }
 }
