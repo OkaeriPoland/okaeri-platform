@@ -29,10 +29,13 @@ public class OkaeriBukkitPlugin extends JavaPlugin {
         BukkitComponentCreator creator = new BukkitComponentCreator(this, this.commands);
         this.injector = OkaeriInjector.create(true)
                 .registerInjectable("server", this.getServer())
-                .registerInjectable("platformCommands", this.getCommands())
+                .registerInjectable("commands", this.getCommands())
                 .registerInjectable("dataFolder", this.getDataFolder())
-                .registerInjectable("pluginLogger", this.getLogger())
-                .registerInjectable("plugin", this);
+                .registerInjectable("logger", this.getLogger())
+                .registerInjectable("plugin", this)
+                .registerInjectable("scheduler", this.getServer().getScheduler())
+                .registerInjectable("scoreboardManager", this.getServer().getScoreboardManager())
+                .registerInjectable("pluginManager", this.getServer().getPluginManager());
         this.injector.registerInjectable("platformInjector", this.getInjector());
 
         // load commands/other beans
