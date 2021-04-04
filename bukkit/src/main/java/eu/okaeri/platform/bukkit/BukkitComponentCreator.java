@@ -47,6 +47,7 @@ public class BukkitComponentCreator implements ComponentCreator {
     @Override
     public boolean isComponent(Class<?> type) {
         return (type.getAnnotation(Component.class) != null)
+                || (type.getAnnotation(Timer.class) != null)
                 || (type.getAnnotation(Configuration.class) != null)
                 || CommandService.class.isAssignableFrom(type)
                 || OkaeriBukkitPlugin.class.isAssignableFrom(type);
@@ -67,13 +68,15 @@ public class BukkitComponentCreator implements ComponentCreator {
             throw new RuntimeException("Cannot transform from source " + manifest.getSource());
         }
 
+        Timer timer = null;
+        String timerName = null;
         boolean register = manifest.isRegister();
         Object beanObject = manifest.getObject();
         Class<?> manifestType = manifest.getType();
         boolean changed = false;
 
-        // create config instance if applicable
-        if (register && (OkaeriConfig.class.isAssignableFrom(manifestType))) {
+        // create config instance if applicable - @Register only - allows method component (manually created config) to be processed
+        if (register && (OkaeriConfig.class.isAssignableFrom(manifestType)) && (manifest.getSource() == BeanSource.COMPONENT)) {
 
             Class<? extends OkaeriConfig> beanClazz = (Class<? extends OkaeriConfig>) manifestType;
             Configuration configuration = beanClazz.getAnnotation(Configuration.class);
@@ -93,7 +96,7 @@ public class BukkitComponentCreator implements ComponentCreator {
                 });
                 this.plugin.getLogger().info("- Loaded configuration: " + beanClazz.getSimpleName() + " { path = " + path + " }");
                 this.loadedConfigs.add(config);
-                beanObject = config;;
+                beanObject = config;
                 changed = true;
             }
             catch (Exception exception) {
@@ -106,27 +109,11 @@ public class BukkitComponentCreator implements ComponentCreator {
         // create instance generic way
         if (!changed) {
             if (manifest.getSource() == BeanSource.METHOD) {
-                // register timer
-                Timer timer = manifest.getMethod().getAnnotation(Timer.class);
-                if (timer != null) {
-
-                    manifest.setName(timer.name());
-                    int delay = (timer.delay() == -1) ? timer.rate() : timer.delay();
-
-                    BukkitScheduler scheduler = this.plugin.getServer().getScheduler();
-                    Runnable runnable = Runnable.class.isAssignableFrom(manifest.getType())
-                            ? (Runnable) invokeMethod(manifest, injector)
-                            : () -> invokeMethod(manifest, injector);
-
-                    BukkitTask task = timer.async()
-                            ? scheduler.runTaskTimerAsynchronously(this.plugin, runnable, delay, timer.rate())
-                            : scheduler.runTaskTimer(this.plugin, runnable, delay, timer.rate());
-
-                    this.loadedTimers.add(task);
-                    String timerMeta = "delay = " + delay + ", rate = " + timer.rate() + ", async = " + timer.async();
-                    this.plugin.getLogger().info("- Added timer: " + manifest.getMethod().getName() + " { " + timerMeta + " }");
-
-                    beanObject = task;
+                // register method timer - skip beans creating Runnable but save Timer (as override)
+                timer = manifest.getMethod().getAnnotation(Timer.class);
+                if (register && (timer != null) && !Runnable.class.isAssignableFrom(manifest.getType())) {
+                    beanObject = (Runnable) () -> invokeMethod(manifest, injector); // create runnable from method
+                    timerName = manifest.getMethod().getName(); // BukkitComponentCreator$$Lambda$754/0x0000000800b52c40 does not look useful in init messages
                 }
                 // normal bean
                 else {
@@ -141,47 +128,77 @@ public class BukkitComponentCreator implements ComponentCreator {
             }
         }
 
-        // register if command
-        if (register && (beanObject instanceof CommandService)) {
-
-            CommandService commandService = (CommandService) beanObject;
-            ServiceMeta serviceMeta = ServiceMeta.of(commandService);
-            this.commands.register(commandService);
-
-            Map<String, String> commandMeta = new LinkedHashMap<>();
-            commandMeta.put("label", serviceMeta.getLabel());
-            if (!serviceMeta.getAliases().isEmpty()) commandMeta.put("aliases", "[" + String.join(", ", serviceMeta.getAliases()) + "]");
-            if (!serviceMeta.getDescription().isEmpty()) commandMeta.put("description", serviceMeta.getDescription());
-
-            beanObject = commandService;
-            this.loadedCommands.add(commandService);
-
-            String commandMetaString = commandMeta.entrySet().stream()
-                    .map(entry -> entry.getKey() + " = " + entry.getValue())
-                    .collect(Collectors.joining(", "));
-
-            this.plugin.getLogger().info("- Added command: " + commandService.getClass().getSimpleName() + " { " + commandMetaString + " }");
+        // register component timer - skip if registered with annotated method return
+        if (register) {
+            if (timer == null) {
+                timer = beanObject.getClass().getAnnotation(Timer.class);
+            }
+            if ((timer != null) && (beanObject instanceof Runnable)) {
+                manifest.setName(timer.name());
+                this.registerTimer(timer, (Runnable) beanObject, timerName);
+            }
         }
 
-        // register if listener
+        // register if command - works for beans created by method too
+        if (register && (beanObject instanceof CommandService)) {
+            this.registerCommand((CommandService) beanObject);
+        }
+
+        // register if listener - works for beans created by method too
         if (register && (beanObject instanceof Listener)) {
-
-            Listener listener = (Listener) beanObject;
-            this.plugin.getServer().getPluginManager().registerEvents(listener, this.plugin);
-
-            beanObject = listener;
-            this.loadedListeners.add(listener);
-
-            String listenerMethods = Arrays.stream(listener.getClass().getDeclaredMethods())
-                    .filter(method -> method.getAnnotation(EventHandler.class) != null)
-                    .map(Method::getName)
-                    .collect(Collectors.joining(", "));
-
-            this.plugin.getLogger().info("- Added listener: " + listener.getClass().getSimpleName() + " { " + listenerMethods + " }");
+            this.registerListener((Listener) beanObject);
         }
 
         // inject
         ComponentHelper.injectComponentFields(beanObject, injector);
         return beanObject;
+    }
+
+    private void registerListener(Listener listener) {
+
+        this.plugin.getServer().getPluginManager().registerEvents(listener, this.plugin);
+        this.loadedListeners.add(listener);
+
+        String listenerMethods = Arrays.stream(listener.getClass().getDeclaredMethods())
+                .filter(method -> method.getAnnotation(EventHandler.class) != null)
+                .map(Method::getName)
+                .collect(Collectors.joining(", "));
+
+        this.plugin.getLogger().info("- Added listener: " + listener.getClass().getSimpleName() + " { " + listenerMethods + " }");
+    }
+
+    private void registerCommand(CommandService commandService) {
+
+        ServiceMeta serviceMeta = ServiceMeta.of(commandService);
+        this.commands.register(commandService);
+
+        Map<String, String> commandMeta = new LinkedHashMap<>();
+        commandMeta.put("label", serviceMeta.getLabel());
+        if (!serviceMeta.getAliases().isEmpty()) commandMeta.put("aliases", "[" + String.join(", ", serviceMeta.getAliases()) + "]");
+        if (!serviceMeta.getDescription().isEmpty()) commandMeta.put("description", serviceMeta.getDescription());
+
+        this.loadedCommands.add(commandService);
+
+        String commandMetaString = commandMeta.entrySet().stream()
+                .map(entry -> entry.getKey() + " = " + entry.getValue())
+                .collect(Collectors.joining(", "));
+
+        this.plugin.getLogger().info("- Added command: " + commandService.getClass().getSimpleName() + " { " + commandMetaString + " }");
+    }
+
+    private void registerTimer(Timer timer, Runnable runnable, String nameOverride) {
+
+        int delay = (timer.delay() == -1) ? timer.rate() : timer.delay();
+        BukkitScheduler scheduler = this.plugin.getServer().getScheduler();
+
+        BukkitTask task = timer.async()
+                ? scheduler.runTaskTimerAsynchronously(this.plugin, runnable, delay, timer.rate())
+                : scheduler.runTaskTimer(this.plugin, runnable, delay, timer.rate());
+
+        this.loadedTimers.add(task);
+
+        String resultingTimerName = ((nameOverride == null) ? runnable.getClass().getSimpleName() : nameOverride);
+        String timerMeta = "delay = " + delay + ", rate = " + timer.rate() + ", async = " + timer.async();
+        this.plugin.getLogger().info("- Added timer: " + resultingTimerName + " { " + timerMeta + " }");
     }
 }

@@ -10,7 +10,7 @@ Whole ecosystems built on top of the best okaeri packages.
 
 ## Bukkit
 
-Currently the only target (less than 200kB total of additional jar size), integrates:
+Currently the only target (about 200kB total of additional jar size), integrates:
 
 - **Dependency Injection**:
   - [okaeri-injector](https://github.com/OkaeriPoland/okaeri-injector): "Probably the most basic and simplest DI possible with just ~9kB in size."

@@ -130,8 +130,7 @@ public class BeanManifest {
             Optional<? extends Injectable<?>> injectable = injector.getInjectable(this.name, this.type);
             if (injectable.isPresent()) {
                 this.object = injectable.get().getObject();
-            }
-            else if (this.ready(injector) && creator.isComponent(this.type) && (this.source != BeanSource.INJECT)) {
+            } else if (this.ready(injector) && creator.isComponent(this.type) && (this.source != BeanSource.INJECT)) {
                 this.object = creator.makeObject(this, injector);
                 injector.registerInjectable(this.name, this.object);
             }
@@ -151,12 +150,28 @@ public class BeanManifest {
 
     private void invokeMethodDependencies(ComponentCreator creator, Injector injector) {
         for (BeanManifest depend : this.depends) {
+
             if ((this.object == null) || !depend.ready(injector) || (depend.getSource() != BeanSource.METHOD) || (depend.getObject() != null)) {
                 continue;
             }
+
             depend.setParent(this.object);
-            depend.setObject(creator.makeObject(depend, injector));
-            injector.registerInjectable(depend.getName(), depend.getObject());
+            Object createdObject = creator.makeObject(depend, injector);
+
+            // a little hack to fool stO0opid BeanManifest - void bean can be executable method eg. @Timer
+            if ((createdObject == null) && (depend.getMethod().getReturnType() == void.class)) {
+                depend.setObject(void.class);
+                continue;
+            }
+
+            // standard bean
+            if (createdObject != null) {
+                depend.setObject(createdObject);
+                injector.registerInjectable(depend.getName(), depend.getObject());
+                continue;
+            }
+
+            throw new RuntimeException("Cannot register null as bean [method: " + depend.getMethod() + "]");
         }
     }
 
