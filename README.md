@@ -185,7 +185,7 @@ public class TestListener implements Listener {
   @Inject("subbean") private String subbeanString;
   @Inject("joinReward") ItemStack rewardItem;
   @Inject private QueuedTeleports queuedTeleports;
-  @Inject private Logger logger; // plugin's logger (name=pluginLogger)
+  @Inject private Logger logger; // plugin's logger (name=logger)
 
   @EventHandler
   public void onJoin(PlayerJoinEvent event) {
@@ -304,7 +304,7 @@ Internals mainly used inside of the platform, but available for manual use. For 
 
 | Inject Name | Type | Description |
 |-|-|-|
-| `platformCommands` | eu.okaeri.commands.`OkaeriCommands` | instance of `okaeri-commands` used for registering commands internally |
+| `commands` | eu.okaeri.commands.`OkaeriCommands` | instance of `okaeri-commands` used for registering commands internally |
 | `platformInjector` | eu.okaeri.injector.`Injector` | instance of `okaeri-injector` used internally |
 
 Generally available common instances, useful in almost every component (e.g. Logger):
@@ -313,5 +313,8 @@ Generally available common instances, useful in almost every component (e.g. Log
 |-|-|-|
 | `server` | org.bukkit.`Server` | injectable version of `JavaPlugin#getServer()` |
 | `dataFolder` | java.io.`File` | injectable version of `JavaPlugin#getDataFolder()` |
-| `pluginLogger` | java.util.logging.`Logger` | injectable version of `JavaPlugin#getLogger()` |
+| `logger` | java.util.logging.`Logger` | injectable version of `JavaPlugin#getLogger()` |
 | `plugin` | org.bukkit.plugin.`Plugin` | injectable instance of platform plugin |
+| `scheduler` | org.bukkit.scheduler.`BukkitScheduler` | injectable version of `Server#getScheduler()` |
+| `pluginManager` | org.bukkit.plugin.`PluginManager` | injectable version of `Server#getPluginManager()` |
+| `scoreboardManager` | org.bukkit.scoreboard.`ScoreboardManager` | injectable version of `Server#getScoreboardManager()` |

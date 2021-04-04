@@ -19,7 +19,7 @@ public class TestListener implements Listener {
     @Inject("subbean") private String subbeanString;
     @Inject("joinReward") ItemStack rewardItem;
     @Inject private QueuedTeleports queuedTeleports;
-    @Inject private Logger logger; // plugin's logger (name=pluginLogger)
+    @Inject private Logger logger; // plugin's logger (name=logger)
 
     @EventHandler
     public void onJoin(PlayerJoinEvent event) {
