@@ -300,13 +300,6 @@ public class TestConfig extends OkaeriConfig {
 
 ### Default injectables
 
-Internals mainly used inside of the platform, but available for manual use. For example Injector can be used to create instances of classes using @Inject(s):
-
-| Inject Name | Type | Description |
-|-|-|-|
-| `commands` | eu.okaeri.commands.`OkaeriCommands` | instance of `okaeri-commands` used for registering commands internally |
-| `platformInjector` | eu.okaeri.injector.`Injector` | instance of `okaeri-injector` used internally |
-
 Generally available common instances, useful in almost every component (e.g. Logger):
 
 | Inject Name | Type | Description |
@@ -318,3 +311,10 @@ Generally available common instances, useful in almost every component (e.g. Log
 | `scheduler` | org.bukkit.scheduler.`BukkitScheduler` | injectable version of `Server#getScheduler()` |
 | `pluginManager` | org.bukkit.plugin.`PluginManager` | injectable version of `Server#getPluginManager()` |
 | `scoreboardManager` | org.bukkit.scoreboard.`ScoreboardManager` | injectable version of `Server#getScoreboardManager()` |
+
+Internals mainly used inside of the platform, but available for manual use. For example Injector can be used to create instances of classes that are using @Inject(s):
+
+| Inject Name | Type | Description |
+|-|-|-|
+| `commands` | eu.okaeri.commands.`OkaeriCommands` | instance of `okaeri-commands` used for registering commands internally |
+| `platformInjector` | eu.okaeri.injector.`Injector` | instance of `okaeri-injector` used internally |
