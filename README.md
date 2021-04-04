@@ -34,11 +34,13 @@ See [bukkit-example](https://github.com/OkaeriPoland/okaeri-platform/tree/master
 // - okaeri-commands' CommandService
 // - bukkit's Listener (@Component required)
 // - okaeri-configs configs' (@Configuration required)
+// - Runnables (@Timer required)
 // - any beans located in class with @Component
 // skip registration using register=false
 @Register(TestConfig.class)
 @Register(TestCommand.class)
 @Register(TestListener.class)
+@Register(TestTask.class)
 public class ExamplePlugin extends OkaeriBukkitPlugin {
 
   @Inject("subbean")
@@ -56,7 +58,7 @@ public class ExamplePlugin extends OkaeriBukkitPlugin {
 
   // method beans can use DI
   @Bean("testString")
-  public String configureTestString(JavaPlugin plugin) {
+  public String configureTestString(Plugin plugin) {
     return "plugin -> " + plugin.getName();
   }
 
@@ -127,6 +129,17 @@ public class ExamplePlugin extends OkaeriBukkitPlugin {
             .makeUnbreakable() // wow no breaking :O
             .manipulate((item) -> item) // manipulate item manually without breaking out of the builder
             .get(); // gotta resolve that stack
+  }
+
+  // built-in cache abstraction
+  // se usage in the TestTask
+  @Bean("cachedDbData")
+  public Cached<String> loadDataFromDbWithCache(TestConfig config) {
+    // resolves only once at the beginning and then only after ttl expires (using 2nd arg supplier)
+    // it is possible to use Cached.of(supplier) to disable ttl completely
+    // getting value is done using #get(), it is possible to force update using #update()
+    // remember however that if supplier is blocking it would affect your current thread
+    return Cached.of(Duration.ofMinutes(1), () -> config.getGreeting() + " [" + Instant.now() + "]");
   }
 }
 ```
@@ -201,6 +214,29 @@ public class TestListener implements Listener {
 ```
 
 ```java
+// example of timer component class
+// async=true - simulating blocking fetching scenario
+@Timer(rate = MinecraftTimeEquivalent.MINUTES_5, async = true)
+public class TestTask implements Runnable {
+
+    @Inject private TestConfig config;
+    @Inject private Server server;
+    @Inject private Plugin plugin;
+
+    @Override
+    public void run() {
+        // built-in CommandRunner for easy exectution
+        // of commands e.g. from the configuration/web/other source
+        CommandRunner.of(this.plugin, this.server.getOnlinePlayers()) // accepts any single element or collection
+                .forceMainThread(true) // forces execution on the main thread
+                .withField("{ending}", "hmmm..")
+                .withField("{name}", HumanEntity::getName) // dynamic replaces based on current element or static values
+                .execute(Arrays.asList("say how are you {name}? {ending}", this.config.getRepeatingCommand())); // pass single element or collection of commands
+    }
+}
+```
+
+```java
 // automatically created in the plugin dir
 // updates comments and changes (new keys) automatically
 // manipulate it as pojo and save with #save()
@@ -212,10 +248,23 @@ public class TestListener implements Listener {
 // # Example config value
 // greeting: Hi!!!!!!!!1111oneone
 //
+// automatically manages file inside plugin's directory
+// allows component to be registered with @Register
 @Configuration(path = "config.yml")
+// adds header, supports multiline strings or multiple annotations
+// string array can be passed as an argument too, same with @Comment
 @Header("================================")
 @Header("       Magic Configuration      ")
 @Header("================================")
+// automatically applies name transformations:
+// strategies: 
+// - IDENTITY: do not change (default)
+// - SNAKE_CASE: exampleValue -> example_Value
+// - HYPHEN_CASE: exampleValue -> example-Value
+// modifiers:
+// - NONE: do not change (default)
+// - TO_LOWER_CASE: e.g. example-Value -> example-value
+// - TO_UPPER_CASE: e.g. example_Value -> EXAMPLE_VALUE
 @Names(strategy = NameStrategy.HYPHEN_CASE, modifier = NameModifier.TO_LOWER_CASE)
 public class TestConfig extends OkaeriConfig {
 
@@ -223,6 +272,9 @@ public class TestConfig extends OkaeriConfig {
   @Variable("APP_GREETING") // use jvm property or environment variable if available
   @Comment("Example config value") // built-in comment support
   private String greeting = "Hi!!!!!!!!1111oneone"; // default values
+
+  @Comment("Example command")
+  private String repeatingCommand = "say from the config for {name}!";
 
   /* getters/setters or nothing if annotated with lombok */
 }
