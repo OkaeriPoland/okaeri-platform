@@ -185,6 +185,7 @@ public class TestListener implements Listener {
   @Inject("subbean") private String subbeanString;
   @Inject("joinReward") ItemStack rewardItem;
   @Inject private QueuedTeleports queuedTeleports;
+  @Inject private Logger logger; // plugin's logger (name=pluginLogger)
 
   @EventHandler
   public void onJoin(PlayerJoinEvent event) {
@@ -209,6 +210,9 @@ public class TestListener implements Listener {
       Location locationTenUp = event.getPlayer().getLocation().add(0, 10, 0);
       this.queuedTeleports.teleport(event.getPlayer(), locationTenUp, (player) -> player.sendMessage("Enjoy flying!"));
     }
+
+    // logger demonstration
+    this.logger.warning("WOW SOMEONE IS WRITING: " + event.getMessage());
   }
 }
 ```
@@ -293,3 +297,21 @@ public class TestConfig extends OkaeriConfig {
   /* getters/setters or nothing if annotated with lombok */
 }
 ```
+
+### Default injectables
+
+Internals mainly used inside of the platform, but available for manual use. For example Injector can be used to create instances of classes using @Inject(s):
+
+| Inject Name | Type | Description |
+|-|-|-|
+| `platformCommands` | eu.okaeri.commands.`OkaeriCommands` | instance of `okaeri-commands` used for registering commands internally |
+| `platformInjector` | eu.okaeri.injector.`Injector` | instance of `okaeri-injector` used internally |
+
+Generally available common instances, useful in almost every component (e.g. Logger):
+
+| Inject Name | Type | Description |
+|-|-|-|
+| `server` | org.bukkit.`Server` | injectable version of `JavaPlugin#getServer()` |
+| `dataFolder` | java.io.`File` | injectable version of `JavaPlugin#getDataFolder()` |
+| `pluginLogger` | java.util.logging.`Logger` | injectable version of `JavaPlugin#getLogger()` |
+| `plugin` | org.bukkit.plugin.`Plugin` | injectable instance of platform plugin |

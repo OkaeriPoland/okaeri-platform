@@ -10,6 +10,8 @@ import org.bukkit.event.player.AsyncPlayerChatEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.inventory.ItemStack;
 
+import java.util.logging.Logger;
+
 @Component
 public class TestListener implements Listener {
 
@@ -17,6 +19,7 @@ public class TestListener implements Listener {
     @Inject("subbean") private String subbeanString;
     @Inject("joinReward") ItemStack rewardItem;
     @Inject private QueuedTeleports queuedTeleports;
+    @Inject private Logger logger; // plugin's logger (name=pluginLogger)
 
     @EventHandler
     public void onJoin(PlayerJoinEvent event) {
@@ -41,5 +44,8 @@ public class TestListener implements Listener {
             Location locationTenUp = event.getPlayer().getLocation().add(0, 10, 0);
             this.queuedTeleports.teleport(event.getPlayer(), locationTenUp, (player) -> player.sendMessage("Enjoy flying!"));
         }
+
+        // logger demonstration
+        this.logger.warning("WOW SOMEONE IS WRITING: " + event.getMessage());
     }
 }
