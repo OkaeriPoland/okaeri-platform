@@ -94,7 +94,7 @@ public class ExamplePlugin extends OkaeriBukkitPlugin {
   }
 
   // built-in teleport optimization
-  // uses PaperLib async teleportation if available
+  // uses async teleportation if available
   // and queues teleports limiting potential lag spikes
   // see more in the TestListener for usage
   @Bean("teleportsQueue")
