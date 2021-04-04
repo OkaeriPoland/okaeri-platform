@@ -128,11 +128,13 @@ public class BukkitComponentCreator implements ComponentCreator {
             }
         }
 
-        // register component timer - skip if registered with annotated method return
+        // register component timer
         if (register) {
+            // not originating from method, update annotation
             if (timer == null) {
                 timer = beanObject.getClass().getAnnotation(Timer.class);
             }
+            // finally, register
             if ((timer != null) && (beanObject instanceof Runnable)) {
                 manifest.setName(timer.name());
                 this.registerTimer(timer, (Runnable) beanObject, timerName);

@@ -84,6 +84,7 @@ public class ExamplePlugin extends OkaeriBukkitPlugin {
   }
 
   // timer with injected properties
+  // can also be registered as class using @Register
   // supports all bukkit scheduler features:
   // delay: time before first call (defaults to same as rate)
   // rate: time between executions (in ticks)
