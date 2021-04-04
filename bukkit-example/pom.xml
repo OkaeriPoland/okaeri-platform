@@ -18,6 +18,7 @@
             <groupId>eu.okaeri</groupId>
             <artifactId>okaeri-platform-bukkit</artifactId>
             <version>0.0.10</version>
+            <scope>compile</scope>
         </dependency>
 
         <dependency>
