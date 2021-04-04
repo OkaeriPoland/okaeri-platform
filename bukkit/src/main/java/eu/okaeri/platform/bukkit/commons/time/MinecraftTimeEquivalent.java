@@ -1,5 +1,6 @@
 package eu.okaeri.platform.bukkit.commons.time;
 
+import java.time.Duration;
 import java.util.concurrent.TimeUnit;
 
 // utility exposing easy ready-to-use time->ticks values
@@ -75,7 +76,14 @@ public final class MinecraftTimeEquivalent {
     public static final int HOURS_24 = 24 * 60 * 60 * 20;
 
     public static int ticksOf(TimeUnit timeUnit, int value) {
-        long millis = timeUnit.toMillis(value);
+        return ticksOf(timeUnit.toMillis(value));
+    }
+
+    public static int ticksOf(Duration duration) {
+        return ticksOf(duration.toMillis());
+    }
+
+    public static int ticksOf(long millis) {
         if (millis < 50) throw new IllegalArgumentException("cannot transform " + millis + " ms to ticks, too low value");
         return Math.toIntExact(millis / 50L);
     }
