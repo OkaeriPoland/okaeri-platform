@@ -24,6 +24,11 @@
         </dependency>
         <dependency>
             <groupId>eu.okaeri</groupId>
+            <artifactId>okaeri-configs-core</artifactId>
+            <version>2.5.2</version>
+        </dependency>
+        <dependency>
+            <groupId>eu.okaeri</groupId>
             <artifactId>okaeri-injector</artifactId>
             <version>1.2.2</version>
         </dependency>
