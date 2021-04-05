@@ -5,6 +5,7 @@ import org.bukkit.Location;
 import org.bukkit.entity.Player;
 
 import java.util.Queue;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 @Getter
@@ -12,8 +13,10 @@ public final class QueuedTeleports {
 
     private final Queue<TeleportAction> teleportQueue = new ConcurrentLinkedQueue<>();
 
-    public void teleport(Player player, Location target) {
-        this.teleport(player, target, null);
+    public CompletableFuture<Player> teleport(Player player, Location target) {
+        CompletableFuture<Player> future = new CompletableFuture<>();
+        this.teleport(player, target, future::complete);
+        return future;
     }
 
     public void teleport(Player player, Location target, TeleportActionCallback callback) {

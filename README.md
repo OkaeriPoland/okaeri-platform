@@ -227,7 +227,7 @@ public class TestListener implements Listener {
       // you can use callback paramter if you want to make sure
       // actions are being executed only after teleportation happened
       Location locationTenUp = event.getPlayer().getLocation().add(0, 10, 0);
-      this.queuedTeleports.teleport(event.getPlayer(), locationTenUp, (player) -> player.sendMessage("Enjoy flying!"));
+      this.queuedTeleports.teleport(event.getPlayer(), locationTenUp).thenAccept((player) -> player.sendMessage("Enjoy flying!"));
     }
 
     // logger demonstration
