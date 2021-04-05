@@ -8,10 +8,27 @@
 
 Whole ecosystems built on top of the best okaeri packages.
 
+- Based on dependency injection/beans/components schema:
+  - subcomponent registration with Register(component class) annotation
+  - automatic field injections and bean creation
+- Persistence abstraction (e.g. BasicFlatPersistence, Cached<T>):
+  - serialization/deserialization based on okaeri-configs or custom solution
+  - ready to use support for database (redis, mysql, etc.) storage *Coming Soon*™
+  - ability to implement custom storage layers easily
+- Lots of platform specific utilities:
+  - register platform specific services as components
+  - use commons for the most boring tasks and cleaner code
+
 ## Bukkit
 
 Currently the only target (about 200kB total of additional jar size), integrates:
-
+- **Bukkit Platform Utilities**:
+  - `CommandRunner`: run multiple commands with fields on multiple targets (see example)
+  - `ItemStackBuilder`: easy item creation/manipulation (see example)
+  - `YamlBukkitPersistence`: an easy way to manage e.g. plugin specific player properties (see example)
+  - `AllWorldsRunnable`/`OnlinePlayersRunnable`: special runnable for iterating over all players/all worlds
+  - `QueuedTeleports`: optimized an elegant way to teleport players (see example)
+  - `MinecraftTimeEquivalent`: get ticks approximation from the real world time
 - **Dependency Injection**:
   - [okaeri-injector](https://github.com/OkaeriPoland/okaeri-injector): "Probably the most basic and simplest DI possible with just ~9kB in size."
 - **Configs**:
@@ -25,7 +42,8 @@ Currently the only target (about 200kB total of additional jar size), integrates
 
 ### Example
 
-See [bukkit-example](https://github.com/OkaeriPoland/okaeri-platform/tree/master/bukkit-example) for the repository/dependency and the shading guide.
+See [bukkit-example](https://github.com/OkaeriPoland/okaeri-platform/tree/master/bukkit-example) for the repository/dependency and the shading guide. 
+Note the code below does not represent full source code of the example.
 
 ```java
 // auto registers beans
@@ -182,10 +200,11 @@ public class TestCommand implements CommandService {
 public class TestListener implements Listener {
 
   @Inject private ExamplePlugin plugin;
+  @Inject private Logger logger; // plugin's logger (name=logger)
+  @Inject private Server server;
+  @Inject private QueuedTeleports queuedTeleports;
   @Inject("subbean") private String subbeanString;
   @Inject("joinReward") ItemStack rewardItem;
-  @Inject private QueuedTeleports queuedTeleports;
-  @Inject private Logger logger; // plugin's logger (name=logger)
 
   @EventHandler
   public void onJoin(PlayerJoinEvent event) {
@@ -199,7 +218,7 @@ public class TestListener implements Listener {
     if (event.getMessage().contains("admin pls tp spawn")) {
       // notice how #teleport call is still allowed async
       // as it only creates the task and puts it in the queue
-      Location spawnLocation = this.plugin.getServer().getWorlds().get(0).getSpawnLocation();
+      Location spawnLocation = this.server.getWorlds().get(0).getSpawnLocation();
       this.queuedTeleports.teleport(event.getPlayer(), spawnLocation);
       return;
     }

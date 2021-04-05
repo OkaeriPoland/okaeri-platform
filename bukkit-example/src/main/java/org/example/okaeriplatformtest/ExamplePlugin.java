@@ -4,19 +4,23 @@ import eu.okaeri.injector.annotation.Inject;
 import eu.okaeri.platform.bukkit.OkaeriBukkitPlugin;
 import eu.okaeri.platform.bukkit.annotation.Timer;
 import eu.okaeri.platform.bukkit.commons.item.ItemStackBuilder;
+import eu.okaeri.platform.bukkit.commons.persistence.YamlBukkitPersistence;
 import eu.okaeri.platform.bukkit.commons.teleport.QueuedTeleports;
 import eu.okaeri.platform.bukkit.commons.teleport.QueuedTeleportsTask;
 import eu.okaeri.platform.bukkit.commons.time.MinecraftTimeEquivalent;
 import eu.okaeri.platform.core.annotation.Bean;
 import eu.okaeri.platform.core.annotation.Register;
-import eu.okaeri.platform.core.persistence.Cached;
+import eu.okaeri.platform.core.persistence.Persistence;
+import eu.okaeri.platform.core.persistence.cache.Cached;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.Plugin;
+import org.example.okaeriplatformtest.persistence.PlayerPersistence;
 
+import java.io.File;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -34,6 +38,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 @Register(TestCommand.class)
 @Register(TestListener.class)
 @Register(TestTask.class)
+@Register(PlayerPersistence.class)
 public class ExamplePlugin extends OkaeriBukkitPlugin {
 
     @Inject("subbean")
@@ -47,6 +52,16 @@ public class ExamplePlugin extends OkaeriBukkitPlugin {
     @Override // do not use onDisable (especially without calling super)
     public void onPlatformDisabled() {
         this.getLogger().info("Disabled!");
+    }
+
+    // built-in persistence utils
+    // easy storage for e.g. player properties
+    // see persistence/PlayerPersistence for details
+    @Bean("persistence")
+    public Persistence configurePersistence(@Inject("dataFolder") File dataFolder) {
+        // specify custom child dir in dataFolder or other custom location
+        // or use YamlBukkitPersistence(plugin) for default pluginFolder/storage/*
+        return new YamlBukkitPersistence(new File(dataFolder, "storage"));
     }
 
     // method beans can use DI
