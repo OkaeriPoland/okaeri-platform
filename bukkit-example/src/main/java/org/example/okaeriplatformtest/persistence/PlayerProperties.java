@@ -7,7 +7,7 @@ import lombok.EqualsAndHashCode;
 import java.util.UUID;
 
 @Data
-@EqualsAndHashCode(callSuper = true)
+@EqualsAndHashCode(callSuper = false)
 // custom properties object based on okaeri-configs
 // allows for easy access to player's properties with
 // getters/setters instead of raw values and string keys

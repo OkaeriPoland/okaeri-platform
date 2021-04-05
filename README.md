@@ -27,7 +27,7 @@ Currently the only target (about 200kB total of additional jar size), integrates
   - `ItemStackBuilder`: easy item creation/manipulation (see example)
   - `YamlBukkitPersistence`: an easy way to manage e.g. plugin specific player properties (see example)
   - `AllWorldsRunnable`/`OnlinePlayersRunnable`: special runnable for iterating over all players/all worlds
-  - `QueuedTeleports`: optimized an elegant way to teleport players (see example)
+  - `QueuedTeleports`: optimized and elegant way to teleport players (see example)
   - `MinecraftTimeEquivalent`: get ticks approximation from the real world time
 - **Dependency Injection**:
   - [okaeri-injector](https://github.com/OkaeriPoland/okaeri-injector): "Probably the most basic and simplest DI possible with just ~9kB in size."
