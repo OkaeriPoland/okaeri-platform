@@ -1,8 +1,7 @@
 package eu.okaeri.platform.bukkit.commons.teleport;
 
-import org.bukkit.entity.Player;
+import org.bukkit.entity.Entity;
 
 public interface TeleportActionCallback {
-
-    void teleported(Player player);
+    void teleported(Entity who);
 }

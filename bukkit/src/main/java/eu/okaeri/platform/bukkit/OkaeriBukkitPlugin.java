@@ -25,18 +25,19 @@ public class OkaeriBukkitPlugin extends JavaPlugin {
 
         // initialize system
         this.getLogger().info("Initializing " + this.getClass());
-        this.commands = CommandsManager.create(CommandsInjector.of(CommandsBukkit.of(this), this.injector));
-        BukkitComponentCreator creator = new BukkitComponentCreator(this, this.commands);
         this.injector = OkaeriInjector.create(true)
                 .registerInjectable("server", this.getServer())
-                .registerInjectable("commands", this.getCommands())
                 .registerInjectable("dataFolder", this.getDataFolder())
                 .registerInjectable("logger", this.getLogger())
                 .registerInjectable("plugin", this)
                 .registerInjectable("scheduler", this.getServer().getScheduler())
                 .registerInjectable("scoreboardManager", this.getServer().getScoreboardManager())
                 .registerInjectable("pluginManager", this.getServer().getPluginManager());
+
         this.injector.registerInjectable("injector", this.getInjector());
+        this.commands = CommandsManager.create(CommandsInjector.of(CommandsBukkit.of(this), this.injector));
+        this.injector.registerInjectable("commands", this.getCommands());
+        BukkitComponentCreator creator = new BukkitComponentCreator(this, this.commands);
 
         // load commands/other beans
         try {

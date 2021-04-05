@@ -173,7 +173,9 @@ public class TestCommand implements CommandService {
   // testcmd|testing example
   @Executor
   public BukkitResponse example(@Label String label) {
-    return SuccessResponse.of("It works! " + label + " [" + this.test + "]");
+    return SuccessResponse.of("It works! {label} [{test}]")
+            .withField("{label}", label)
+            .withField("{test}", this.test);
   }
 
   // testcmd|testing complex
