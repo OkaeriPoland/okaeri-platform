@@ -15,33 +15,27 @@ import java.util.function.Consumer;
 
 public class TeleportAction {
 
-    private final Player player;
-    private final Location target;
+    private final Entity who;
+    private final Location where;
     private final TeleportActionCallback callback;
 
-    public TeleportAction(Player player, Location target) {
-        this.player = player;
-        this.target = target;
-        this.callback = null;
-    }
-
-    public TeleportAction(Player player, Location target, TeleportActionCallback callback) {
-        this.player = player;
-        this.target = target;
+    public TeleportAction(Entity who, Location where, TeleportActionCallback callback) {
+        this.who = who;
+        this.where = where;
         this.callback = callback;
     }
 
     @SuppressWarnings("unchecked")
     public void perform() {
 
-        if (!this.player.isOnline()) {
+        if ((this.who instanceof Player) && !((Player) this.who).isOnline()) {
             return;
         }
 
         Consumer<Boolean> consumer = success -> {
 
             if (!success) {
-                Bukkit.getLogger().severe("Failed to teleport the player " + this.player + " to " + this.target);
+                Bukkit.getLogger().severe("Failed to teleport the player " + this.who + " to " + this.where);
                 return;
             }
 
@@ -49,12 +43,12 @@ public class TeleportAction {
                 return;
             }
 
-            this.callback.teleported(this.player);
+            this.callback.teleported(this.who);
         };
 
         if (paperTeleportAsync != null) {
             try {
-                ((CompletableFuture<Boolean>) paperTeleportAsync.invoke(this.player, this.target)).thenAccept(consumer);
+                ((CompletableFuture<Boolean>) paperTeleportAsync.invoke(this.who, this.where)).thenAccept(consumer);
                 return;
             } catch (Throwable ignored) {
             }
@@ -62,13 +56,13 @@ public class TeleportAction {
 
         if (entityTeleportAsync != null) {
             try {
-                entityTeleportAsync.invoke(this.player, PlayerTeleportEvent.TeleportCause.PLUGIN);
+                entityTeleportAsync.invoke(this.who, PlayerTeleportEvent.TeleportCause.PLUGIN);
                 return;
             } catch (Throwable ignored) {
             }
         }
 
-        this.player.teleport(this.target);
+        this.who.teleport(this.where);
         consumer.accept(true);
     }
 
