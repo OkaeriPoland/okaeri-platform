@@ -27,7 +27,7 @@ public class CommandRunner<T> {
     }
 
     public static <T> CommandRunner<T> of(Plugin plugin, Collection<? extends T> targets) {
-        return new CommandRunner<T>(plugin, targets);
+        return new CommandRunner<T>(plugin, new ArrayList<>(targets));
     }
 
     private CommandRunner(Plugin plugin, Collection<? extends T> targets) {
@@ -67,7 +67,7 @@ public class CommandRunner<T> {
                         for (Map.Entry<String, String> entry : this.fields.entrySet()) {
                             String fieldName = entry.getKey();
                             String fieldValue = entry.getValue();
-                            command = StringUtils.replace(command, fieldName, fieldValue);
+                            command = StringUtils.replace(command, "{" + fieldName + "}", fieldValue);
                         }
                         return command;
                     })
@@ -75,7 +75,7 @@ public class CommandRunner<T> {
                         for (Map.Entry<String, CommandFieldReplacer<T>> replacerEntry : this.dynamicFields.entrySet()) {
                             String fieldName = replacerEntry.getKey();
                             CommandFieldReplacer<T> replacer = replacerEntry.getValue();
-                            command = StringUtils.replace(command, fieldName, replacer.replace(target));
+                            command = StringUtils.replace(command, "{" + fieldName + "}", replacer.replace(target));
                         }
                         return command;
                     })

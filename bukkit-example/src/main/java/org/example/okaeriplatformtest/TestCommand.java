@@ -29,8 +29,8 @@ public class TestCommand implements CommandService {
     @Executor
     public BukkitResponse example(@Label String label) {
         return SuccessResponse.of("It works! {label} [{test}]")
-                .withField("{label}", label)
-                .withField("{test}", this.test);
+                .withField("label", label)
+                .withField("test", this.test);
     }
 
     // testcmd|testing complex
@@ -66,7 +66,7 @@ public class TestCommand implements CommandService {
         this.server.getOnlinePlayers().stream()
                 .map(target -> this.teleports.teleport(target, playerLocation).join())
                 .forEach((target) -> SuccessResponse.of("You have been teleported here by {player}!")
-                        .withField("{player}", player)
+                        .withField("player", player)
                         .sendTo(target));
 
         // respond to the player after everyone is teleported
