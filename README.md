@@ -174,8 +174,8 @@ public class TestCommand implements CommandService {
   @Executor
   public BukkitResponse example(@Label String label) {
     return SuccessResponse.of("It works! {label} [{test}]")
-            .withField("{label}", label)
-            .withField("{test}", this.test);
+            .withField("label", label)
+            .withField("test", this.test);
   }
 
   // testcmd|testing complex
@@ -258,8 +258,8 @@ public class TestTask implements Runnable {
     // of commands e.g. from the configuration/web/other source
     CommandRunner.of(this.plugin, this.server.getOnlinePlayers()) // accepts any single element or collection
             .forceMainThread(true) // forces execution on the main thread
-            .withField("{ending}", "hmmm..")
-            .withField("{name}", HumanEntity::getName) // dynamic replaces based on current element or static values
+            .withField("ending", "hmmm..")
+            .withField("name", HumanEntity::getName) // dynamic replaces based on current element or static values
             .execute(Arrays.asList("say how are you {name}? {ending}", this.config.getRepeatingCommand())); // pass single element or collection of commands
 
     // accessing Cached<T>
@@ -339,3 +339,45 @@ Internals mainly used inside of the platform, but available for manual use. For 
 |-|-|-|
 | `commands` | eu.okaeri.commands.`OkaeriCommands` | instance of `okaeri-commands` used for registering commands internally |
 | `injector` | eu.okaeri.injector.`Injector` | instance of `okaeri-injector` used internally |
+
+### Performance
+
+The example plugin loads in below 50ms on the AMD Ryzen 3600 system. Runtime overhead for most of the components
+is negligible as most of the work is done at the startup which is relatively fast too.
+
+```console
+# platform startup speed
+[OkaeriPlatformBukkitExample] Enabling OkaeriPlatformBukkitExample v1.0-SNAPSHOT
+[OkaeriPlatformBukkitExample] Initializing class org.example.okaeriplatformtest.ExamplePlugin
+[OkaeriPlatformBukkitExample] - Loaded configuration: TestConfig { path = config.yml }
+[OkaeriPlatformBukkitExample] - Added command: TestCommand { label = testcmd, aliases = [testing] }
+[OkaeriPlatformBukkitExample] - Added timer: QueuedTeleportsTask { delay = 4, rate = 4, async = false }
+[OkaeriPlatformBukkitExample] - Added timer: exampleTimer { delay = 1200, rate = 1200, async = true }
+[OkaeriPlatformBukkitExample] - Added listener: TestListener { onJoin, onAsyncChat }
+[OkaeriPlatformBukkitExample] - Added timer: TestTask { delay = 6000, rate = 6000, async = true }
+[OkaeriPlatformBukkitExample] = (configs: 1, commands: 1, listeners: 1, timers: 3) 43 ms
+```
+
+**Commands (okaeri-commands)**
+- Services are scanned at the startup and then saved for further search
+- Overhead from matching pattern and method invocation is insignificant, see below
+
+```console
+# commands framework overhead benchmark ~ on average about 300 000 invocations per second
+# benchmark represents matching/invoking an executor (returning simple string) from multiple available
+Benchmark                          Mode  Cnt     Score    Error  Units
+BenchmarkCommands.command_complex  avgt   20  4192.172 ± 47.137  ns/op
+BenchmarkCommands.command_medium   avgt   20  2321.369 ± 66.198  ns/op
+BenchmarkCommands.command_simple   avgt   20  1849.535 ± 23.971  ns/op
+```
+
+**Configs (okaeri-configs)**
+- At the runtime accessing config object properties is no different from the standard POJO.
+- Reading/saving is mostly the same as using bukkit's config directly (I/O is the biggest concern here) and in most cases can be done async.
+
+**Timers (platform's commons)**
+- Any timer created as Runnable (@Bean, @Component) is no different from manually registering it.
+- Method timer comes at insignificant cost of the method invocation and DI (best used for async tasks).
+
+**Listeners (platform's commons)**
+- Any Listener registered with @Component is no different from manually registering it.

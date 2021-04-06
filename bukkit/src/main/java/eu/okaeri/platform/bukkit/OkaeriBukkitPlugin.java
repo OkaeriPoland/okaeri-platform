@@ -24,6 +24,7 @@ public class OkaeriBukkitPlugin extends JavaPlugin {
     public void onEnable() {
 
         // initialize system
+        long start = System.currentTimeMillis();
         this.getLogger().info("Initializing " + this.getClass());
         this.injector = OkaeriInjector.create(true)
                 .registerInjectable("server", this.getServer())
@@ -54,11 +55,13 @@ public class OkaeriBukkitPlugin extends JavaPlugin {
         }
 
         // woah
+        long took = System.currentTimeMillis() - start;
         this.getLogger().info("= (" +
                 "configs: " + creator.getLoadedConfigs().size() + ", " +
                 "commands: " + creator.getLoadedCommands().size() + ", " +
                 "listeners: " + creator.getLoadedListeners().size() + ", " +
-                "timers: " + creator.getLoadedTimers().size() + ")");
+                "timers: " + creator.getLoadedTimers().size() +
+                ") " + took + " ms");
 
         // call custom enable method
         this.onPlatformEnabled();
