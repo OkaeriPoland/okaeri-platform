@@ -337,7 +337,7 @@ Internals mainly used inside of the platform, but available for manual use. For 
 
 | Inject Name | Type | Description |
 |-|-|-|
-| `commands` | eu.okaeri.commands.`OkaeriCommands` | instance of `okaeri-commands` used for registering commands internally |
+| `commands` | eu.okaeri.commands.`Commands` | instance of `okaeri-commands` used for registering commands internally |
 | `injector` | eu.okaeri.injector.`Injector` | instance of `okaeri-injector` used internally |
 
 ### Performance
@@ -376,8 +376,8 @@ BenchmarkCommands.command_simple   avgt   20  1849.535 ± 23.971  ns/op
 - Reading/saving is mostly the same as using bukkit's config directly (I/O is the biggest concern here) and in most cases can be done async.
 
 **Timers (platform's commons)**
-- Any timer created as Runnable (@Bean, @Component) is no different from manually registering it.
-- Method timer comes at insignificant cost of the method invocation and DI (best used for async tasks).
+- Any timer created as Runnable (@Bean, @Timer (on class)) is no different from manually registering it.
+- Method @Timer comes at insignificant cost of the method invocation and DI (best used for async tasks).
 
 **Listeners (platform's commons)**
 - Any Listener registered with @Component is no different from manually registering it.

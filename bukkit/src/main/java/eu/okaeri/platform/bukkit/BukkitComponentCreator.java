@@ -1,6 +1,6 @@
 package eu.okaeri.platform.bukkit;
 
-import eu.okaeri.commands.OkaeriCommands;
+import eu.okaeri.commands.Commands;
 import eu.okaeri.commands.meta.ServiceMeta;
 import eu.okaeri.commands.service.CommandService;
 import eu.okaeri.configs.ConfigManager;
@@ -37,7 +37,7 @@ import static eu.okaeri.platform.core.component.ComponentHelper.invokeMethod;
 public class BukkitComponentCreator implements ComponentCreator {
 
     private final Plugin plugin;
-    private final OkaeriCommands commands;
+    private final Commands commands;
 
     @Getter private List<OkaeriConfig> loadedConfigs = new ArrayList<>();
     @Getter private List<CommandService> loadedCommands = new ArrayList<>();
