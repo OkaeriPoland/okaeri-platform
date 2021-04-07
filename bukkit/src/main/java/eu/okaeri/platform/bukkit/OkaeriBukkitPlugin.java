@@ -1,7 +1,7 @@
 package eu.okaeri.platform.bukkit;
 
+import eu.okaeri.commands.Commands;
 import eu.okaeri.commands.CommandsManager;
-import eu.okaeri.commands.OkaeriCommands;
 import eu.okaeri.commands.bukkit.CommandsBukkit;
 import eu.okaeri.commands.injector.CommandsInjector;
 import eu.okaeri.injector.Injector;
@@ -18,7 +18,7 @@ import java.util.logging.Level;
 public class OkaeriBukkitPlugin extends JavaPlugin {
 
     @Getter private Injector injector;
-    @Getter private OkaeriCommands commands;
+    @Getter private Commands commands;
 
     @Override
     public void onEnable() {
