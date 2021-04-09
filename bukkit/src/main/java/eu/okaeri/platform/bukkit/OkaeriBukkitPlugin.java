@@ -36,9 +36,10 @@ public class OkaeriBukkitPlugin extends JavaPlugin {
                 .registerInjectable("pluginManager", this.getServer().getPluginManager());
 
         this.injector.registerInjectable("injector", this.getInjector());
-        this.commands = CommandsManager.create(CommandsInjector.of(CommandsBukkit.of(this), this.injector));
+        CommandsBukkit commandsBukkit = CommandsBukkit.of(this).resultHandler(new BukkitCommandsResultHandler());
+        this.commands = CommandsManager.create(CommandsInjector.of(commandsBukkit, this.injector));
         this.injector.registerInjectable("commands", this.getCommands());
-        BukkitComponentCreator creator = new BukkitComponentCreator(this, this.commands);
+        BukkitComponentCreator creator = new BukkitComponentCreator(this, this.commands, this.injector);
 
         // load commands/other beans
         try {
@@ -60,7 +61,8 @@ public class OkaeriBukkitPlugin extends JavaPlugin {
                 "configs: " + creator.getLoadedConfigs().size() + ", " +
                 "commands: " + creator.getLoadedCommands().size() + ", " +
                 "listeners: " + creator.getLoadedListeners().size() + ", " +
-                "timers: " + creator.getLoadedTimers().size() +
+                "timers: " + creator.getLoadedTimers().size() + ", " +
+                "localeConfigs: " + creator.getLoadedLocaleConfigs().size() +
                 ") " + took + " ms");
 
         // call custom enable method
