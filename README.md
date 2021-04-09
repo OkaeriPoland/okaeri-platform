@@ -45,7 +45,7 @@ Currently the only target (about 200kB total of additional jar size), integrates
 ### Example
 
 See [bukkit-example](https://github.com/OkaeriPoland/okaeri-platform/tree/master/bukkit-example) for the repository/dependency and the shading guide. 
-Note the code below does not represent full source code of the example.
+Note the code below does not represent full source code of the example. Project in the example directory represents at least basic usage of every component.
 
 ```java
 // auto registers beans

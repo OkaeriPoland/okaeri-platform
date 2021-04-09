@@ -107,7 +107,7 @@ public class BukkitComponentCreator implements ComponentCreator {
 
                 OkaeriConfig config = ConfigManager.create(beanClazz, (it) -> {
                     it.withBindFile(new File(this.plugin.getDataFolder(), path));
-                    it.withConfigurer(new OkaeriValidator(configurer, defaultNotNull)); // FIXME: allow for custom configurers
+                    it.withConfigurer(new OkaeriValidator(configurer, defaultNotNull));
                     it.saveDefaults();
                     it.load(true);
                 });
