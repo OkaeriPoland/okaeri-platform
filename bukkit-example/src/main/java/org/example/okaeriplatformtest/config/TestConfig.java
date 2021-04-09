@@ -1,4 +1,4 @@
-package org.example.okaeriplatformtest;
+package org.example.okaeriplatformtest.config;
 
 import eu.okaeri.configs.OkaeriConfig;
 import eu.okaeri.configs.annotation.*;
@@ -21,7 +21,7 @@ import lombok.Setter;
 @Getter
 @Setter
 // automatically manages file inside plugin's directory
-@Configuration(path = "config.yml")
+@Configuration
 // adds header, supports multiline strings or multiple annotations
 // string array can be passed as an argument too, same with @Comment
 // it is possible to create empty line with "" and empty comment with " "

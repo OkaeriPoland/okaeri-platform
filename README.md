@@ -38,7 +38,9 @@ Currently the only target (about 200kB total of additional jar size), integrates
   - [okaeri-commands-bukkit](https://github.com/OkaeriPoland/okaeri-commands/tree/master/bukkit): annotation based command framework (see [okaeri-commands](https://github.com/OkaeriPoland/okaeri-commands))
   - [okaeri-commands-injector](https://github.com/OkaeriPoland/okaeri-commands/tree/master/injector): okaeri-injector integration for the best ecosystem experience
 - **Messages (i18n)**
-  - *Coming Soon*™: currently it is recommended to create `@Configuration(path = "messages.yml")`
+  - [okaeri-i18n](https://github.com/OkaeriPoland/okaeri-i18n): translation library with compile time key checking (getters possible instead of string keys),
+    built using amazing [okaeri-placeholders](https://github.com/OkaeriPoland/okaeri-placeholders) with pluralization for 143 locales, subfields, default values, boolean/floating point formatting,
+    placeholder arguments (`{player.healthBar(20)}`, `{top.guild(1)}`, `{top.guild(1,kills)}`)
 
 ### Example
 
@@ -287,7 +289,7 @@ public class TestTask implements Runnable {
 //
 // automatically manages file inside plugin's directory
 // allows component to be registered with @Register
-@Configuration(path = "config.yml")
+@Configuration // config.yml by default - to change use path = "custom_location.yml"
 // adds header, supports multiline strings or multiple annotations
 // string array can be passed as an argument too, same with @Comment
 // it is possible to create empty line with "" and empty comment with " "
@@ -342,7 +344,7 @@ Internals mainly used inside of the platform, but available for manual use. For 
 
 ### Performance
 
-The example plugin loads in below 50ms on the AMD Ryzen 3600 system. Runtime overhead for most of the components
+The example plugin loads in below 100ms on the AMD Ryzen 3600 system. Runtime overhead for most of the components
 is negligible as most of the work is done at the startup which is relatively fast too.
 
 ```console

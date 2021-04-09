@@ -18,6 +18,8 @@ import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.Plugin;
+import org.example.okaeriplatformtest.config.TestConfig;
+import org.example.okaeriplatformtest.config.TestLocaleConfig;
 import org.example.okaeriplatformtest.persistence.PlayerPersistence;
 
 import java.io.File;
@@ -35,6 +37,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 // - any beans located in class with @Component
 // skip registration using register=false
 @Register(TestConfig.class)
+@Register(TestLocaleConfig.class)
 @Register(TestCommand.class)
 @Register(TestListener.class)
 @Register(TestTask.class)

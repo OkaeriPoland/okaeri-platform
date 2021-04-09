@@ -9,11 +9,13 @@ import java.lang.annotation.Target;
 
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
-public @interface Configuration {
+public @interface Messages {
 
-    String path() default "config.yml";
+    String path() default "i18n";
     Class<? extends Configurer> provider() default DEFAULT.class;
-    boolean defaultNotNull() default true;
+    String suffix() default ".yml";
+    String defaultLocale();
+    boolean unpack() default true;
 
     abstract class DEFAULT extends Configurer {
     }

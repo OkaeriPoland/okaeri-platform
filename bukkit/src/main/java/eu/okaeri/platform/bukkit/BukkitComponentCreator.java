@@ -5,20 +5,29 @@ import eu.okaeri.commands.meta.ServiceMeta;
 import eu.okaeri.commands.service.CommandService;
 import eu.okaeri.configs.ConfigManager;
 import eu.okaeri.configs.OkaeriConfig;
-import eu.okaeri.configs.postprocessor.SectionSeparator;
+import eu.okaeri.configs.configurer.Configurer;
+import eu.okaeri.configs.schema.ConfigDeclaration;
+import eu.okaeri.configs.schema.FieldDeclaration;
 import eu.okaeri.configs.validator.okaeri.OkaeriValidator;
 import eu.okaeri.configs.yaml.bukkit.YamlBukkitConfigurer;
+import eu.okaeri.i18n.configs.LocaleConfig;
+import eu.okaeri.i18n.configs.LocaleConfigManager;
+import eu.okaeri.i18n.configs.impl.MOCI18n;
 import eu.okaeri.injector.Injector;
+import eu.okaeri.placeholders.bukkit.BukkitPlaceholders;
 import eu.okaeri.platform.bukkit.annotation.Timer;
+import eu.okaeri.platform.bukkit.commons.i18n.PlayerLocaleProvider;
 import eu.okaeri.platform.core.annotation.Bean;
 import eu.okaeri.platform.core.annotation.Component;
 import eu.okaeri.platform.core.annotation.Configuration;
+import eu.okaeri.platform.core.annotation.Messages;
 import eu.okaeri.platform.core.component.ComponentCreator;
 import eu.okaeri.platform.core.component.ComponentHelper;
 import eu.okaeri.platform.core.component.manifest.BeanManifest;
 import eu.okaeri.platform.core.component.manifest.BeanSource;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import net.md_5.bungee.api.ChatColor;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.plugin.Plugin;
@@ -38,8 +47,10 @@ public class BukkitComponentCreator implements ComponentCreator {
 
     private final Plugin plugin;
     private final Commands commands;
+    private final Injector injector;
 
     @Getter private List<OkaeriConfig> loadedConfigs = new ArrayList<>();
+    @Getter private List<LocaleConfig> loadedLocaleConfigs = new ArrayList<>();
     @Getter private List<CommandService> loadedCommands = new ArrayList<>();
     @Getter private List<Listener> loadedListeners = new ArrayList<>();
     @Getter private List<BukkitTask> loadedTimers = new ArrayList<>();
@@ -49,6 +60,7 @@ public class BukkitComponentCreator implements ComponentCreator {
         return (type.getAnnotation(Component.class) != null)
                 || (type.getAnnotation(Timer.class) != null)
                 || (type.getAnnotation(Configuration.class) != null)
+                || (type.getAnnotation(Messages.class) != null)
                 || CommandService.class.isAssignableFrom(type)
                 || OkaeriBukkitPlugin.class.isAssignableFrom(type);
     }
@@ -60,7 +72,7 @@ public class BukkitComponentCreator implements ComponentCreator {
     }
 
     @Override
-    @SuppressWarnings("unchecked")
+    @SuppressWarnings({"unchecked", "ResultOfMethodCallIgnored"})
     public Object makeObject(BeanManifest manifest, Injector injector) {
 
         // validation
@@ -76,25 +88,30 @@ public class BukkitComponentCreator implements ComponentCreator {
         boolean changed = false;
 
         // create config instance if applicable - @Register only - allows method component (manually created config) to be processed
-        if (register && (OkaeriConfig.class.isAssignableFrom(manifestType)) && (manifest.getSource() == BeanSource.COMPONENT)) {
+        if (register && (!LocaleConfig.class.isAssignableFrom(manifestType)) && (OkaeriConfig.class.isAssignableFrom(manifestType)) && (manifest.getSource() == BeanSource.COMPONENT)) {
 
             Class<? extends OkaeriConfig> beanClazz = (Class<? extends OkaeriConfig>) manifestType;
             Configuration configuration = beanClazz.getAnnotation(Configuration.class);
             if (configuration == null) {
-                throw new IllegalArgumentException("Cannot auto-register OkaeriConfig without @Configuration annotation, use register=false to just register an instance");
+                throw new IllegalArgumentException("Cannot auto-register OkaeriConfig without @Configuration annotation, use register=false to just register as instance");
             }
 
             String path = configuration.path();
             boolean defaultNotNull = configuration.defaultNotNull();
+            Class<? extends Configurer> provider = configuration.provider();
 
             try {
+                Configurer configurer = (provider == Configuration.DEFAULT.class)
+                        ? new YamlBukkitConfigurer()
+                        : provider.newInstance();
+
                 OkaeriConfig config = ConfigManager.create(beanClazz, (it) -> {
                     it.withBindFile(new File(this.plugin.getDataFolder(), path));
-                    it.withConfigurer(new OkaeriValidator(new YamlBukkitConfigurer(SectionSeparator.NONE), defaultNotNull));
+                    it.withConfigurer(new OkaeriValidator(configurer, defaultNotNull)); // FIXME: allow for custom configurers
                     it.saveDefaults();
                     it.load(true);
                 });
-                this.plugin.getLogger().info("- Loaded configuration: " + beanClazz.getSimpleName() + " { path = " + path + " }");
+                this.plugin.getLogger().info("- Loaded configuration: " + beanClazz.getSimpleName() + " { path = " + path + ", provider = " + provider.getSimpleName() + " }");
                 this.loadedConfigs.add(config);
                 beanObject = config;
                 changed = true;
@@ -103,6 +120,74 @@ public class BukkitComponentCreator implements ComponentCreator {
                 this.plugin.getLogger().log(Level.SEVERE, "Failed to load configuration " + path, exception);
                 this.plugin.getServer().getPluginManager().disablePlugin(this.plugin);
                 throw new RuntimeException("Configuration load failure");
+            }
+        }
+
+        // create locale config instance if applicable - @Register only - allows method component (manually created config) to be processed
+        if (register && (LocaleConfig.class.isAssignableFrom(manifestType)) && (manifest.getSource() == BeanSource.COMPONENT)) {
+
+            Class<? extends LocaleConfig> beanClazz = (Class<? extends LocaleConfig>) manifestType;
+            Messages messages = beanClazz.getAnnotation(Messages.class);
+            if (messages == null) {
+                throw new IllegalArgumentException("Cannot auto-register LocaleConfig without @Messages annotation, use register=false to just register as instance");
+            }
+
+            String path = messages.path();
+            String suffix = messages.suffix();
+            Class<? extends Configurer> provider = messages.provider();
+            boolean unpack = messages.unpack();
+            File directory = new File(this.plugin.getDataFolder(), path);
+            directory.mkdirs();
+
+            try {
+                LocaleConfig template = LocaleConfigManager.createTemplate(beanClazz);
+                File[] files = directory.listFiles((dir, name) -> name.toLowerCase(Locale.ROOT).endsWith(suffix));
+                MOCI18n i18n = new MOCI18n();
+                i18n.setDefaultLocale(Locale.forLanguageTag(messages.defaultLocale()));
+                i18n.registerLocaleProvider(new PlayerLocaleProvider());
+                i18n.setPlaceholders(BukkitPlaceholders.create());
+                List<Locale> loadedLocales = new ArrayList<>();
+                this.injector.registerInjectable(template);
+
+                if (files != null) {
+                    for (File file : files) {
+
+                        String name = file.getName();
+                        String localeName = name.substring(0, name.length() - suffix.length());
+                        Locale locale = Locale.forLanguageTag(localeName);
+
+                        Configurer configurer = (provider == Messages.DEFAULT.class)
+                                ? new YamlBukkitConfigurer()
+                                : provider.newInstance();
+
+                        LocaleConfig localeConfig = ConfigManager.create(beanClazz, it -> {
+                            it.withConfigurer(configurer);
+                            it.withBindFile(file);
+                            it.load();
+                        });
+
+                        ConfigDeclaration declaration = localeConfig.getDeclaration();
+                        for (FieldDeclaration field : declaration.getFields()) {
+                            if (!(field.getValue() instanceof String)) continue;
+                            String fieldValue = String.valueOf(field.getValue());
+                            field.updateValue(ChatColor.translateAlternateColorCodes('&', fieldValue));
+                        }
+
+                        i18n.registerConfig(locale, localeConfig);
+                        this.loadedLocaleConfigs.add(localeConfig);
+                        loadedLocales.add(locale);
+                    }
+                }
+
+                this.plugin.getLogger().info("- Loaded messages: " + beanClazz.getSimpleName() + " { path = " + path + ", suffix = " + suffix + ", provider = " + provider.getSimpleName() + " }");
+                this.plugin.getLogger().info("  > " + loadedLocales.stream().map(Locale::toString).collect(Collectors.joining(", ")));
+                beanObject = i18n;
+                changed = true;
+            }
+            catch (Exception exception) {
+                this.plugin.getLogger().log(Level.SEVERE, "Failed to load messages configuration " + path, exception);
+                this.plugin.getServer().getPluginManager().disablePlugin(this.plugin);
+                throw new RuntimeException("Messages configuration load failure");
             }
         }
 

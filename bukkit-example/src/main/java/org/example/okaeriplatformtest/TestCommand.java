@@ -1,5 +1,6 @@
 package org.example.okaeriplatformtest;
 
+import eu.okaeri.commands.annotation.Arg;
 import eu.okaeri.commands.annotation.Executor;
 import eu.okaeri.commands.annotation.Label;
 import eu.okaeri.commands.annotation.ServiceDescriptor;
@@ -8,6 +9,8 @@ import eu.okaeri.commands.bukkit.response.ErrorResponse;
 import eu.okaeri.commands.bukkit.response.RawResponse;
 import eu.okaeri.commands.bukkit.response.SuccessResponse;
 import eu.okaeri.commands.service.CommandService;
+import eu.okaeri.i18n.configs.impl.MOCI18n;
+import eu.okaeri.i18n.message.Message;
 import eu.okaeri.injector.annotation.Inject;
 import eu.okaeri.platform.bukkit.commons.teleport.QueuedTeleports;
 import eu.okaeri.platform.core.annotation.Bean;
@@ -15,6 +18,10 @@ import org.bukkit.Location;
 import org.bukkit.Server;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+import org.example.okaeriplatformtest.config.TestConfig;
+import org.example.okaeriplatformtest.config.TestLocaleConfig;
+
+import java.util.logging.Logger;
 
 @ServiceDescriptor(label = "testcmd", aliases = "testing")
 public class TestCommand implements CommandService {
@@ -24,6 +31,9 @@ public class TestCommand implements CommandService {
     @Inject private TestConfig config;
     @Inject private Server server;
     @Inject private QueuedTeleports teleports;
+    @Inject private MOCI18n i18n;
+    @Inject private TestLocaleConfig messages;
+    @Inject private Logger logger;
 
     // testcmd|testing example
     @Executor
@@ -43,6 +53,49 @@ public class TestCommand implements CommandService {
     @Executor(pattern = {"greet", "greeting"}, description = "greets you :O")
     public BukkitResponse greet(ExamplePlugin diExample, @Inject("testString") String namedDiExample) {
         return RawResponse.of(this.config.getGreeting(), diExample.getName(), namedDiExample);
+    }
+
+    // testcmd|testing i18n
+    @Executor
+    public Message i18n(CommandSender sender) {
+        return this.i18n.get(sender, this.messages.getPlayerMessage())
+                .with("sender", sender);
+    }
+
+    // testcmd|testing i18nbench
+    @Executor
+    public Message i18nbench(CommandSender sender) {
+        Message message = this.i18n.get(sender, this.messages.getPlayerMessage()).with("sender", sender);
+        long start = System.nanoTime();
+        StringBuilder builder = new StringBuilder();
+        for (int i = 0; i < 1000; i++) {
+            builder.append(message.apply());
+        }
+        long took = System.nanoTime() - start;
+        sender.sendMessage(builder.substring(0, 1));
+        sender.sendMessage(took + " " + (took / 1000) );
+        return message;
+    }
+
+    // testcmd|testing i18n <value>
+    @Executor(pattern = "i18n *")
+    public Message i18n(CommandSender sender, @Arg("value") String value) {
+        this.logger.info("test i18n " + value);
+        if ("1".equals(value)) {
+            return this.i18n.get(sender, this.messages.getExampleMessage())
+                    .with("who", 1);
+        } else if ("2".equals(value)) {
+            return this.i18n.get(sender, this.messages.getExampleMessage())
+                    .with("who", 2);
+        } else if ("you".equals(value)) {
+            Message with = this.i18n.get(sender, this.messages.getExampleMessage())
+                    .with("who", "you");
+            System.out.println(with);
+            this.logger.info(with.apply());
+            return with;
+        } else {
+            return this.i18n.get(sender, this.messages.getExampleMessage());
+        }
     }
 
     // testcmd|testing tphereall
