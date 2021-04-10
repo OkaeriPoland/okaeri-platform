@@ -78,6 +78,3 @@ public abstract class BasicFlatPersistence implements Persistence<Document> {
     }
 }
 
-// undocumented feature of okaeri-configs :woah:
-class FlatConfig extends OkaeriConfig {
-}

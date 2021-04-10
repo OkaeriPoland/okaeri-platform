@@ -1,17 +1,15 @@
 package org.example.okaeriplatformtest;
 
-import eu.okaeri.commands.annotation.Arg;
-import eu.okaeri.commands.annotation.Executor;
-import eu.okaeri.commands.annotation.Label;
-import eu.okaeri.commands.annotation.ServiceDescriptor;
+import eu.okaeri.commands.annotation.*;
 import eu.okaeri.commands.bukkit.response.BukkitResponse;
 import eu.okaeri.commands.bukkit.response.ErrorResponse;
 import eu.okaeri.commands.bukkit.response.RawResponse;
 import eu.okaeri.commands.bukkit.response.SuccessResponse;
 import eu.okaeri.commands.service.CommandService;
-import eu.okaeri.i18n.configs.impl.MOCI18n;
 import eu.okaeri.i18n.message.Message;
 import eu.okaeri.injector.annotation.Inject;
+import eu.okaeri.placeholders.message.CompiledMessage;
+import eu.okaeri.platform.bukkit.commons.i18n.BI18n;
 import eu.okaeri.platform.bukkit.commons.teleport.QueuedTeleports;
 import eu.okaeri.platform.core.annotation.Bean;
 import org.bukkit.Location;
@@ -21,6 +19,8 @@ import org.bukkit.entity.Player;
 import org.example.okaeriplatformtest.config.TestConfig;
 import org.example.okaeriplatformtest.config.TestLocaleConfig;
 
+import java.util.List;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 @ServiceDescriptor(label = "testcmd", aliases = "testing")
@@ -31,7 +31,7 @@ public class TestCommand implements CommandService {
     @Inject private TestConfig config;
     @Inject private Server server;
     @Inject private QueuedTeleports teleports;
-    @Inject private MOCI18n i18n;
+    @Inject private BI18n i18n;
     @Inject private TestLocaleConfig messages;
     @Inject private Logger logger;
 
@@ -60,6 +60,22 @@ public class TestCommand implements CommandService {
     public Message i18n(CommandSender sender) {
         return this.i18n.get(sender, this.messages.getPlayerMessage())
                 .with("sender", sender);
+    }
+
+    // testcmd|testing reload
+    @Executor
+    public Message reload(CommandSender sender) {
+
+        try {
+            this.config.load(); // reload config
+            this.i18n.load(); // reload current i18n locales configs (no removing, no adding at runtime)
+        }
+        catch (Exception exception) {
+            this.logger.log(Level.SEVERE, "Failed to reload configuration", exception);
+            return this.i18n.get(sender, this.messages.getReloadFailMessage());
+        }
+
+        return this.i18n.get(sender, this.messages.getReloadMessage());
     }
 
     // testcmd|testing i18nbench
@@ -96,6 +112,18 @@ public class TestCommand implements CommandService {
         } else {
             return this.i18n.get(sender, this.messages.getExampleMessage());
         }
+    }
+
+    // testcmd|testing eval <message> - looks dangerous tbh
+    @Executor(pattern = "eval")
+    public String eval(CommandSender sender, @RawArgs List<String> rawArgs) {
+
+        String raw = String.join(" ", rawArgs.subList(1, rawArgs.size()));
+        CompiledMessage message = CompiledMessage.of(raw);
+
+        return this.i18n.getPlaceholders().contextOf(message)
+                .with("sender", sender)
+                .apply();
     }
 
     // testcmd|testing tphereall
