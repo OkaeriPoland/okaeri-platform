@@ -40,19 +40,19 @@
         <dependency>
             <groupId>eu.okaeri</groupId>
             <artifactId>okaeri-placeholders-bukkit</artifactId>
-            <version>1.4.2</version>
+            <version>1.4.3</version>
         </dependency>
 
         <!-- commands -->
         <dependency>
             <groupId>eu.okaeri</groupId>
             <artifactId>okaeri-commands-bukkit</artifactId>
-            <version>0.2.0</version>
+            <version>0.2.1</version>
         </dependency>
         <dependency>
             <groupId>eu.okaeri</groupId>
             <artifactId>okaeri-commands-injector</artifactId>
-            <version>0.2.0</version>
+            <version>0.2.1</version>
         </dependency>
 
         <!-- spigot -->

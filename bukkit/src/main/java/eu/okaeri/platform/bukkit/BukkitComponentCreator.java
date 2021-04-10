@@ -11,6 +11,7 @@ import eu.okaeri.configs.yaml.bukkit.YamlBukkitConfigurer;
 import eu.okaeri.i18n.configs.LocaleConfig;
 import eu.okaeri.i18n.configs.LocaleConfigManager;
 import eu.okaeri.injector.Injector;
+import eu.okaeri.placeholders.Placeholders;
 import eu.okaeri.placeholders.bukkit.BukkitPlaceholders;
 import eu.okaeri.platform.bukkit.annotation.Timer;
 import eu.okaeri.platform.bukkit.commons.i18n.BI18n;
@@ -41,6 +42,8 @@ import static eu.okaeri.platform.core.component.ComponentHelper.invokeMethod;
 
 @RequiredArgsConstructor
 public class BukkitComponentCreator implements ComponentCreator {
+
+    public static Placeholders defaultPlaceholders;
 
     private final Plugin plugin;
     private final Commands commands;
@@ -125,6 +128,15 @@ public class BukkitComponentCreator implements ComponentCreator {
         // create locale config instance if applicable - @Register only - allows method component (manually created config) to be processed
         if (register && (LocaleConfig.class.isAssignableFrom(manifestType)) && (manifest.getSource() == BeanSource.COMPONENT)) {
 
+            // not really needed thanks to preloading in OkaeriBukkitPlugin but just in case
+            if (defaultPlaceholders == null) {
+                long start = System.currentTimeMillis();
+                defaultPlaceholders = BukkitPlaceholders.create(true);
+                long took = System.currentTimeMillis() - start;
+                int resolversCount = defaultPlaceholders.getResolversCount();
+                this.plugin.getLogger().info("- Loaded placeholders system for i18n { resolversCount = " + resolversCount + " } [" + took + " ms]");
+            }
+
             long start = System.currentTimeMillis();
             Class<? extends LocaleConfig> beanClazz = (Class<? extends LocaleConfig>) manifestType;
             Messages messages = beanClazz.getAnnotation(Messages.class);
@@ -146,7 +158,7 @@ public class BukkitComponentCreator implements ComponentCreator {
                 BI18n i18n = new BI18n();
                 i18n.setDefaultLocale(Locale.forLanguageTag(messages.defaultLocale()));
                 i18n.registerLocaleProvider(new PlayerLocaleProvider());
-                i18n.setPlaceholders(BukkitPlaceholders.create(true));
+                i18n.setPlaceholders(this.defaultPlaceholders.copy());
 
                 List<Locale> loadedLocales = new ArrayList<>();
                 this.injector.registerInjectable(path, template);
