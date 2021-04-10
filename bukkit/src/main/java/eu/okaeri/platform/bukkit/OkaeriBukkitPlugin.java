@@ -63,7 +63,7 @@ public class OkaeriBukkitPlugin extends JavaPlugin {
                 "listeners: " + creator.getLoadedListeners().size() + ", " +
                 "timers: " + creator.getLoadedTimers().size() + ", " +
                 "localeConfigs: " + creator.getLoadedLocaleConfigs().size() +
-                ") " + took + " ms");
+                ") [" + took + " ms]");
 
         // call custom enable method
         this.onPlatformEnabled();

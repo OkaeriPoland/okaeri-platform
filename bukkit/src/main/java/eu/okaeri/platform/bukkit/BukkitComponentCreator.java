@@ -6,16 +6,14 @@ import eu.okaeri.commands.service.CommandService;
 import eu.okaeri.configs.ConfigManager;
 import eu.okaeri.configs.OkaeriConfig;
 import eu.okaeri.configs.configurer.Configurer;
-import eu.okaeri.configs.schema.ConfigDeclaration;
-import eu.okaeri.configs.schema.FieldDeclaration;
 import eu.okaeri.configs.validator.okaeri.OkaeriValidator;
 import eu.okaeri.configs.yaml.bukkit.YamlBukkitConfigurer;
 import eu.okaeri.i18n.configs.LocaleConfig;
 import eu.okaeri.i18n.configs.LocaleConfigManager;
-import eu.okaeri.i18n.configs.impl.MOCI18n;
 import eu.okaeri.injector.Injector;
 import eu.okaeri.placeholders.bukkit.BukkitPlaceholders;
 import eu.okaeri.platform.bukkit.annotation.Timer;
+import eu.okaeri.platform.bukkit.commons.i18n.BI18n;
 import eu.okaeri.platform.bukkit.commons.i18n.PlayerLocaleProvider;
 import eu.okaeri.platform.core.annotation.Bean;
 import eu.okaeri.platform.core.annotation.Component;
@@ -27,7 +25,6 @@ import eu.okaeri.platform.core.component.manifest.BeanManifest;
 import eu.okaeri.platform.core.component.manifest.BeanSource;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import net.md_5.bungee.api.ChatColor;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.plugin.Plugin;
@@ -90,6 +87,7 @@ public class BukkitComponentCreator implements ComponentCreator {
         // create config instance if applicable - @Register only - allows method component (manually created config) to be processed
         if (register && (!LocaleConfig.class.isAssignableFrom(manifestType)) && (OkaeriConfig.class.isAssignableFrom(manifestType)) && (manifest.getSource() == BeanSource.COMPONENT)) {
 
+            long start = System.currentTimeMillis();
             Class<? extends OkaeriConfig> beanClazz = (Class<? extends OkaeriConfig>) manifestType;
             Configuration configuration = beanClazz.getAnnotation(Configuration.class);
             if (configuration == null) {
@@ -103,7 +101,7 @@ public class BukkitComponentCreator implements ComponentCreator {
             try {
                 Configurer configurer = (provider == Configuration.DEFAULT.class)
                         ? new YamlBukkitConfigurer()
-                        : provider.newInstance();
+                        : this.injector.createInstance(provider);
 
                 OkaeriConfig config = ConfigManager.create(beanClazz, (it) -> {
                     it.withBindFile(new File(this.plugin.getDataFolder(), path));
@@ -111,7 +109,8 @@ public class BukkitComponentCreator implements ComponentCreator {
                     it.saveDefaults();
                     it.load(true);
                 });
-                this.plugin.getLogger().info("- Loaded configuration: " + beanClazz.getSimpleName() + " { path = " + path + ", provider = " + provider.getSimpleName() + " }");
+                long took = System.currentTimeMillis() - start;
+                this.plugin.getLogger().info("- Loaded configuration: " + beanClazz.getSimpleName() + " { path = " + path + ", provider = " + provider.getSimpleName() + " } [" + took + " ms]");
                 this.loadedConfigs.add(config);
                 beanObject = config;
                 changed = true;
@@ -126,6 +125,7 @@ public class BukkitComponentCreator implements ComponentCreator {
         // create locale config instance if applicable - @Register only - allows method component (manually created config) to be processed
         if (register && (LocaleConfig.class.isAssignableFrom(manifestType)) && (manifest.getSource() == BeanSource.COMPONENT)) {
 
+            long start = System.currentTimeMillis();
             Class<? extends LocaleConfig> beanClazz = (Class<? extends LocaleConfig>) manifestType;
             Messages messages = beanClazz.getAnnotation(Messages.class);
             if (messages == null) {
@@ -142,12 +142,14 @@ public class BukkitComponentCreator implements ComponentCreator {
             try {
                 LocaleConfig template = LocaleConfigManager.createTemplate(beanClazz);
                 File[] files = directory.listFiles((dir, name) -> name.toLowerCase(Locale.ROOT).endsWith(suffix));
-                MOCI18n i18n = new MOCI18n();
+
+                BI18n i18n = new BI18n();
                 i18n.setDefaultLocale(Locale.forLanguageTag(messages.defaultLocale()));
                 i18n.registerLocaleProvider(new PlayerLocaleProvider());
-                i18n.setPlaceholders(BukkitPlaceholders.create());
+                i18n.setPlaceholders(BukkitPlaceholders.create(true));
+
                 List<Locale> loadedLocales = new ArrayList<>();
-                this.injector.registerInjectable(template);
+                this.injector.registerInjectable(path, template);
 
                 if (files != null) {
                     for (File file : files) {
@@ -158,28 +160,18 @@ public class BukkitComponentCreator implements ComponentCreator {
 
                         Configurer configurer = (provider == Messages.DEFAULT.class)
                                 ? new YamlBukkitConfigurer()
-                                : provider.newInstance();
+                                : this.injector.createInstance(provider);
 
-                        LocaleConfig localeConfig = ConfigManager.create(beanClazz, it -> {
-                            it.withConfigurer(configurer);
-                            it.withBindFile(file);
-                            it.load();
-                        });
-
-                        ConfigDeclaration declaration = localeConfig.getDeclaration();
-                        for (FieldDeclaration field : declaration.getFields()) {
-                            if (!(field.getValue() instanceof String)) continue;
-                            String fieldValue = String.valueOf(field.getValue());
-                            field.updateValue(ChatColor.translateAlternateColorCodes('&', fieldValue));
-                        }
-
+                        LocaleConfig localeConfig = LocaleConfigManager.create(beanClazz, configurer, file);
                         i18n.registerConfig(locale, localeConfig);
+
                         this.loadedLocaleConfigs.add(localeConfig);
                         loadedLocales.add(locale);
                     }
                 }
 
-                this.plugin.getLogger().info("- Loaded messages: " + beanClazz.getSimpleName() + " { path = " + path + ", suffix = " + suffix + ", provider = " + provider.getSimpleName() + " }");
+                long took = System.currentTimeMillis() - start;
+                this.plugin.getLogger().info("- Loaded messages: " + beanClazz.getSimpleName() + " { path = " + path + ", suffix = " + suffix + ", provider = " + provider.getSimpleName() + " } [" + took + " ms]");
                 this.plugin.getLogger().info("  > " + loadedLocales.stream().map(Locale::toString).collect(Collectors.joining(", ")));
                 beanObject = i18n;
                 changed = true;

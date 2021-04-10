@@ -14,7 +14,7 @@ public @interface Messages {
     String path() default "i18n";
     Class<? extends Configurer> provider() default DEFAULT.class;
     String suffix() default ".yml";
-    String defaultLocale();
+    String defaultLocale() default "en";
     boolean unpack() default true;
 
     abstract class DEFAULT extends Configurer {
