@@ -20,7 +20,7 @@
         <dependency>
             <groupId>eu.okaeri</groupId>
             <artifactId>okaeri-commands-core</artifactId>
-            <version>0.2.0</version>
+            <version>0.2.1</version>
         </dependency>
         <dependency>
             <groupId>eu.okaeri</groupId>
@@ -30,7 +30,7 @@
         <dependency>
             <groupId>eu.okaeri</groupId>
             <artifactId>okaeri-i18n-configs</artifactId>
-            <version>1.1.7</version>
+            <version>1.1.8</version>
         </dependency>
         <dependency>
             <groupId>eu.okaeri</groupId>
