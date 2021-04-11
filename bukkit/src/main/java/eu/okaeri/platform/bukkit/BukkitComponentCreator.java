@@ -6,8 +6,10 @@ import eu.okaeri.commands.service.CommandService;
 import eu.okaeri.configs.ConfigManager;
 import eu.okaeri.configs.OkaeriConfig;
 import eu.okaeri.configs.configurer.Configurer;
+import eu.okaeri.configs.serdes.OkaeriSerdesPack;
 import eu.okaeri.configs.validator.okaeri.OkaeriValidator;
 import eu.okaeri.configs.yaml.bukkit.YamlBukkitConfigurer;
+import eu.okaeri.configs.yaml.bukkit.serdes.SerdesBukkit;
 import eu.okaeri.i18n.configs.LocaleConfig;
 import eu.okaeri.i18n.configs.LocaleConfigManager;
 import eu.okaeri.injector.Injector;
@@ -37,6 +39,7 @@ import java.lang.reflect.Method;
 import java.util.*;
 import java.util.logging.Level;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static eu.okaeri.platform.core.component.ComponentHelper.invokeMethod;
 
@@ -122,12 +125,17 @@ public class BukkitComponentCreator implements ComponentCreator {
                         ? new YamlBukkitConfigurer()
                         : this.injector.createInstance(provider);
 
+                OkaeriSerdesPack[] serdesPacks = Stream.concat(Stream.of(SerdesBukkit.class), Arrays.stream(configuration.serdes()))
+                        .map(this.injector::createInstance)
+                        .toArray(OkaeriSerdesPack[]::new);
+
                 OkaeriConfig config = ConfigManager.create(beanClazz, (it) -> {
                     it.withBindFile(new File(this.plugin.getDataFolder(), path));
-                    it.withConfigurer(new OkaeriValidator(configurer, defaultNotNull));
+                    it.withConfigurer(new OkaeriValidator(configurer, defaultNotNull), serdesPacks);
                     it.saveDefaults();
                     it.load(true);
                 });
+
                 long took = System.currentTimeMillis() - start;
                 this.log("Loaded configuration: " + beanClazz.getSimpleName() + " { path = " + path + ", provider = " + provider.getSimpleName() + " } [" + took + " ms]");
                 this.loadedConfigs.add(config);
