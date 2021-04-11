@@ -350,17 +350,17 @@ thanks to special async preloading technology (blocking time is the real time se
 
 ```console
 # platform startup speed
-[OkaeriPlatformBukkitExample] Enabling OkaeriPlatformBukkitExample v1.0-SNAPSHOT
-[OkaeriPlatformBukkitExample] Initializing class org.example.okaeriplatformtest.ExamplePlugin
-[OkaeriPlatformBukkitExample] ~ Loaded configuration: TestConfig { path = config.yml, provider = DEFAULT } [17 ms]
-[OkaeriPlatformBukkitExample] ~ Loaded messages: TestLocaleConfig { path = i18n, suffix = .yml, provider = DEFAULT } [20 ms]
-[OkaeriPlatformBukkitExample]   > es, pl
-[OkaeriPlatformBukkitExample] - Added timer: exampleTimer { delay = 1200, rate = 1200, async = true }
-[OkaeriPlatformBukkitExample] - Added timer: QueuedTeleportsTask { delay = 4, rate = 4, async = false }
-[OkaeriPlatformBukkitExample] - Added command: TestCommand { label = testcmd, aliases = [testing] }
-[OkaeriPlatformBukkitExample] - Added timer: TestTask { delay = 6000, rate = 6000, async = true }
-[OkaeriPlatformBukkitExample] - Added listener: TestListener { onAsyncChat, onJoin }
-[OkaeriPlatformBukkitExample] = (configs: 1, commands: 1, listeners: 1, timers: 3, localeConfigs: 2) [blocking: 15 ms]
+[..] Enabling OkaeriPlatformBukkitExample v1.0-SNAPSHOT
+[..] Initializing class org.example.okaeriplatformtest.ExamplePlugin
+[..] ~ Loaded configuration: TestConfig { path = config.yml, provider = DEFAULT } [17 ms]
+[..] ~ Loaded messages: TestLocaleConfig { path = i18n, suffix = .yml, provider = DEFAULT } [20 ms]
+[..]   > es, pl
+[..] - Added timer: exampleTimer { delay = 1200, rate = 1200, async = true }
+[..] - Added timer: QueuedTeleportsTask { delay = 4, rate = 4, async = false }
+[..] - Added command: TestCommand { label = testcmd, aliases = [testing] }
+[..] - Added timer: TestTask { delay = 6000, rate = 6000, async = true }
+[..] - Added listener: TestListener { onAsyncChat, onJoin }
+[..] = (configs: 1, commands: 1, listeners: 1, timers: 3, localeConfigs: 2) [blocking: 15 ms]
 ```
 
 **Commands (okaeri-commands)**
