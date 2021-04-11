@@ -344,9 +344,10 @@ Internals mainly used inside of the platform, but available for manual use. For 
 
 ### Performance
 
-The example plugin loads in under 20ms on the AMD Ryzen 3600 system. Runtime overhead for most of the components
-is negligible as most of the work is done at the startup, which is relatively fast, and even less noticeable
-thanks to special async preloading technology (blocking time is the real time server spent waiting for the platform).
+The example plugin loads in under 20ms on the AMD Ryzen 3600 system. Runtime overhead for most of the components is negligible
+as most of the work is done at the startup, which is relatively fast, and even less noticeable thanks to special async preloading
+technology (up to 5x faster loading time). We use highly parallelized startup routine that can load most of the data at
+the time server is loading worlds or other plugins. Blocking time is the real time server spent waiting for the platform.
 
 ```console
 # platform startup speed

@@ -26,6 +26,8 @@ import java.util.logging.Level;
 
 public class OkaeriBukkitPlugin extends JavaPlugin {
 
+    private static final boolean USE_PARALLELISM = Boolean.parseBoolean(System.getProperty("okaeri.platform.parallelism", "true"));
+
     @Getter private Injector injector;
     @Getter private Commands commands;
 
@@ -68,7 +70,7 @@ public class OkaeriBukkitPlugin extends JavaPlugin {
     private void preloadData(String name, Runnable runnable) {
         Thread preloader = this.createPreloadThread(name, runnable);
         this.preloaders.add(preloader);
-        preloader.start();
+        if (USE_PARALLELISM) preloader.start();
     }
 
     @SneakyThrows
@@ -117,10 +119,13 @@ public class OkaeriBukkitPlugin extends JavaPlugin {
         // dispatch async logs
         // to show that these were loaded
         // before other components here
-        this.creator.dispatchLogs();
+        if (this.creator != null) this.creator.dispatchLogs();
 
         // wait if not initialized yet
-        for (Thread preloader : this.preloaders) preloader.join();
+        for (Thread preloader : this.preloaders) {
+            if (USE_PARALLELISM) preloader.join();
+            else preloader.run();
+        }
 
         // register injectables
         this.injector

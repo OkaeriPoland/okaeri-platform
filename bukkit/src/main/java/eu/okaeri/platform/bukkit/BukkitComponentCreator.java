@@ -64,7 +64,8 @@ public class BukkitComponentCreator implements ComponentCreator {
 
     private void log(String message) {
         if (Bukkit.isPrimaryThread()) {
-            this.plugin.getLogger().info("- " + message);
+            Arrays.stream(("- " + message).split("\n"))
+                    .forEach(line -> this.plugin.getLogger().info(line));
             return;
         }
         this.asyncLogs.add("~ " + message);
