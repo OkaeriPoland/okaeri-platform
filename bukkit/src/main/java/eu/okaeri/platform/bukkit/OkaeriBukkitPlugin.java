@@ -5,6 +5,8 @@ import eu.okaeri.commands.CommandsManager;
 import eu.okaeri.commands.bukkit.CommandsBukkit;
 import eu.okaeri.commands.injector.CommandsInjector;
 import eu.okaeri.configs.OkaeriConfig;
+import eu.okaeri.configs.schema.ConfigDeclaration;
+import eu.okaeri.configs.schema.FieldDeclaration;
 import eu.okaeri.i18n.configs.LocaleConfig;
 import eu.okaeri.injector.Injector;
 import eu.okaeri.injector.OkaeriInjector;
@@ -19,14 +21,18 @@ import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.plugin.java.JavaPluginLoader;
 
 import java.io.File;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 import java.util.logging.Level;
 
 
 public class OkaeriBukkitPlugin extends JavaPlugin {
 
     private static final boolean USE_PARALLELISM = Boolean.parseBoolean(System.getProperty("okaeri.platform.parallelism", "true"));
+    private static final Set<String> ASYNC_BANNED_TYPES = new HashSet<>(Arrays.asList(
+            "org.bukkit.block.Block",
+            "org.bukkit.Location",
+            "org.bukkit.World"
+    ));
 
     @Getter private Injector injector;
     @Getter private Commands commands;
@@ -87,9 +93,37 @@ public class OkaeriBukkitPlugin extends JavaPlugin {
                 continue;
             }
 
+            if (this.isUnsafeAsync(depend.getType())) {
+                continue;
+            }
+
             depend.setObject(this.creator.makeObject(depend, this.injector));
             this.injector.registerInjectable(depend.getName(), depend.getObject());
         }
+    }
+
+    @SuppressWarnings("unchecked")
+    private boolean isUnsafeAsync(Class<?> configType) {
+
+        ConfigDeclaration declaration = ConfigDeclaration.of(configType);
+
+        for (FieldDeclaration field : declaration.getFields()) {
+
+            Class<?> fieldRealType = field.getType().getType();
+
+            if (OkaeriConfig.class.isAssignableFrom(fieldRealType)) {
+                // subconfig - deep check
+                if (!this.isUnsafeAsync(fieldRealType)) {
+                    return false;
+                }
+            }
+
+            if (ASYNC_BANNED_TYPES.contains(fieldRealType.getCanonicalName())) {
+                return false;
+            }
+        }
+
+        return true;
     }
 
     @SneakyThrows
@@ -139,7 +173,7 @@ public class OkaeriBukkitPlugin extends JavaPlugin {
 
         // load commands/other beans
         try {
-            // scan starting from the current class
+            // execute component tree and register everything
             this.beanManifest.execute(this.creator, this.injector);
             // sub-components do not require manual injecting because
             // these are filled at the initialization by the DI itself

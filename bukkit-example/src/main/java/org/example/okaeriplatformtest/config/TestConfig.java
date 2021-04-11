@@ -6,6 +6,8 @@ import eu.okaeri.platform.core.annotation.Configuration;
 import eu.okaeri.validator.annotation.Size;
 import lombok.Getter;
 import lombok.Setter;
+import org.bukkit.Bukkit;
+import org.bukkit.World;
 
 // automatically created in the plugin dir
 // updates comments and changes (new keys) automatically
@@ -21,6 +23,7 @@ import lombok.Setter;
 @Getter
 @Setter
 // automatically manages file inside plugin's directory
+// custom serialization packs with serdes = {CustomSerdesPack.class, ..}
 @Configuration
 // adds header, supports multiline strings or multiple annotations
 // string array can be passed as an argument too, same with @Comment
@@ -48,4 +51,7 @@ public class TestConfig extends OkaeriConfig {
 
     @Comment("Example command")
     private String repeatingCommand = "say from the config for {name}!";
+
+    @Comment("Magic")
+    private World world = Bukkit.getWorld("world");
 }
