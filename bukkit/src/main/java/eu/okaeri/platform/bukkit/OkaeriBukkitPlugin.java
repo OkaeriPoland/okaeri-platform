@@ -114,16 +114,16 @@ public class OkaeriBukkitPlugin extends JavaPlugin {
             if (OkaeriConfig.class.isAssignableFrom(fieldRealType)) {
                 // subconfig - deep check
                 if (!this.isUnsafeAsync(fieldRealType)) {
-                    return false;
+                    return true;
                 }
             }
 
             if (ASYNC_BANNED_TYPES.contains(fieldRealType.getCanonicalName())) {
-                return false;
+                return true;
             }
         }
 
-        return true;
+        return false;
     }
 
     @SneakyThrows

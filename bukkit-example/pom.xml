@@ -17,7 +17,7 @@
         <dependency>
             <groupId>eu.okaeri</groupId>
             <artifactId>okaeri-platform-bukkit</artifactId>
-            <version>0.2.0</version>
+            <version>0.2.1</version>
             <scope>compile</scope>
         </dependency>
 
@@ -38,7 +38,7 @@
 
     <build>
         <finalName>okaeriplatformtest-bukkit-${project.version}</finalName>
-        <defaultGoal>clean install</defaultGoal>
+        <defaultGoal>clean package</defaultGoal>
         <resources>
             <resource>
                 <directory>src/main/resources</directory>
