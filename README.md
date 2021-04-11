@@ -344,23 +344,23 @@ Internals mainly used inside of the platform, but available for manual use. For 
 
 ### Performance
 
-The example plugin loads in under 50ms on the AMD Ryzen 3600 system. Runtime overhead for most of the components
+The example plugin loads in under 20ms on the AMD Ryzen 3600 system. Runtime overhead for most of the components
 is negligible as most of the work is done at the startup, which is relatively fast, and even less noticeable
-thanks to special async preloading technology.
+thanks to special async preloading technology (blocking time is the real time server spent waiting for the platform).
 
 ```console
 # platform startup speed
 [OkaeriPlatformBukkitExample] Enabling OkaeriPlatformBukkitExample v1.0-SNAPSHOT
 [OkaeriPlatformBukkitExample] Initializing class org.example.okaeriplatformtest.ExamplePlugin
-[OkaeriPlatformBukkitExample] - Added timer: QueuedTeleportsTask { delay = 4, rate = 4, async = false }
-[OkaeriPlatformBukkitExample] - Loaded configuration: TestConfig { path = config.yml, provider = DEFAULT } [6 ms]
-[OkaeriPlatformBukkitExample] - Loaded messages: TestLocaleConfig { path = i18n, suffix = .yml, provider = DEFAULT } [5 ms]
+[OkaeriPlatformBukkitExample] ~ Loaded configuration: TestConfig { path = config.yml, provider = DEFAULT } [17 ms]
+[OkaeriPlatformBukkitExample] ~ Loaded messages: TestLocaleConfig { path = i18n, suffix = .yml, provider = DEFAULT } [20 ms]
 [OkaeriPlatformBukkitExample]   > es, pl
-[OkaeriPlatformBukkitExample] - Added command: TestCommand { label = testcmd, aliases = [testing] }
 [OkaeriPlatformBukkitExample] - Added timer: exampleTimer { delay = 1200, rate = 1200, async = true }
-[OkaeriPlatformBukkitExample] - Added listener: TestListener { onJoin, onAsyncChat }
+[OkaeriPlatformBukkitExample] - Added timer: QueuedTeleportsTask { delay = 4, rate = 4, async = false }
+[OkaeriPlatformBukkitExample] - Added command: TestCommand { label = testcmd, aliases = [testing] }
 [OkaeriPlatformBukkitExample] - Added timer: TestTask { delay = 6000, rate = 6000, async = true }
-[OkaeriPlatformBukkitExample] = (configs: 1, commands: 1, listeners: 1, timers: 3, localeConfigs: 2) [27 ms]
+[OkaeriPlatformBukkitExample] - Added listener: TestListener { onAsyncChat, onJoin }
+[OkaeriPlatformBukkitExample] = (configs: 1, commands: 1, listeners: 1, timers: 3, localeConfigs: 2) [blocking: 15 ms]
 ```
 
 **Commands (okaeri-commands)**

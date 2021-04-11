@@ -4,6 +4,8 @@ import eu.okaeri.commands.Commands;
 import eu.okaeri.commands.CommandsManager;
 import eu.okaeri.commands.bukkit.CommandsBukkit;
 import eu.okaeri.commands.injector.CommandsInjector;
+import eu.okaeri.configs.OkaeriConfig;
+import eu.okaeri.i18n.configs.LocaleConfig;
 import eu.okaeri.injector.Injector;
 import eu.okaeri.injector.OkaeriInjector;
 import eu.okaeri.placeholders.bukkit.BukkitPlaceholders;
@@ -42,6 +44,7 @@ public class OkaeriBukkitPlugin extends JavaPlugin {
 
     // let's see who is faster
     private void postBukkitConstruct() {
+        this.getLogger().info("Preloading " + this.getName() + " " + this.getDescription().getVersion());
         this.preloadData("Placeholders", () -> BukkitComponentCreator.defaultPlaceholders = BukkitPlaceholders.create(true));
         this.preloadData("BeanManifest", () -> {
             this.injector = OkaeriInjector.create(true);
@@ -52,13 +55,55 @@ public class OkaeriBukkitPlugin extends JavaPlugin {
             this.creator = new BukkitComponentCreator(this, this.commands, this.injector);
             this.beanManifest = BeanManifest.of(this.getClass(), this.creator, true);
         });
+        this.preloadData("Config", () -> this.preloadConfig(this.beanManifest));
+        this.preloadData("LocaleConfig", () -> this.preloadLocaleConfig(this.beanManifest));
+    }
+
+    private Thread createPreloadThread(String name, Runnable runnable) {
+        Thread preloader = new Thread(runnable);
+        preloader.setName("Okaeri Platform Preloader (" + this.getName() + ") - " + name);
+        return preloader;
     }
 
     private void preloadData(String name, Runnable runnable) {
-        Thread preloader = new Thread(runnable);
-        preloader.setName("Okaeri Platform Preloader - " + name);
+        Thread preloader = this.createPreloadThread(name, runnable);
         this.preloaders.add(preloader);
-        preloader.run();
+        preloader.start();
+    }
+
+    @SneakyThrows
+    private void preloadConfig(BeanManifest beanManifest) {
+
+        while (this.beanManifest == null) Thread.sleep(1);
+        List<BeanManifest> depends = this.beanManifest.getDepends();
+
+        for (BeanManifest depend : depends) {
+
+            if (!OkaeriConfig.class.isAssignableFrom(depend.getType()) // is not okaeri config
+                    || LocaleConfig.class.isAssignableFrom(depend.getType()) // or is locale config
+                    || !depend.ready(this.injector)) { // or is not ready (somehow has dependencies)
+                continue;
+            }
+
+            depend.setObject(this.creator.makeObject(depend, this.injector));
+            this.injector.registerInjectable(depend.getName(), depend.getObject());
+        }
+    }
+
+    @SneakyThrows
+    private void preloadLocaleConfig(BeanManifest beanManifest) {
+
+        while ((this.beanManifest == null) || (BukkitComponentCreator.defaultPlaceholders == null)) Thread.sleep(1);
+        List<BeanManifest> depends = this.beanManifest.getDepends();
+
+        for (BeanManifest depend : depends) {
+            if (!LocaleConfig.class.isAssignableFrom(depend.getType())  // is not locale config
+                    || !depend.ready(this.injector)) { // or is not ready (somehow has dependencies)
+                continue;
+            }
+            depend.setObject(this.creator.makeObject(depend, this.injector));
+            this.injector.registerInjectable(depend.getName(), depend.getObject());
+        }
     }
 
     @Override
@@ -68,6 +113,11 @@ public class OkaeriBukkitPlugin extends JavaPlugin {
         // initialize system
         long start = System.currentTimeMillis();
         this.getLogger().info("Initializing " + this.getClass());
+
+        // dispatch async logs
+        // to show that these were loaded
+        // before other components here
+        this.creator.dispatchLogs();
 
         // wait if not initialized yet
         for (Thread preloader : this.preloaders) preloader.join();
@@ -104,7 +154,7 @@ public class OkaeriBukkitPlugin extends JavaPlugin {
                 "listeners: " + this.creator.getLoadedListeners().size() + ", " +
                 "timers: " + this.creator.getLoadedTimers().size() + ", " +
                 "localeConfigs: " + this.creator.getLoadedLocaleConfigs().size() +
-                ") [" + took + " ms]");
+                ") [blocking: " + took + " ms]");
 
         // call custom enable method
         this.onPlatformEnabled();
