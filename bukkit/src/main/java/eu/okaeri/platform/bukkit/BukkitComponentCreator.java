@@ -113,7 +113,7 @@ public class BukkitComponentCreator implements ComponentCreator {
             Class<? extends OkaeriConfig> beanClazz = (Class<? extends OkaeriConfig>) manifestType;
             Configuration configuration = beanClazz.getAnnotation(Configuration.class);
             if (configuration == null) {
-                throw new IllegalArgumentException("Cannot auto-register OkaeriConfig without @Configuration annotation, use register=false to just register as instance");
+                throw new IllegalArgumentException("Cannot auto-register OkaeriConfig without @Configuration annotation, use register=false to just register as instance: " + beanClazz);
             }
 
             String path = configuration.path();
@@ -165,7 +165,7 @@ public class BukkitComponentCreator implements ComponentCreator {
             Class<? extends LocaleConfig> beanClazz = (Class<? extends LocaleConfig>) manifestType;
             Messages messages = beanClazz.getAnnotation(Messages.class);
             if (messages == null) {
-                throw new IllegalArgumentException("Cannot auto-register LocaleConfig without @Messages annotation, use register=false to just register as instance");
+                throw new IllegalArgumentException("Cannot auto-register LocaleConfig without @Messages annotation, use register=false to just register as instance: " + beanClazz);
             }
 
             String path = messages.path();
@@ -284,7 +284,7 @@ public class BukkitComponentCreator implements ComponentCreator {
     private void registerCommand(CommandService commandService) {
 
         ServiceMeta serviceMeta = ServiceMeta.of(commandService);
-        this.commands.register(commandService);
+        this.commands.getRegistry().register(commandService);
 
         Map<String, String> commandMeta = new LinkedHashMap<>();
         commandMeta.put("label", serviceMeta.getLabel());

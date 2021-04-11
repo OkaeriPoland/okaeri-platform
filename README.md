@@ -369,12 +369,12 @@ the time server is loading worlds or other plugins. Blocking time is the real ti
 - Overhead from matching pattern and method invocation is insignificant, see below
 
 ```console
-# commands framework overhead benchmark ~ on average about 300 000 invocations per second
+# commands framework overhead benchmark ~ over 1 000 000 invocations per second
 # benchmark represents matching/invoking an executor (returning simple string) from multiple available
-Benchmark                          Mode  Cnt     Score    Error  Units
-BenchmarkCommands.command_complex  avgt   20  4192.172 ± 47.137  ns/op
-BenchmarkCommands.command_medium   avgt   20  2321.369 ± 66.198  ns/op
-BenchmarkCommands.command_simple   avgt   20  1849.535 ± 23.971  ns/op
+Benchmark                           Mode  Cnt        Score       Error  Units
+BenchmarkCommands.command_complex  thrpt    5  1109842.766 ± 47168.401  ops/s   901 ns/invocation
+BenchmarkCommands.command_medium   thrpt    5  1112048.204 ± 46700.652  ops/s   899 ns/invocation
+BenchmarkCommands.command_simple   thrpt    5  1253307.288 ± 31533.820  ops/s   797 ns/invocation
 ```
 
 **Configs (okaeri-configs)**
