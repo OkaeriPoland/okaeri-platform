@@ -26,9 +26,9 @@ import eu.okaeri.platform.core.component.manifest.BeanManifest;
 import eu.okaeri.platform.core.component.manifest.BeanSource;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import org.bukkit.Bukkit;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
-import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitScheduler;
 import org.bukkit.scheduler.BukkitTask;
 
@@ -45,7 +45,7 @@ public class BukkitComponentCreator implements ComponentCreator {
 
     public static Placeholders defaultPlaceholders;
 
-    private final Plugin plugin;
+    private final OkaeriBukkitPlugin plugin;
     private final Commands commands;
     private final Injector injector;
 
@@ -54,6 +54,21 @@ public class BukkitComponentCreator implements ComponentCreator {
     @Getter private List<CommandService> loadedCommands = new ArrayList<>();
     @Getter private List<Listener> loadedListeners = new ArrayList<>();
     @Getter private List<BukkitTask> loadedTimers = new ArrayList<>();
+    @Getter private List<String> asyncLogs = new ArrayList<>();
+
+    public void dispatchLogs() {
+        this.asyncLogs.stream()
+                .flatMap(asyncLog -> Arrays.stream(asyncLog.split("\n")))
+                .forEach(line -> this.plugin.getLogger().info(line));
+    }
+
+    private void log(String message) {
+        if (Bukkit.isPrimaryThread()) {
+            this.plugin.getLogger().info("- " + message);
+            return;
+        }
+        this.asyncLogs.add("~ " + message);
+    }
 
     @Override
     public boolean isComponent(Class<?> type) {
@@ -113,7 +128,7 @@ public class BukkitComponentCreator implements ComponentCreator {
                     it.load(true);
                 });
                 long took = System.currentTimeMillis() - start;
-                this.plugin.getLogger().info("- Loaded configuration: " + beanClazz.getSimpleName() + " { path = " + path + ", provider = " + provider.getSimpleName() + " } [" + took + " ms]");
+                this.log("Loaded configuration: " + beanClazz.getSimpleName() + " { path = " + path + ", provider = " + provider.getSimpleName() + " } [" + took + " ms]");
                 this.loadedConfigs.add(config);
                 beanObject = config;
                 changed = true;
@@ -134,7 +149,7 @@ public class BukkitComponentCreator implements ComponentCreator {
                 defaultPlaceholders = BukkitPlaceholders.create(true);
                 long took = System.currentTimeMillis() - start;
                 int resolversCount = defaultPlaceholders.getResolversCount();
-                this.plugin.getLogger().info("- Loaded placeholders system for i18n { resolversCount = " + resolversCount + " } [" + took + " ms]");
+                this.log("Loaded placeholders system for i18n { resolversCount = " + resolversCount + " } [" + took + " ms]");
             }
 
             long start = System.currentTimeMillis();
@@ -158,7 +173,7 @@ public class BukkitComponentCreator implements ComponentCreator {
                 BI18n i18n = new BI18n();
                 i18n.setDefaultLocale(Locale.forLanguageTag(messages.defaultLocale()));
                 i18n.registerLocaleProvider(new PlayerLocaleProvider());
-                i18n.setPlaceholders(this.defaultPlaceholders.copy());
+                i18n.setPlaceholders(defaultPlaceholders.copy());
 
                 List<Locale> loadedLocales = new ArrayList<>();
                 this.injector.registerInjectable(path, template);
@@ -183,8 +198,8 @@ public class BukkitComponentCreator implements ComponentCreator {
                 }
 
                 long took = System.currentTimeMillis() - start;
-                this.plugin.getLogger().info("- Loaded messages: " + beanClazz.getSimpleName() + " { path = " + path + ", suffix = " + suffix + ", provider = " + provider.getSimpleName() + " } [" + took + " ms]");
-                this.plugin.getLogger().info("  > " + loadedLocales.stream().map(Locale::toString).collect(Collectors.joining(", ")));
+                this.log("Loaded messages: " + beanClazz.getSimpleName() + " { path = " + path + ", suffix = " + suffix + ", provider = " + provider.getSimpleName() + " } [" + took + " ms]\n" +
+                        "  > " + loadedLocales.stream().map(Locale::toString).collect(Collectors.joining(", ")));
                 beanObject = i18n;
                 changed = true;
             }
@@ -208,8 +223,7 @@ public class BukkitComponentCreator implements ComponentCreator {
                 else {
                     beanObject = invokeMethod(manifest, injector);
                 }
-            }
-            else if (manifest.getSource() == BeanSource.COMPONENT) {
+            } else if (manifest.getSource() == BeanSource.COMPONENT) {
                 if (!this.isComponent(manifestType)) {
                     throw new RuntimeException("Cannot create instance of non-component class " + manifestType);
                 }
@@ -255,7 +269,7 @@ public class BukkitComponentCreator implements ComponentCreator {
                 .map(Method::getName)
                 .collect(Collectors.joining(", "));
 
-        this.plugin.getLogger().info("- Added listener: " + listener.getClass().getSimpleName() + " { " + listenerMethods + " }");
+        this.log("Added listener: " + listener.getClass().getSimpleName() + " { " + listenerMethods + " }");
     }
 
     private void registerCommand(CommandService commandService) {
@@ -274,7 +288,7 @@ public class BukkitComponentCreator implements ComponentCreator {
                 .map(entry -> entry.getKey() + " = " + entry.getValue())
                 .collect(Collectors.joining(", "));
 
-        this.plugin.getLogger().info("- Added command: " + commandService.getClass().getSimpleName() + " { " + commandMetaString + " }");
+        this.log("Added command: " + commandService.getClass().getSimpleName() + " { " + commandMetaString + " }");
     }
 
     private void registerTimer(Timer timer, Runnable runnable, String nameOverride) {
@@ -290,6 +304,6 @@ public class BukkitComponentCreator implements ComponentCreator {
 
         String resultingTimerName = ((nameOverride == null) ? runnable.getClass().getSimpleName() : nameOverride);
         String timerMeta = "delay = " + delay + ", rate = " + timer.rate() + ", async = " + timer.async();
-        this.plugin.getLogger().info("- Added timer: " + resultingTimerName + " { " + timerMeta + " }");
+        this.log("Added timer: " + resultingTimerName + " { " + timerMeta + " }");
     }
 }

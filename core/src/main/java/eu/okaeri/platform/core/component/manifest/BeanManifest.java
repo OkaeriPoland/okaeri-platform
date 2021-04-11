@@ -112,7 +112,6 @@ public class BeanManifest {
         return manifest;
     }
 
-
     private String name;
     private Object object;
     private Class<?> type;
@@ -188,7 +187,7 @@ public class BeanManifest {
         }
     }
 
-    private boolean ready(Injector injector) {
+    public boolean ready(Injector injector) {
 
         for (BeanManifest depend : this.depends) {
 
