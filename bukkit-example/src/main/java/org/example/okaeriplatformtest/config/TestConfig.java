@@ -6,8 +6,6 @@ import eu.okaeri.platform.core.annotation.Configuration;
 import eu.okaeri.validator.annotation.Size;
 import lombok.Getter;
 import lombok.Setter;
-import org.bukkit.Bukkit;
-import org.bukkit.World;
 
 // automatically created in the plugin dir
 // updates comments and changes (new keys) automatically
@@ -51,7 +49,4 @@ public class TestConfig extends OkaeriConfig {
 
     @Comment("Example command")
     private String repeatingCommand = "say from the config for {name}!";
-
-    @Comment("Magic")
-    private World world = Bukkit.getWorld("world");
 }
