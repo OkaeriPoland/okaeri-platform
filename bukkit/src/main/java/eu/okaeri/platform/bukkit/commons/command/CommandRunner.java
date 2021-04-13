@@ -1,6 +1,5 @@
 package eu.okaeri.platform.bukkit.commons.command;
 
-import org.apache.commons.lang.StringUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.plugin.Plugin;
@@ -9,8 +8,7 @@ import java.util.*;
 
 /**
  * CommandRunner runner = CommandRunner.of(Bukkit.getOnlinePlayers())
- *   .forceMainThread()
- *   .withField("{name}", (target) -> target.getName())
+ *   .field("{name}", (target) -> target.getName())
  *   .execute("say {name}");
  */
 public class CommandRunner<T> {
@@ -35,12 +33,12 @@ public class CommandRunner<T> {
         this.targets = targets;
     }
 
-    public CommandRunner<T> withField(String name, String content) {
+    public CommandRunner<T> field(String name, String content) {
         this.fields.put(name, content);
         return this;
     }
 
-    public CommandRunner<T> withField(String name, CommandFieldReplacer<T> fieldReplacer) {
+    public CommandRunner<T> field(String name, CommandFieldReplacer<T> fieldReplacer) {
         this.dynamicFields.put(name, fieldReplacer);
         return this;
     }
@@ -67,7 +65,7 @@ public class CommandRunner<T> {
                         for (Map.Entry<String, String> entry : this.fields.entrySet()) {
                             String fieldName = entry.getKey();
                             String fieldValue = entry.getValue();
-                            command = StringUtils.replace(command, "{" + fieldName + "}", fieldValue);
+                            command = command.replace("{" + fieldName + "}", fieldValue);
                         }
                         return command;
                     })
@@ -75,7 +73,7 @@ public class CommandRunner<T> {
                         for (Map.Entry<String, CommandFieldReplacer<T>> replacerEntry : this.dynamicFields.entrySet()) {
                             String fieldName = replacerEntry.getKey();
                             CommandFieldReplacer<T> replacer = replacerEntry.getValue();
-                            command = StringUtils.replace(command, "{" + fieldName + "}", replacer.replace(target));
+                            command = command.replace("{" + fieldName + "}", replacer.replace(target));
                         }
                         return command;
                     })

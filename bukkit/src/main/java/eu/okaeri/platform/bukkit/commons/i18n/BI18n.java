@@ -7,7 +7,7 @@ import eu.okaeri.i18n.configs.OCI18n;
 import eu.okaeri.i18n.configs.impl.MOCI18n;
 import eu.okaeri.i18n.message.Message;
 import eu.okaeri.placeholders.message.CompiledMessage;
-import net.md_5.bungee.api.ChatColor;
+import org.bukkit.ChatColor;
 
 import java.util.HashMap;
 import java.util.Locale;

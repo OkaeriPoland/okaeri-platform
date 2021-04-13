@@ -56,7 +56,7 @@ public class TeleportAction {
 
         if (entityTeleportAsync != null) {
             try {
-                entityTeleportAsync.invoke(this.who, PlayerTeleportEvent.TeleportCause.PLUGIN);
+                entityTeleportAsync.bindTo(this.who).invoke(this.where, PlayerTeleportEvent.TeleportCause.PLUGIN);
                 return;
             } catch (Throwable ignored) {
             }

@@ -1,6 +1,7 @@
 package eu.okaeri.platform.bukkit.commons.item;
 
-import net.md_5.bungee.api.ChatColor;
+import eu.okaeri.platform.bukkit.commons.UnsafeBukkitCommons;
+import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.ItemFlag;
@@ -145,7 +146,7 @@ public class ItemStackBuilder {
 
     public ItemStackBuilder makeUnbreakable() {
         ItemMeta itemMeta = this.itemStack.getItemMeta();
-        itemMeta.setUnbreakable(true);
+        UnsafeBukkitCommons.setItemMetaUnbreakable(itemMeta, true);
         this.itemStack.setItemMeta(itemMeta);
         return this;
     }
