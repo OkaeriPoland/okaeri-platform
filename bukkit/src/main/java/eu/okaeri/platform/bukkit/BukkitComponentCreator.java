@@ -283,6 +283,10 @@ public class BukkitComponentCreator implements ComponentCreator {
 
     private void registerCommand(CommandService commandService) {
 
+        if (this.commands == null) {
+            throw new IllegalArgumentException("cannot register command service with commands provider being null");
+        }
+
         ServiceMeta serviceMeta = ServiceMeta.of(commandService);
         this.commands.getRegistry().register(commandService);
 

@@ -11,6 +11,7 @@ import eu.okaeri.i18n.configs.LocaleConfig;
 import eu.okaeri.injector.Injector;
 import eu.okaeri.injector.OkaeriInjector;
 import eu.okaeri.placeholders.bukkit.BukkitPlaceholders;
+import eu.okaeri.platform.bukkit.commons.UnsafeBukkitCommons;
 import eu.okaeri.platform.core.component.ComponentHelper;
 import eu.okaeri.platform.core.component.manifest.BeanManifest;
 import eu.okaeri.platform.core.exception.BreakException;
@@ -27,7 +28,7 @@ import java.util.logging.Level;
 
 public class OkaeriBukkitPlugin extends JavaPlugin {
 
-    private static final boolean USE_PARALLELISM = Boolean.parseBoolean(System.getProperty("okaeri.platform.parallelism", "true"));
+    private static boolean useParallelism = Boolean.parseBoolean(System.getProperty("okaeri.platform.parallelism", "true"));
     private static final Set<String> ASYNC_BANNED_TYPES = new HashSet<>(Arrays.asList(
             "org.bukkit.block.Block",
             "org.bukkit.Location",
@@ -52,19 +53,22 @@ public class OkaeriBukkitPlugin extends JavaPlugin {
 
     // let's see who is faster
     private void postBukkitConstruct() {
-        this.getLogger().info("Preloading " + this.getName() + " " + this.getDescription().getVersion());
+
+        // check if version is safe to use with async preloading
+        // older class loader is known to be causing problems
+        String nmsv = UnsafeBukkitCommons.getNmsv();
+        if (nmsv.matches("^v1_(7|8|9|10|11)_.*$")) {
+            useParallelism = false;
+            this.getLogger().warning("Cannot use async preloading, version " + nmsv + " is not supported!");
+        } else {
+            this.getLogger().info("Preloading " + this.getName() + " " + this.getDescription().getVersion());
+        }
+
+        // schedule tasks
         this.preloadData("Placeholders", () -> BukkitComponentCreator.defaultPlaceholders = BukkitPlaceholders.create(true));
-        this.preloadData("BeanManifest", () -> {
-            this.injector = OkaeriInjector.create(true);
-            this.injector.registerInjectable("injector", this.injector);
-            CommandsBukkit commandsBukkit = CommandsBukkit.of(this).resultHandler(new BukkitCommandsResultHandler());
-            this.commands = CommandsManager.create(CommandsInjector.of(commandsBukkit, this.injector));
-            this.injector.registerInjectable("commands", this.commands);
-            this.creator = new BukkitComponentCreator(this, this.commands, this.injector);
-            this.beanManifest = BeanManifest.of(this.getClass(), this.creator, true);
-        });
-        this.preloadData("Config", () -> this.preloadConfig(this.beanManifest));
-        this.preloadData("LocaleConfig", () -> this.preloadLocaleConfig(this.beanManifest));
+        this.preloadData("BeanManifest", this::preloadManifest);
+        this.preloadData("Config", this::preloadConfig);
+        this.preloadData("LocaleConfig", this::preloadLocaleConfig);
     }
 
     private Thread createPreloadThread(String name, Runnable runnable) {
@@ -76,11 +80,21 @@ public class OkaeriBukkitPlugin extends JavaPlugin {
     private void preloadData(String name, Runnable runnable) {
         Thread preloader = this.createPreloadThread(name, runnable);
         this.preloaders.add(preloader);
-        if (USE_PARALLELISM) preloader.start();
+        if (useParallelism) preloader.start();
+    }
+
+    private void preloadManifest() {
+        this.injector = OkaeriInjector.create(true);
+        this.injector.registerInjectable("injector", this.injector);
+        CommandsBukkit commandsBukkit = CommandsBukkit.of(this).resultHandler(new BukkitCommandsResultHandler());
+        this.commands = CommandsManager.create(CommandsInjector.of(commandsBukkit, this.injector));
+        this.injector.registerInjectable("commands", this.commands);
+        this.creator = new BukkitComponentCreator(this, this.commands, this.injector);
+        this.beanManifest = BeanManifest.of(this.getClass(), this.creator, true);
     }
 
     @SneakyThrows
-    private void preloadConfig(BeanManifest beanManifest) {
+    private void preloadConfig() {
 
         while (this.beanManifest == null) Thread.sleep(1);
         List<BeanManifest> depends = this.beanManifest.getDepends();
@@ -127,7 +141,7 @@ public class OkaeriBukkitPlugin extends JavaPlugin {
     }
 
     @SneakyThrows
-    private void preloadLocaleConfig(BeanManifest beanManifest) {
+    private void preloadLocaleConfig() {
 
         while ((this.beanManifest == null) || (BukkitComponentCreator.defaultPlaceholders == null)) Thread.sleep(1);
         List<BeanManifest> depends = this.beanManifest.getDepends();
@@ -157,7 +171,7 @@ public class OkaeriBukkitPlugin extends JavaPlugin {
 
         // wait if not initialized yet
         for (Thread preloader : this.preloaders) {
-            if (USE_PARALLELISM) preloader.join();
+            if (useParallelism) preloader.join();
             else preloader.run();
         }
 
