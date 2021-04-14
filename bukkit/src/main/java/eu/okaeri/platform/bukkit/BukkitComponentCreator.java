@@ -7,6 +7,7 @@ import eu.okaeri.configs.ConfigManager;
 import eu.okaeri.configs.OkaeriConfig;
 import eu.okaeri.configs.configurer.Configurer;
 import eu.okaeri.configs.serdes.OkaeriSerdesPack;
+import eu.okaeri.configs.serdes.commons.SerdesCommons;
 import eu.okaeri.configs.validator.okaeri.OkaeriValidator;
 import eu.okaeri.configs.yaml.bukkit.YamlBukkitConfigurer;
 import eu.okaeri.configs.yaml.bukkit.serdes.SerdesBukkit;
@@ -17,6 +18,7 @@ import eu.okaeri.placeholders.Placeholders;
 import eu.okaeri.placeholders.bukkit.BukkitPlaceholders;
 import eu.okaeri.platform.bukkit.annotation.Timer;
 import eu.okaeri.platform.bukkit.commons.i18n.BI18n;
+import eu.okaeri.platform.bukkit.commons.i18n.I18nColorsConfig;
 import eu.okaeri.platform.bukkit.commons.i18n.PlayerLocaleProvider;
 import eu.okaeri.platform.core.annotation.Bean;
 import eu.okaeri.platform.core.annotation.Component;
@@ -31,12 +33,19 @@ import lombok.RequiredArgsConstructor;
 import org.bukkit.Bukkit;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitScheduler;
 import org.bukkit.scheduler.BukkitTask;
 
 import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.*;
+import java.util.jar.JarEntry;
+import java.util.jar.JarFile;
 import java.util.logging.Level;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -125,7 +134,7 @@ public class BukkitComponentCreator implements ComponentCreator {
                         ? new YamlBukkitConfigurer()
                         : this.injector.createInstance(provider);
 
-                OkaeriSerdesPack[] serdesPacks = Stream.concat(Stream.of(SerdesBukkit.class), Arrays.stream(configuration.serdes()))
+                OkaeriSerdesPack[] serdesPacks = Stream.concat(Stream.of(SerdesBukkit.class, SerdesCommons.class), Arrays.stream(configuration.serdes()))
                         .map(this.injector::createInstance)
                         .toArray(OkaeriSerdesPack[]::new);
 
@@ -171,39 +180,102 @@ public class BukkitComponentCreator implements ComponentCreator {
             String path = messages.path();
             String suffix = messages.suffix();
             Class<? extends Configurer> provider = messages.provider();
+            Locale defaultLocale = Locale.forLanguageTag(messages.defaultLocale());
             boolean unpack = messages.unpack();
             File directory = new File(this.plugin.getDataFolder(), path);
+            boolean directoryExisted = directory.exists();
             directory.mkdirs();
 
+            // unpack files from the resources
+            if (unpack && !directoryExisted) {
+                try {
+                    Method getFile = JavaPlugin.class.getDeclaredMethod("getFile");
+                    getFile.setAccessible(true);
+                    File jar = (File) getFile.invoke(this.plugin);
+                    JarFile jarFile = new JarFile(jar);
+                    Enumeration<JarEntry> entries = jarFile.entries();
+                    while (entries.hasMoreElements()) {
+                        JarEntry jarEntry = entries.nextElement();
+                        String entryName = jarEntry.getName();
+                        if (!entryName.startsWith(path + "/")) {
+                            continue;
+                        }
+                        if (!jarEntry.isDirectory()) {
+                            continue;
+                        }
+                        File file = new File(this.plugin.getDataFolder(), entryName);
+                        if (file.exists()) {
+                            continue;
+                        }
+                        InputStream is = jarFile.getInputStream(jarEntry);
+                        FileOutputStream fos = new FileOutputStream(file);
+                        while (is.available() > 0) {
+                            fos.write(is.read());
+                        }
+                        fos.close();
+                        is.close();
+                    }
+                } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException | IOException exception) {
+                    this.plugin.getLogger().log(Level.SEVERE, "Failed to unpack resources", exception);
+                    exception.printStackTrace();
+                }
+            }
+
+            // gather colors config
+            I18nColorsConfig colorsConfig = ConfigManager.create(I18nColorsConfig.class, (it) -> {
+                Configurer configurer = (provider == Messages.DEFAULT.class) ? new YamlBukkitConfigurer() : this.injector.createInstance(provider);
+                it.withConfigurer(configurer, new SerdesCommons());
+                it.withBindFile(new File(directory, "colors" + suffix));
+                if (it.getBindFile().exists()) it.load(true);
+                if (unpack && !directoryExisted) it.saveDefaults();
+            });
+
+            // load locales
             try {
                 LocaleConfig template = LocaleConfigManager.createTemplate(beanClazz);
                 File[] files = directory.listFiles((dir, name) -> name.toLowerCase(Locale.ROOT).endsWith(suffix));
+                if (files == null) files = new File[0];
 
-                BI18n i18n = new BI18n();
-                i18n.setDefaultLocale(Locale.forLanguageTag(messages.defaultLocale()));
+                BI18n i18n = new BI18n(colorsConfig);
+                i18n.setDefaultLocale(defaultLocale);
                 i18n.registerLocaleProvider(new PlayerLocaleProvider());
                 i18n.setPlaceholders(defaultPlaceholders.copy());
 
                 List<Locale> loadedLocales = new ArrayList<>();
                 this.injector.registerInjectable(path, template);
 
-                if (files != null) {
-                    for (File file : files) {
+                // check path directory for locale files
+                for (File file : files) {
+                    // read locale from name
+                    String name = file.getName();
+                    String localeName = name.substring(0, name.length() - suffix.length());
+                    Locale locale = Locale.forLanguageTag(localeName);
+                    // create configurer
+                    Configurer configurer = (provider == Messages.DEFAULT.class)
+                            ? new YamlBukkitConfigurer()
+                            : this.injector.createInstance(provider);
+                    // register
+                    LocaleConfig localeConfig = LocaleConfigManager.create(beanClazz, configurer, file, !defaultLocale.equals(locale));
+                    i18n.registerConfig(locale, localeConfig);
+                    this.loadedLocaleConfigs.add(localeConfig);
+                    loadedLocales.add(locale);
+                }
 
-                        String name = file.getName();
-                        String localeName = name.substring(0, name.length() - suffix.length());
-                        Locale locale = Locale.forLanguageTag(localeName);
-
-                        Configurer configurer = (provider == Messages.DEFAULT.class)
-                                ? new YamlBukkitConfigurer()
-                                : this.injector.createInstance(provider);
-
-                        LocaleConfig localeConfig = LocaleConfigManager.create(beanClazz, configurer, file);
-                        i18n.registerConfig(locale, localeConfig);
-
-                        this.loadedLocaleConfigs.add(localeConfig);
-                        loadedLocales.add(locale);
-                    }
+                // default locale was not overwritten by a file
+                if (!loadedLocales.contains(defaultLocale)) {
+                    // create configurer
+                    Configurer configurer = (provider == Messages.DEFAULT.class)
+                            ? new YamlBukkitConfigurer()
+                            : this.injector.createInstance(provider);
+                    // register default locale based on interface values
+                    LocaleConfig defaultLocaleConfig = ConfigManager.create(beanClazz, it -> {
+                        it.withBindFile(new File(directory, messages.defaultLocale() + suffix));
+                        it.withConfigurer(configurer);
+                        if (unpack && !directoryExisted) it.saveDefaults();
+                    });
+                    i18n.registerConfig(defaultLocale, defaultLocaleConfig);
+                    this.loadedLocaleConfigs.add(defaultLocaleConfig);
+                    loadedLocales.add(defaultLocale);
                 }
 
                 long took = System.currentTimeMillis() - start;
