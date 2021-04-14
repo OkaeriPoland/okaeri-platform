@@ -9,8 +9,8 @@ backwards compatible support for migrating developers, it is advised to stick to
 
 ## colors.yml
 
-All matchers are defined by `colors.yml` in the `path` of specific `@Messages` group. File would be unpacked from 
-plugin's resources and available to the end-user if `unpack = true`. When unpacking is disabled, it can be manually created.
+All matchers are defined by `colors.yml` in the `path` of specific `@Messages` group. File would be unpacked from plugin's resources
+or defaults and available to the end-user if `unpack = true`. When unpacking is disabled, it can be manually created.
 
 Each matcher entry consists of:
 - pattern: regex expression that must match whole key
