@@ -31,6 +31,11 @@ public class BI18n extends MOCI18n {
     }
 
     public void load() {
+
+        if ((this.colorsConfig.getBindFile() != null) && this.colorsConfig.getBindFile().exists()) {
+            this.colorsConfig.load();
+        }
+
         for (Map.Entry<Locale, LocaleConfig> entry : this.configs.entrySet()) {
             LocaleConfig config = entry.getValue();
             this.update(config);
