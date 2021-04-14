@@ -11,11 +11,12 @@ import eu.okaeri.i18n.configs.LocaleConfig;
 import eu.okaeri.injector.Injector;
 import eu.okaeri.injector.OkaeriInjector;
 import eu.okaeri.placeholders.bukkit.BukkitPlaceholders;
-import eu.okaeri.platform.bukkit.commons.UnsafeBukkitCommons;
 import eu.okaeri.platform.core.component.ComponentHelper;
 import eu.okaeri.platform.core.component.manifest.BeanManifest;
 import eu.okaeri.platform.core.exception.BreakException;
+import lombok.Data;
 import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import org.bukkit.plugin.PluginDescriptionFile;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -24,6 +25,7 @@ import org.bukkit.plugin.java.JavaPluginLoader;
 import java.io.File;
 import java.util.*;
 import java.util.logging.Level;
+import java.util.stream.Collectors;
 
 
 public class OkaeriBukkitPlugin extends JavaPlugin {
@@ -40,7 +42,7 @@ public class OkaeriBukkitPlugin extends JavaPlugin {
 
     private BeanManifest beanManifest;
     private BukkitComponentCreator creator;
-    private List<Thread> preloaders = new ArrayList<>();
+    private List<AsyncLoader> preloaders = new ArrayList<>();
 
     public OkaeriBukkitPlugin() {
         this.postBukkitConstruct();
@@ -51,20 +53,18 @@ public class OkaeriBukkitPlugin extends JavaPlugin {
         this.postBukkitConstruct();
     }
 
+    @Data
+    @RequiredArgsConstructor
+    class AsyncLoader {
+        private final String name;
+        private final Runnable runnable;
+        private Thread thread;
+        private boolean done;
+    }
+
     // let's see who is faster
     private void postBukkitConstruct() {
-
-        // check if version is safe to use with async preloading
-        // older class loader is known to be causing problems
-        String nmsv = UnsafeBukkitCommons.getNmsv();
-        if (nmsv.matches("^v1_(7|8|9|10|11)_.*$")) {
-            useParallelism = false;
-            this.getLogger().warning("Cannot use async preloading, version " + nmsv + " is not supported!");
-        } else {
-            this.getLogger().info("Preloading " + this.getName() + " " + this.getDescription().getVersion());
-        }
-
-        // schedule tasks
+        this.getLogger().info("Preloading " + this.getName() + " " + this.getDescription().getVersion());
         this.preloadData("Placeholders", () -> BukkitComponentCreator.defaultPlaceholders = BukkitPlaceholders.create(true));
         this.preloadData("BeanManifest", this::preloadManifest);
         this.preloadData("Config", this::preloadConfig);
@@ -78,8 +78,18 @@ public class OkaeriBukkitPlugin extends JavaPlugin {
     }
 
     private void preloadData(String name, Runnable runnable) {
-        Thread preloader = this.createPreloadThread(name, runnable);
-        this.preloaders.add(preloader);
+
+        AsyncLoader asyncLoader = new AsyncLoader(name, runnable);
+        Thread preloader = this.createPreloadThread(name, () -> {
+            try {
+                runnable.run();
+                asyncLoader.setDone(true);
+            } catch (Throwable ignored) {
+            }
+        });
+
+        asyncLoader.setThread(preloader);
+        this.preloaders.add(asyncLoader);
         if (useParallelism) preloader.start();
     }
 
@@ -164,16 +174,26 @@ public class OkaeriBukkitPlugin extends JavaPlugin {
         long start = System.currentTimeMillis();
         this.getLogger().info("Initializing " + this.getClass());
 
+        // fallback load
+        this.preloaders.stream()
+                .filter(loader -> !loader.getThread().isAlive())
+                .filter(loader -> !loader.isDone())
+                .map(loader -> {
+                    this.getLogger().warning("- Fallback loading (async fail): " + loader.getName());
+                    return loader.getRunnable();
+                })
+                .forEach(Runnable::run);
+
+        // wait if not initialized yet
+        for (Thread preloader : this.preloaders.stream().map(AsyncLoader::getThread).collect(Collectors.toList())) {
+            if (useParallelism) preloader.join();
+            else preloader.run();
+        }
+
         // dispatch async logs
         // to show that these were loaded
         // before other components here
         if (this.creator != null) this.creator.dispatchLogs();
-
-        // wait if not initialized yet
-        for (Thread preloader : this.preloaders) {
-            if (useParallelism) preloader.join();
-            else preloader.run();
-        }
 
         // register injectables
         this.injector
