@@ -249,6 +249,7 @@ public class BukkitComponentCreator implements ComponentCreator {
                     // read locale from name
                     String name = file.getName();
                     String localeName = name.substring(0, name.length() - suffix.length());
+                    if ("colors".equals(localeName)) continue;
                     Locale locale = Locale.forLanguageTag(localeName);
                     // create configurer
                     Configurer configurer = (provider == Messages.DEFAULT.class)

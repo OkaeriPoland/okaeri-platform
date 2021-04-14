@@ -45,7 +45,7 @@ public class BI18n extends MOCI18n {
 
     private void update(LocaleConfig config) {
 
-        if (config.getBindFile() != null) config.load(true);
+        if ((config.getBindFile() != null) && config.getBindFile().exists()) config.load(true);
         ConfigDeclaration declaration = config.getDeclaration();
 
         for (FieldDeclaration field : declaration.getFields()) {
