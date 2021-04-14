@@ -52,17 +52,27 @@ public class BI18n extends MOCI18n {
             String fieldName = field.getName().toLowerCase(Locale.ROOT);
             String fieldValue = String.valueOf(field.getValue());
 
-            // normalnie pokolorowane - ignorujemy
+            // already contains colors - ignore
             if (this.hasColors(fieldValue)) {
                 field.updateValue(ChatColor.translateAlternateColorCodes('&', fieldValue));
                 continue;
             }
 
-            // kolorujemy
+            // add colors based on the matchers
             for (I18nColorMatcher matcher : this.colorsConfig.getMatchers()) {
+
+                // matcher does not match, continue
                 if (!matcher.getPattern().matcher(fieldName).matches()) {
                     continue;
                 }
+
+                // fields color
+                if (matcher.getFieldsColor() != null) {
+                    fieldValue = MESSAGE_FIELD_PATTERN.matcher(fieldValue)
+                            .replaceAll(matcher.getFieldsColor() + "$0" + matcher.getMessageColor());
+                }
+
+                // message color
                 field.updateValue(matcher.getMessageColor() + fieldValue);
                 break;
             }
