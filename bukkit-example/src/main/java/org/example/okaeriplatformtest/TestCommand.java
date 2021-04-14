@@ -72,10 +72,10 @@ public class TestCommand implements CommandService {
         }
         catch (Exception exception) {
             this.logger.log(Level.SEVERE, "Failed to reload configuration", exception);
-            return this.i18n.get(sender, this.messages.getReloadFailMessage());
+            return this.i18n.get(sender, this.messages.getCommandsReloadFail());
         }
 
-        return this.i18n.get(sender, this.messages.getReloadMessage());
+        return this.i18n.get(sender, this.messages.getCommandsReloadSuccess());
     }
 
     // testcmd|testing i18nbench
