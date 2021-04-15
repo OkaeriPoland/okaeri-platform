@@ -11,6 +11,8 @@ import eu.okaeri.i18n.configs.LocaleConfig;
 import eu.okaeri.injector.Injector;
 import eu.okaeri.injector.OkaeriInjector;
 import eu.okaeri.placeholders.bukkit.BukkitPlaceholders;
+import eu.okaeri.platform.bukkit.commons.i18n.BI18n;
+import eu.okaeri.platform.bukkit.commons.i18n.I18nCommandsTextHandler;
 import eu.okaeri.platform.core.component.ComponentHelper;
 import eu.okaeri.platform.core.component.manifest.BeanManifest;
 import eu.okaeri.platform.core.exception.BreakException;
@@ -39,6 +41,7 @@ public class OkaeriBukkitPlugin extends JavaPlugin {
 
     @Getter private Injector injector;
     @Getter private Commands commands;
+    @Getter private CommandsBukkit commandsBukkit;
 
     private BeanManifest beanManifest;
     private BukkitComponentCreator creator;
@@ -94,11 +97,14 @@ public class OkaeriBukkitPlugin extends JavaPlugin {
     }
 
     private void preloadManifest() {
+        // injector
         this.injector = OkaeriInjector.create(true);
         this.injector.registerInjectable("injector", this.injector);
-        CommandsBukkit commandsBukkit = CommandsBukkit.of(this).resultHandler(new BukkitCommandsResultHandler());
-        this.commands = CommandsManager.create(CommandsInjector.of(commandsBukkit, this.injector));
+        // commands
+        this.commandsBukkit = CommandsBukkit.of(this).resultHandler(new BukkitCommandsResultHandler());
+        this.commands = CommandsManager.create(CommandsInjector.of(this.commandsBukkit, this.injector));
         this.injector.registerInjectable("commands", this.commands);
+        // manifest
         this.creator = new BukkitComponentCreator(this, this.commands, this.injector);
         this.beanManifest = BeanManifest.of(this.getClass(), this.creator, true);
     }
@@ -189,6 +195,10 @@ public class OkaeriBukkitPlugin extends JavaPlugin {
             if (useParallelism) preloader.join();
             else preloader.run();
         }
+
+        // apply i18n text resolver for commands framework if available
+        this.injector.getInjectable("i18n", BI18n.class)
+                .ifPresent(i18n -> this.commandsBukkit.textHandler(new I18nCommandsTextHandler(i18n.getObject())));
 
         // dispatch async logs
         // to show that these were loaded
