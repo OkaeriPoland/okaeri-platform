@@ -7,6 +7,7 @@ import eu.okaeri.i18n.configs.OCI18n;
 import eu.okaeri.i18n.configs.impl.MOCI18n;
 import eu.okaeri.i18n.message.Message;
 import eu.okaeri.placeholders.message.CompiledMessage;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.bukkit.ChatColor;
 
@@ -20,8 +21,8 @@ public class BI18n extends MOCI18n {
 
     private static final Pattern ALT_COLOR_PATTERN = Pattern.compile("&[0-9A-Fa-fK-Ok-oRXrx]");
     private static final Pattern MESSAGE_FIELD_PATTERN = Pattern.compile("\\{[^{]+\\}");
-    private final Map<Locale, LocaleConfig> configs = new HashMap<>();
-    private final I18nColorsConfig colorsConfig;
+    @Getter private final Map<Locale, LocaleConfig> configs = new HashMap<>();
+    @Getter private final I18nColorsConfig colorsConfig;
 
     @Override
     public OCI18n<CompiledMessage, Message> registerConfig(Locale locale, LocaleConfig config) {

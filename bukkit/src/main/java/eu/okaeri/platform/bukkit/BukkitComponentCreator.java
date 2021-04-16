@@ -37,12 +37,10 @@ import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitScheduler;
 import org.bukkit.scheduler.BukkitTask;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
@@ -184,41 +182,51 @@ public class BukkitComponentCreator implements ComponentCreator {
             boolean unpack = messages.unpack();
             File directory = new File(this.plugin.getDataFolder(), path);
             boolean directoryExisted = directory.exists();
-            directory.mkdirs();
+            Map<Locale, String> packedLocales = new LinkedHashMap<>();
+            if (unpack) directory.mkdirs();
 
             // unpack files from the resources
-            if (unpack && !directoryExisted) {
-                try {
-                    Method getFile = JavaPlugin.class.getDeclaredMethod("getFile");
-                    getFile.setAccessible(true);
-                    File jar = (File) getFile.invoke(this.plugin);
-                    JarFile jarFile = new JarFile(jar);
-                    Enumeration<JarEntry> entries = jarFile.entries();
-                    while (entries.hasMoreElements()) {
-                        JarEntry jarEntry = entries.nextElement();
-                        String entryName = jarEntry.getName();
-                        if (!entryName.startsWith(path + "/")) {
-                            continue;
-                        }
-                        if (!jarEntry.isDirectory()) {
-                            continue;
-                        }
-                        File file = new File(this.plugin.getDataFolder(), entryName);
-                        if (file.exists()) {
-                            continue;
-                        }
-                        InputStream is = jarFile.getInputStream(jarEntry);
-                        FileOutputStream fos = new FileOutputStream(file);
-                        while (is.available() > 0) {
-                            fos.write(is.read());
-                        }
-                        fos.close();
-                        is.close();
+            try {
+                Method getFile = JavaPlugin.class.getDeclaredMethod("getFile");
+                getFile.setAccessible(true);
+                File jar = (File) getFile.invoke(this.plugin);
+                JarFile jarFile = new JarFile(jar);
+                Enumeration<JarEntry> entries = jarFile.entries();
+
+                while (entries.hasMoreElements()) {
+
+                    JarEntry jarEntry = entries.nextElement();
+                    String entryName = jarEntry.getName();
+
+                    if (!entryName.startsWith(path + "/") || entryName.endsWith("/")) {
+                        continue;
                     }
-                } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException | IOException exception) {
-                    this.plugin.getLogger().log(Level.SEVERE, "Failed to unpack resources", exception);
-                    exception.printStackTrace();
+
+                    File file = new File(this.plugin.getDataFolder(), entryName);
+                    if (file.exists()) {
+                        continue;
+                    }
+
+                    InputStream is = jarFile.getInputStream(jarEntry);
+                    FileOutputStream fos = (unpack && !directoryExisted) ? new FileOutputStream(file) : null;
+                    ByteArrayOutputStream baos = new ByteArrayOutputStream();
+                    while (is.available() > 0) {
+                        int read = is.read();
+                        if (fos != null) fos.write(read);
+                        baos.write(read);
+                    }
+                    if (fos != null) fos.close();
+                    is.close();
+
+                    String name = file.getName();
+                    String localeName = name.substring(0, name.length() - suffix.length());
+                    if ("colors".equals(localeName)) continue;
+                    Locale locale = Locale.forLanguageTag(localeName);
+                    packedLocales.put(locale, new String(baos.toByteArray(), StandardCharsets.UTF_8));
                 }
+            } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException | IOException exception) {
+                this.plugin.getLogger().log(Level.SEVERE, "Failed to unpack resources", exception);
+                exception.printStackTrace();
             }
 
             // gather colors config
@@ -230,7 +238,7 @@ public class BukkitComponentCreator implements ComponentCreator {
                 if (unpack && !directoryExisted) it.saveDefaults();
             });
 
-            // load locales
+            // load file locales
             try {
                 LocaleConfig template = LocaleConfigManager.createTemplate(beanClazz);
                 File[] files = directory.listFiles((dir, name) -> name.toLowerCase(Locale.ROOT).endsWith(suffix));
@@ -262,6 +270,28 @@ public class BukkitComponentCreator implements ComponentCreator {
                     loadedLocales.add(locale);
                 }
 
+                // load packes locales
+                for (Map.Entry<Locale, String> entry : packedLocales.entrySet()) {
+                    // gather data
+                    Locale locale = entry.getKey();
+                    String configString = entry.getValue();
+                    // already loaded from file
+                    if (loadedLocales.contains(locale)) continue;
+                    // create configurer
+                    Configurer configurer = (provider == Messages.DEFAULT.class)
+                            ? new YamlBukkitConfigurer()
+                            : this.injector.createInstance(provider);
+                    // register
+                    LocaleConfig localeConfig = ConfigManager.create(beanClazz, (it) -> {
+                        it.withConfigurer(configurer);
+                        if (!defaultLocale.equals(locale)) it.getDeclaration().getFields().forEach((field) -> field.updateValue(null));
+                        it.load(configString);
+                    });
+                    i18n.registerConfig(locale, localeConfig);
+                    this.loadedLocaleConfigs.add(localeConfig);
+                    loadedLocales.add(locale);
+                }
+
                 // default locale was not overwritten by a file
                 if (!loadedLocales.contains(defaultLocale)) {
                     // create configurer
@@ -283,6 +313,7 @@ public class BukkitComponentCreator implements ComponentCreator {
                 this.log("Loaded messages: " + beanClazz.getSimpleName() + " { path = " + path + ", suffix = " + suffix + ", provider = " + provider.getSimpleName() + " } [" + took + " ms]\n" +
                         "  > " + loadedLocales.stream().map(Locale::toString).collect(Collectors.joining(", ")));
                 beanObject = i18n;
+                manifest.setName(path);
                 changed = true;
             }
             catch (Exception exception) {

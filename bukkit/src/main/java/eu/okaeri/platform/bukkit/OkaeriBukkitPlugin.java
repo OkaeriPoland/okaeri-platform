@@ -12,6 +12,7 @@ import eu.okaeri.injector.Injector;
 import eu.okaeri.injector.OkaeriInjector;
 import eu.okaeri.placeholders.bukkit.BukkitPlaceholders;
 import eu.okaeri.platform.bukkit.commons.i18n.BI18n;
+import eu.okaeri.platform.bukkit.commons.i18n.I18nCommandsMessages;
 import eu.okaeri.platform.bukkit.commons.i18n.I18nCommandsTextHandler;
 import eu.okaeri.platform.core.component.ComponentHelper;
 import eu.okaeri.platform.core.component.manifest.BeanManifest;
@@ -106,7 +107,9 @@ public class OkaeriBukkitPlugin extends JavaPlugin {
         this.injector.registerInjectable("commands", this.commands);
         // manifest
         this.creator = new BukkitComponentCreator(this, this.commands, this.injector);
-        this.beanManifest = BeanManifest.of(this.getClass(), this.creator, true);
+        BeanManifest localManifest = BeanManifest.of(this.getClass(), this.creator, true);
+        localManifest.getDepends().add(0, BeanManifest.of(I18nCommandsMessages.class, this.creator, false)); // add i18n system config
+        this.beanManifest = localManifest;
     }
 
     @SneakyThrows
@@ -196,9 +199,11 @@ public class OkaeriBukkitPlugin extends JavaPlugin {
             else preloader.run();
         }
 
-        // apply i18n text resolver for commands framework if available
-        this.injector.getInjectable("i18n", BI18n.class)
-                .ifPresent(i18n -> this.commandsBukkit.textHandler(new I18nCommandsTextHandler(i18n.getObject())));
+        // apply i18n text resolver for commands framework
+        Set<BI18n> i18nCommandsProviders = new HashSet<>();
+        this.injector.getInjectable("i18n", BI18n.class).ifPresent(i18n -> i18nCommandsProviders.add(i18n.getObject()));
+        this.injector.getInjectable("i18n-platform-commands", BI18n.class).ifPresent(i18n -> i18nCommandsProviders.add(i18n.getObject()));
+        this.commandsBukkit.textHandler(new I18nCommandsTextHandler(i18nCommandsProviders));
 
         // dispatch async logs
         // to show that these were loaded
