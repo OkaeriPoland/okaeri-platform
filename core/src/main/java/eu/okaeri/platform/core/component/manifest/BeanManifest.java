@@ -123,6 +123,16 @@ public class BeanManifest {
     private List<BeanManifest> depends;
     private Map<Class<?>, Integer> failCounter = new HashMap<>();
 
+    public BeanManifest withDepend(BeanManifest beanManifest) {
+        this.depends.add(beanManifest);
+        return this;
+    }
+
+    public BeanManifest name(String name) {
+        this.name = name;
+        return this;
+    }
+
     public BeanManifest update(ComponentCreator creator, Injector injector) {
 
         if (this.object == null) {
