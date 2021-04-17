@@ -123,6 +123,11 @@ public class BeanManifest {
     private List<BeanManifest> depends;
     private Map<Class<?>, Integer> failCounter = new HashMap<>();
 
+    public BeanManifest withDepend(int pos, BeanManifest beanManifest) {
+        this.depends.add(pos, beanManifest);
+        return this;
+    }
+
     public BeanManifest withDepend(BeanManifest beanManifest) {
         this.depends.add(beanManifest);
         return this;

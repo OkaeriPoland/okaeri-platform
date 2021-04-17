@@ -19,6 +19,7 @@ import eu.okaeri.placeholders.bukkit.BukkitPlaceholders;
 import eu.okaeri.platform.bukkit.annotation.Timer;
 import eu.okaeri.platform.bukkit.commons.i18n.BI18n;
 import eu.okaeri.platform.bukkit.commons.i18n.I18nColorsConfig;
+import eu.okaeri.platform.bukkit.commons.i18n.I18nCommandsMessages;
 import eu.okaeri.platform.bukkit.commons.i18n.PlayerLocaleProvider;
 import eu.okaeri.platform.core.annotation.Bean;
 import eu.okaeri.platform.core.annotation.Component;
@@ -53,18 +54,20 @@ import static eu.okaeri.platform.core.component.ComponentHelper.invokeMethod;
 @RequiredArgsConstructor
 public class BukkitComponentCreator implements ComponentCreator {
 
+    private static final boolean DEBUG = Boolean.parseBoolean(System.getProperty("okaeri.platform.debug", "false"));
     public static Placeholders defaultPlaceholders;
 
     private final OkaeriBukkitPlugin plugin;
     private final Commands commands;
     private final Injector injector;
 
-    @Getter private List<OkaeriConfig> loadedConfigs = new ArrayList<>();
-    @Getter private List<LocaleConfig> loadedLocaleConfigs = new ArrayList<>();
     @Getter private List<CommandService> loadedCommands = new ArrayList<>();
     @Getter private List<Listener> loadedListeners = new ArrayList<>();
     @Getter private List<BukkitTask> loadedTimers = new ArrayList<>();
-    @Getter private List<String> asyncLogs = new ArrayList<>();
+
+    @Getter private List<OkaeriConfig> loadedConfigs = Collections.synchronizedList(new ArrayList<>());
+    @Getter private List<LocaleConfig> loadedLocaleConfigs = Collections.synchronizedList(new ArrayList<>());
+    @Getter private List<String> asyncLogs = Collections.synchronizedList(new ArrayList<>());
 
     public void dispatchLogs() {
         this.asyncLogs.stream()
@@ -310,8 +313,10 @@ public class BukkitComponentCreator implements ComponentCreator {
                 }
 
                 long took = System.currentTimeMillis() - start;
-                this.log("Loaded messages: " + beanClazz.getSimpleName() + " { path = " + path + ", suffix = " + suffix + ", provider = " + provider.getSimpleName() + " } [" + took + " ms]\n" +
-                        "  > " + loadedLocales.stream().map(Locale::toString).collect(Collectors.joining(", ")));
+                if ((beanClazz != I18nCommandsMessages.class) || DEBUG) {
+                    this.log("Loaded messages: " + beanClazz.getSimpleName() + " { path = " + path + ", suffix = " + suffix + ", provider = " + provider.getSimpleName() + " } [" + took + " ms]\n" +
+                            "  > " + loadedLocales.stream().map(Locale::toString).collect(Collectors.joining(", ")));
+                }
                 beanObject = i18n;
                 manifest.setName(path);
                 changed = true;
