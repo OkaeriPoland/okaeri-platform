@@ -107,9 +107,8 @@ public class OkaeriBukkitPlugin extends JavaPlugin {
         this.injector.registerInjectable("commands", this.commands);
         // manifest
         this.creator = new BukkitComponentCreator(this, this.commands, this.injector);
-        BeanManifest localManifest = BeanManifest.of(this.getClass(), this.creator, true);
-        localManifest.getDepends().add(0, BeanManifest.of(I18nCommandsMessages.class, this.creator, false)); // add i18n system config
-        this.beanManifest = localManifest;
+        BeanManifest i18CommandsMessages = BeanManifest.of(I18nCommandsMessages.class, this.creator, false).name("i18n-platform-commands");
+        this.beanManifest = BeanManifest.of(this.getClass(), this.creator, true).withDepend(i18CommandsMessages);
     }
 
     @SneakyThrows
