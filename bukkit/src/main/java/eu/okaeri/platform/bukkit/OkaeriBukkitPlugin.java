@@ -46,7 +46,7 @@ public class OkaeriBukkitPlugin extends JavaPlugin {
 
     private BeanManifest beanManifest;
     private BukkitComponentCreator creator;
-    private List<AsyncLoader> preloaders = new ArrayList<>();
+    private List<AsyncLoader> preloaders = Collections.synchronizedList(new ArrayList<>());
 
     public OkaeriBukkitPlugin() {
         this.postBukkitConstruct();
