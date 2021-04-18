@@ -126,6 +126,11 @@ public class TestCommand implements CommandService {
                 .apply();
     }
 
+    @Executor
+    public String exception() {
+        throw new RuntimeException("rrrrrr");
+    }
+
     // testcmd|testing tphereall
     @Executor(async = true)
     public BukkitResponse tphereall(CommandSender sender) {
