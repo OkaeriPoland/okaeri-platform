@@ -1,10 +1,13 @@
 package org.example.okaeriplatformtest;
 
+import eu.okaeri.commands.bukkit.handler.CommandsUnknownErrorEvent;
+import eu.okaeri.commands.service.CommandContext;
 import eu.okaeri.injector.annotation.Inject;
 import eu.okaeri.platform.bukkit.commons.teleport.QueuedTeleports;
 import eu.okaeri.platform.core.annotation.Component;
 import org.bukkit.Location;
 import org.bukkit.Server;
+import org.bukkit.command.CommandSender;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.AsyncPlayerChatEvent;
@@ -14,6 +17,8 @@ import org.bukkit.scheduler.BukkitScheduler;
 import org.example.okaeriplatformtest.persistence.PlayerPersistence;
 import org.example.okaeriplatformtest.persistence.PlayerProperties;
 
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.time.Instant;
 import java.util.logging.Logger;
 
@@ -69,5 +74,29 @@ public class TestListener implements Listener {
 
         // logger demonstration
         this.logger.warning("WOW SOMEONE IS WRITING: " + event.getMessage());
+    }
+
+    @EventHandler
+    public void onCommandsUnknownError(CommandsUnknownErrorEvent event) {
+
+        // disable sending "Unknown error! Reference ID: {id}" message
+        // event.setSendMessage(false);
+
+        // fetch sender
+        CommandContext commandContext = event.getCommandContext();
+        CommandSender sender = commandContext.get("sender", CommandSender.class);
+        if (sender == null) {
+            return;
+        }
+
+        // useful properties
+        // String errorId = event.getErrorId();
+        // InvocationContext invocationContext = event.getInvocationContext();
+
+        // custom handling, e.g. sentry
+        StringWriter sw = new StringWriter();
+        PrintWriter pw = new PrintWriter(sw);
+        event.getCause().printStackTrace(pw);
+        sender.sendMessage(sw.toString());
     }
 }
