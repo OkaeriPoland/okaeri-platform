@@ -57,12 +57,12 @@
         <dependency>
             <groupId>eu.okaeri</groupId>
             <artifactId>okaeri-commands-bukkit</artifactId>
-            <version>0.4.5</version>
+            <version>0.4.6</version>
         </dependency>
         <dependency>
             <groupId>eu.okaeri</groupId>
             <artifactId>okaeri-commands-injector</artifactId>
-            <version>0.4.5</version>
+            <version>0.4.6</version>
         </dependency>
 
         <!-- spigot -->
