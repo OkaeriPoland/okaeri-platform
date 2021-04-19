@@ -247,7 +247,7 @@ public class BukkitComponentCreator implements ComponentCreator {
                 File[] files = directory.listFiles((dir, name) -> name.toLowerCase(Locale.ROOT).endsWith(suffix));
                 if (files == null) files = new File[0];
 
-                BI18n i18n = new BI18n(colorsConfig);
+                BI18n i18n = new BI18n(colorsConfig, messages.prefix().field(), messages.prefix().marker());
                 i18n.setDefaultLocale(defaultLocale);
                 i18n.registerLocaleProvider(new PlayerLocaleProvider());
                 i18n.setPlaceholders(defaultPlaceholders.copy());
