@@ -14,6 +14,7 @@ import eu.okaeri.placeholders.bukkit.BukkitPlaceholders;
 import eu.okaeri.platform.bukkit.commons.i18n.BI18n;
 import eu.okaeri.platform.bukkit.commons.i18n.I18nCommandsMessages;
 import eu.okaeri.platform.bukkit.commons.i18n.I18nCommandsTextHandler;
+import eu.okaeri.platform.bukkit.commons.i18n.I18nPrefixProvider;
 import eu.okaeri.platform.core.component.ComponentHelper;
 import eu.okaeri.platform.core.component.manifest.BeanManifest;
 import eu.okaeri.platform.core.exception.BreakException;
@@ -27,6 +28,7 @@ import org.bukkit.plugin.java.JavaPluginLoader;
 
 import java.io.File;
 import java.util.*;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.logging.Level;
 import java.util.stream.Collectors;
 
@@ -200,8 +202,22 @@ public class OkaeriBukkitPlugin extends JavaPlugin {
 
         // apply i18n text resolver for commands framework
         Set<BI18n> i18nCommandsProviders = new HashSet<>();
-        this.injector.getInjectable("i18n", BI18n.class).ifPresent(i18n -> i18nCommandsProviders.add(i18n.getObject()));
-        this.injector.getInjectable("i18n-platform-commands", BI18n.class).ifPresent(i18n -> i18nCommandsProviders.add(i18n.getObject()));
+        AtomicReference<I18nPrefixProvider> prefixProvider = new AtomicReference<>();
+        this.injector.getInjectable("i18n", BI18n.class)
+                .ifPresent(i18n -> {
+                    BI18n bi18n = i18n.getObject();
+                    prefixProvider.set(bi18n.getPrefixProvider());
+                    i18nCommandsProviders.add(bi18n);
+                });
+        this.injector.getInjectable("i18n-platform-commands", BI18n.class)
+                .ifPresent(i18n -> {
+                    BI18n bi18n = i18n.getObject();
+                    I18nPrefixProvider i18nPrefixProvider = prefixProvider.get();
+                    if (i18nPrefixProvider != null) {
+                        bi18n.setPrefixProvider(i18nPrefixProvider);
+                    }
+                    i18nCommandsProviders.add(bi18n);
+                });
         this.commandsBukkit.textHandler(new I18nCommandsTextHandler(i18nCommandsProviders));
 
         // dispatch async logs
