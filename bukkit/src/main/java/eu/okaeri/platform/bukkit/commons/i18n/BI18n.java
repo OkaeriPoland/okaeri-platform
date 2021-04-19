@@ -9,6 +9,7 @@ import eu.okaeri.i18n.message.Message;
 import eu.okaeri.placeholders.message.CompiledMessage;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import lombok.Setter;
 import org.bukkit.ChatColor;
 
 import java.util.HashMap;
@@ -21,10 +22,14 @@ public class BI18n extends MOCI18n {
 
     private static final Pattern ALT_COLOR_PATTERN = Pattern.compile("&[0-9A-Fa-fK-Ok-oRXrx]");
     private static final Pattern MESSAGE_FIELD_PATTERN = Pattern.compile("\\{[^{]+\\}");
+
     @Getter private final Map<Locale, LocaleConfig> configs = new HashMap<>();
     @Getter private final I18nColorsConfig colorsConfig;
     private final String prefixField;
     private final String prefixMarker;
+
+    @Getter @Setter
+    private I18nPrefixProvider prefixProvider;
 
     @Override
     public OCI18n<CompiledMessage, Message> registerConfig(Locale locale, LocaleConfig config) {
@@ -46,17 +51,25 @@ public class BI18n extends MOCI18n {
         }
     }
 
+    @Override
+    public Message get(Object entity, String key) {
+
+        Message message = super.get(entity, key);
+        String raw = message.raw();
+
+        if (raw.startsWith(this.prefixMarker) && (this.prefixProvider != null)) {
+            raw = raw.substring(this.prefixMarker.length());
+            String prefix = this.prefixProvider.getPrefix(entity, key);
+            return Message.of(this.getPlaceholders(), prefix + raw);
+        }
+
+        return message;
+    }
+
     private void update(LocaleConfig config) {
 
         if ((config.getBindFile() != null) && config.getBindFile().exists()) config.load(true);
         ConfigDeclaration declaration = config.getDeclaration();
-
-        String prefix = ChatColor.translateAlternateColorCodes('&',
-                (String) declaration.getFields().stream()
-                        .filter(field -> this.prefixField.equals(field.getField().getName()))
-                        .findFirst()
-                        .map(FieldDeclaration::getValue)
-                        .orElse(""));
 
         for (FieldDeclaration field : declaration.getFields()) {
 
@@ -71,7 +84,7 @@ public class BI18n extends MOCI18n {
             String localPrefix = "";
             if (fieldValue.startsWith(this.prefixMarker)) {
                 fieldValue = fieldValue.substring(this.prefixMarker.length());
-                localPrefix = prefix;
+                localPrefix = this.prefixMarker;
             }
 
             // already contains colors - ignore
@@ -99,6 +112,13 @@ public class BI18n extends MOCI18n {
                 break;
             }
         }
+
+        String prefix = ChatColor.translateAlternateColorCodes('&', (String) declaration.getFields().stream()
+                .filter(field -> this.prefixField.equals(field.getField().getName()))
+                .findFirst()
+                .map(FieldDeclaration::getValue)
+                .orElse(""));
+        this.prefixProvider = (entity, key) -> prefix;
     }
 
     private boolean hasColors(String text) {
