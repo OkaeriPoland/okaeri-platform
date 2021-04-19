@@ -23,6 +23,8 @@ public class BI18n extends MOCI18n {
     private static final Pattern MESSAGE_FIELD_PATTERN = Pattern.compile("\\{[^{]+\\}");
     @Getter private final Map<Locale, LocaleConfig> configs = new HashMap<>();
     @Getter private final I18nColorsConfig colorsConfig;
+    private final String prefixField;
+    private final String prefixMarker;
 
     @Override
     public OCI18n<CompiledMessage, Message> registerConfig(Locale locale, LocaleConfig config) {
@@ -49,6 +51,13 @@ public class BI18n extends MOCI18n {
         if ((config.getBindFile() != null) && config.getBindFile().exists()) config.load(true);
         ConfigDeclaration declaration = config.getDeclaration();
 
+        String prefix = ChatColor.translateAlternateColorCodes('&',
+                (String) declaration.getFields().stream()
+                        .filter(field -> this.prefixField.equals(field.getField().getName()))
+                        .findFirst()
+                        .map(FieldDeclaration::getValue)
+                        .orElse(""));
+
         for (FieldDeclaration field : declaration.getFields()) {
 
             if (!(field.getValue() instanceof String)) {
@@ -58,9 +67,16 @@ public class BI18n extends MOCI18n {
             String fieldName = field.getName().toLowerCase(Locale.ROOT);
             String fieldValue = String.valueOf(field.getValue());
 
+            // prefix
+            String localPrefix = "";
+            if (fieldValue.startsWith(this.prefixMarker)) {
+                fieldValue = fieldValue.substring(this.prefixMarker.length());
+                localPrefix = prefix;
+            }
+
             // already contains colors - ignore
             if (this.hasColors(fieldValue)) {
-                field.updateValue(ChatColor.translateAlternateColorCodes('&', fieldValue));
+                field.updateValue(localPrefix + ChatColor.translateAlternateColorCodes('&', fieldValue));
                 continue;
             }
 
@@ -79,7 +95,7 @@ public class BI18n extends MOCI18n {
                 }
 
                 // message color
-                field.updateValue(matcher.getMessageColor() + fieldValue);
+                field.updateValue(localPrefix + matcher.getMessageColor() + fieldValue);
                 break;
             }
         }

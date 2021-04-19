@@ -16,6 +16,14 @@ public @interface Messages {
     String suffix() default ".yml";
     String defaultLocale() default "en";
     boolean unpack() default true;
+    Prefix prefix() default @Prefix;
+
+    @Target(ElementType.TYPE)
+    @Retention(RetentionPolicy.RUNTIME)
+    @interface Prefix {
+        String field() default "prefix";
+        String marker() default "~";
+    }
 
     abstract class DEFAULT extends Configurer {
     }
