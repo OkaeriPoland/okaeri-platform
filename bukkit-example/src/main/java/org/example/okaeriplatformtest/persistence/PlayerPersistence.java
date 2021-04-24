@@ -1,9 +1,9 @@
 package org.example.okaeriplatformtest.persistence;
 
 import eu.okaeri.injector.annotation.Inject;
-import eu.okaeri.platform.bukkit.commons.persistence.YamlBukkitPersistence;
 import eu.okaeri.platform.core.annotation.Component;
-import eu.okaeri.platform.core.persistence.PersistencePath;
+import eu.okaeri.platform.persistence.PersistencePath;
+import eu.okaeri.platform.persistence.flat.BasicFlatPersistence;
 import org.bukkit.OfflinePlayer;
 
 import java.util.UUID;
@@ -13,7 +13,7 @@ import java.util.UUID;
 // note that saving is done using CustomObject#save() and not BasicFlatPersistence#write
 public class PlayerPersistence {
 
-    @Inject private YamlBukkitPersistence persistence;
+    @Inject private BasicFlatPersistence persistence;
 
     // make sure the method incorporates here some form of caching, see more below
     public PlayerProperties get(OfflinePlayer player) {
