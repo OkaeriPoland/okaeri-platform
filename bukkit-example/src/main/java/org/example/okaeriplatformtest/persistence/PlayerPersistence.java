@@ -28,7 +28,7 @@ public class PlayerPersistence {
 
     // for the real use case it is recommended
     // to cache PlayerPersistence#get methods
-    // calling #read/#readInto causes disk access, etc.
+    // calling #read causes disk access, etc.
     //
     // one may use Map<UUID, PlayerProperties>
     // with listeners for join/quit
@@ -37,7 +37,7 @@ public class PlayerPersistence {
 
         // load properties from the storage backend
         PersistencePath persistencePath = this.toPath(uniqueId);
-        PlayerProperties properties = this.persistence.readInto(persistencePath, PlayerProperties.class);
+        PlayerProperties properties = this.persistence.read(persistencePath).into(PlayerProperties.class);
 
         // update basic properties
         // name is the most important here as it can be changed
