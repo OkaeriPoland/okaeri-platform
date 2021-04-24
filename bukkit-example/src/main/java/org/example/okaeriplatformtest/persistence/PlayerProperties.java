@@ -1,8 +1,7 @@
 package org.example.okaeriplatformtest.persistence;
 
-import eu.okaeri.configs.OkaeriConfig;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
+import eu.okaeri.platform.persistence.config.ConfigDocument;
+import lombok.*;
 
 import java.util.UUID;
 
@@ -11,7 +10,7 @@ import java.util.UUID;
 // custom properties object based on okaeri-configs
 // allows for easy access to player's properties with
 // getters/setters instead of raw values and string keys
-public class PlayerProperties extends OkaeriConfig {
+public class PlayerProperties extends ConfigDocument {
 
     // recommended defaults
     private UUID uuid;

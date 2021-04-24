@@ -1,11 +1,11 @@
-package eu.okaeri.platform.core.persistence;
+package eu.okaeri.platform.persistence;
 
 import java.util.Collection;
 
 public interface Persistence<T> {
 
     // basic group "ExamplePlugin:" -> "example_plugin:player:USER_IDENTIFIER"
-    PersistencePath getPath();
+    PersistencePath getBasePath();
 
     // check if element exists
     // important as it is advised that read returns empty objects

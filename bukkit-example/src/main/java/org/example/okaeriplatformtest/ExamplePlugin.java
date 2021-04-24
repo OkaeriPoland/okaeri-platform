@@ -10,8 +10,8 @@ import eu.okaeri.platform.bukkit.commons.teleport.QueuedTeleportsTask;
 import eu.okaeri.platform.bukkit.commons.time.MinecraftTimeEquivalent;
 import eu.okaeri.platform.core.annotation.Bean;
 import eu.okaeri.platform.core.annotation.Register;
-import eu.okaeri.platform.core.persistence.Persistence;
-import eu.okaeri.platform.core.persistence.cache.Cached;
+import eu.okaeri.platform.persistence.Persistence;
+import eu.okaeri.platform.persistence.cache.Cached;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
@@ -63,8 +63,8 @@ public class ExamplePlugin extends OkaeriBukkitPlugin {
     @Bean("persistence")
     public Persistence configurePersistence(@Inject("dataFolder") File dataFolder) {
         // specify custom child dir in dataFolder or other custom location
-        // or use YamlBukkitPersistence(plugin) for default pluginFolder/storage/*
-        return new YamlBukkitPersistence(new File(dataFolder, "storage"));
+        // or use YamlBukkitPersistence.of(plugin) for default pluginFolder/storage/*
+        return YamlBukkitPersistence.of(new File(dataFolder, "storage"));
     }
 
     // method beans can use DI

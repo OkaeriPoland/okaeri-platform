@@ -368,7 +368,7 @@ Internals mainly used inside of the platform, but available for manual use. For 
 
 ### Performance
 
-The example plugin loads in under 20ms on the AMD Ryzen 3600 system. Runtime overhead for most of the components is negligible
+The example plugin loads in under 50ms on the AMD Ryzen 3600 system. Runtime overhead for most of the components is negligible
 as most of the work is done at the startup, which is relatively fast, and even less noticeable thanks to special async preloading
 technology (up to 5x faster loading time). We use highly parallelized startup routine that can load most of the data at
 the time server is loading worlds or other plugins. Blocking time is the real time server spent waiting for the platform.
@@ -378,14 +378,14 @@ the time server is loading worlds or other plugins. Blocking time is the real ti
 [..] Enabling OkaeriPlatformBukkitExample v1.0-SNAPSHOT
 [..] Initializing class org.example.okaeriplatformtest.ExamplePlugin
 [..] ~ Loaded configuration: TestConfig { path = config.yml, provider = DEFAULT } [17 ms]
-[..] ~ Loaded messages: TestLocaleConfig { path = i18n, suffix = .yml, provider = DEFAULT } [20 ms]
-[..]   > es, pl
+[..] ~ Loaded messages: TestLocaleConfig { path = i18n, suffix = .yml, provider = DEFAULT } [31 ms]
+[..]   > es, en
 [..] - Added timer: exampleTimer { delay = 1200, rate = 1200, async = true }
 [..] - Added timer: QueuedTeleportsTask { delay = 4, rate = 4, async = false }
 [..] - Added command: TestCommand { label = testcmd, aliases = [testing] }
 [..] - Added timer: TestTask { delay = 6000, rate = 6000, async = true }
-[..] - Added listener: TestListener { onAsyncChat, onJoin }
-[..] = (configs: 1, commands: 1, listeners: 1, timers: 3, localeConfigs: 2) [blocking: 15 ms]
+[..] - Added listener: TestListener { onCommandsUnknownError, onJoin, onAsyncChat }
+[..] = (configs: 1, commands: 1, listeners: 1, timers: 3, localeConfigs: 11) [blocking: 40 ms]
 ```
 
 **Commands (okaeri-commands)**
