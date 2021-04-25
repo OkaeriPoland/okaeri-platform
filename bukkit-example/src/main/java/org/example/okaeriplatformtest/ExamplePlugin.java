@@ -79,11 +79,11 @@ public class ExamplePlugin extends OkaeriBukkitPlugin {
                 // between multiple instances you must allow users to set persistence's
                 // basePath manually or add some other possibility to differ keys
                 // otherwise plugin usage would be limited to one instance per one redis
-                PersistencePath storage = PersistencePath.of(plugin.getName()).sub("storage");
+                PersistencePath basePath = PersistencePath.of(config.getStoragePrefix());
                 // construct redis client based on your needs, e.g. using config
                 RedisClient redisClient = RedisClient.create(config.getStorageRedisUri());
                 // it is recommended to use json configurer for the redis backend
-                return new BasicRedisPersistence(storage, redisClient, new JsonSimpleConfigurer(), new SerdesBukkit());
+                return new BasicRedisPersistence(basePath, redisClient, new JsonSimpleConfigurer(), new SerdesBukkit());
             default:
                 throw new RuntimeException("unsupported storage backend: " + config.getStorageBackend());
         }

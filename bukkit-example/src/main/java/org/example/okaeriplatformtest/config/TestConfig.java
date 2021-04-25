@@ -54,6 +54,13 @@ public class TestConfig extends OkaeriConfig {
     @Comment("Type of the storage backend: FLAT, REDIS")
     private StorageBackend storageBackend = StorageBackend.FLAT;
 
+    @Variable("OPE_STORAGE_PREFIX")
+    @Comment("Prefix for the storage: allows to have multiple instances using same database")
+    @Comment("FLAT  : no effect due to local nature")
+    @Comment("REDIS : {storagePrefix}:{collection} -> OkaeriPlatformBukkitExample:player")
+//    @Comment("MYSQL : {storagePrefix}:{collection} -> ope_storage_player (recommended shortened [here 'ope:storage'] due to database limitations)")
+    private String storagePrefix = "OkaeriPlatformBukkitExample:storage";
+
     @Variable("OPE_STORAGE_REDIS_URI")
     @Comment("Redis URI - used for storage-backend: REDIS")
     private String storageRedisUri = "redis://localhost";
