@@ -43,10 +43,10 @@ import java.util.concurrent.atomic.AtomicInteger;
 // skip registration using register=false
 @Register(TestConfig.class)
 @Register(TestLocaleConfig.class)
+@Register(PlayerPersistence.class)
 @Register(TestCommand.class)
 @Register(TestListener.class)
 @Register(TestTask.class)
-@Register(PlayerPersistence.class)
 public class ExamplePlugin extends OkaeriBukkitPlugin {
 
     @Inject("subbean")

@@ -7,34 +7,49 @@ import eu.okaeri.platform.persistence.config.ConfigDocument;
 import eu.okaeri.platform.persistence.config.ConfigPersistence;
 import io.lettuce.core.RedisClient;
 import io.lettuce.core.api.StatefulRedisConnection;
-import lombok.Getter;
+
+import java.util.Collection;
+import java.util.stream.Collectors;
 
 public class BasicRedisPersistence extends ConfigPersistence {
 
-    @Getter private final PersistencePath basePath;
     private StatefulRedisConnection<String, String> connection;
 
     public BasicRedisPersistence(PersistencePath basePath, RedisClient client, Configurer configurer, OkaeriSerdesPack... serdesPacks) {
-        super(configurer, serdesPacks);
+        super(basePath, configurer, serdesPacks);
         this.connection = client.connect();
-        this.basePath = basePath;
     }
 
     @Override
-    public boolean exists(PersistencePath path) {
-        return this.connection.sync().exists(this.toFullPath(path).getValue()) == 1;
+    public Collection<ConfigDocument> readAll(PersistencePath collection) {
+        return this.connection.sync().hkeys(this.getBasePath().sub(collection).getValue()).stream()
+                .map(key -> this.read(collection, PersistencePath.of(key)))
+                .collect(Collectors.toList());
     }
 
     @Override
-    public boolean write(PersistencePath path, ConfigDocument document) {
-        this.connection.sync().set(this.toFullPath(path).getValue(), document.saveToString());
+    public boolean exists(PersistencePath collection, PersistencePath path) {
+        String hKey = this.getBasePath().sub(collection).getValue();
+        return this.connection.sync().hexists(hKey, path.getValue());
+    }
+
+    @Override
+    public boolean write(PersistencePath collection, PersistencePath path, ConfigDocument document) {
+        String hKey = this.getBasePath().sub(collection).getValue();
+        this.connection.sync().hset(hKey, path.getValue(), document.saveToString());
         return true;
     }
 
     @Override
-    public ConfigDocument load(ConfigDocument document, PersistencePath fullPath) {
-        String configContents = this.connection.sync().get(fullPath.getValue());
-        if (configContents == null) return document;
+    public ConfigDocument load(ConfigDocument document, PersistencePath collection, PersistencePath path) {
+
+        String hKey = this.getBasePath().sub(collection).getValue();
+        String configContents = this.connection.sync().hget(hKey, path.getValue());
+
+        if (configContents == null) {
+            return document;
+        }
+
         return (ConfigDocument) document.load(configContents);
     }
 }

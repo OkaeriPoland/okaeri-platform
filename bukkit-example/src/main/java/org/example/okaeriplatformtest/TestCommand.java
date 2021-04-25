@@ -18,10 +18,12 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.example.okaeriplatformtest.config.TestConfig;
 import org.example.okaeriplatformtest.config.TestLocaleConfig;
+import org.example.okaeriplatformtest.persistence.PlayerPersistence;
 
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 
 @ServiceDescriptor(label = "testcmd", aliases = "testing")
 public class TestCommand implements CommandService {
@@ -34,6 +36,7 @@ public class TestCommand implements CommandService {
     @Inject private BI18n i18n;
     @Inject private TestLocaleConfig messages;
     @Inject private Logger logger;
+    @Inject private PlayerPersistence playerPersistence;
 
     // testcmd|testing example
     @Executor
@@ -112,6 +115,17 @@ public class TestCommand implements CommandService {
         } else {
             return this.i18n.get(sender, this.messages.getExampleMessage());
         }
+    }
+
+    // testcmd|testing readallplayers
+    @Executor
+    public void readallplayers(CommandSender sender) {
+        long start = System.currentTimeMillis();
+        sender.sendMessage(this.playerPersistence.getAll().stream()
+                .map(properties -> properties.getName() + ": " + properties.getLastJoined())
+                .collect(Collectors.joining("\n")));
+        long took = System.currentTimeMillis() - start;
+        sender.sendMessage(took + " ms");
     }
 
     // testcmd|testing eval <message> - looks dangerous tbh
