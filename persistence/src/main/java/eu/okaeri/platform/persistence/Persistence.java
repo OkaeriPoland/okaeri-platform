@@ -12,12 +12,21 @@ public interface Persistence<T> {
     // instead of throwing an exception
     boolean exists(PersistencePath collection, PersistencePath path);
 
-    // read saved object at key, full path = "{this.path}:{path}"
+    // read saved object at key
     T read(PersistencePath collection, PersistencePath path);
 
     // read all saved objects in the path
     Collection<? extends T> readAll(PersistencePath collection);
 
-    // write object to exact key, full path = "{this.path}:{path}"
+    // write object to exact key
     boolean write(PersistencePath collection, PersistencePath path, T object);
+
+    // delete single
+    boolean delete(PersistencePath collection, PersistencePath path);
+
+    // delete all from collection
+    boolean deleteAll(PersistencePath collection);
+
+    // delete all - purge all collections
+    long deleteAll();
 }

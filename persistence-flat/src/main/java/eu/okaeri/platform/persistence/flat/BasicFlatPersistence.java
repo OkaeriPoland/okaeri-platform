@@ -9,6 +9,7 @@ import lombok.Getter;
 import lombok.SneakyThrows;
 
 import java.io.File;
+import java.util.Arrays;
 
 // build to store data in the PLUGIN_DIR/storage/*
 public class BasicFlatPersistence extends ConfigPersistence {
@@ -59,5 +60,32 @@ public class BasicFlatPersistence extends ConfigPersistence {
     @Override
     public ConfigDocument load(ConfigDocument document, PersistencePath collection, PersistencePath path) {
         return (ConfigDocument) document.load();
+    }
+
+    @Override
+    public boolean delete(PersistencePath collection, PersistencePath path) {
+        return this.toFullPath(collection, path).toFile().delete();
+    }
+
+    @Override
+    public boolean deleteAll(PersistencePath collection) {
+        return this.delete(this.getBasePath().sub(collection)) > 0;
+    }
+
+    @Override
+    public long deleteAll() {
+        return this.delete(this.getBasePath());
+    }
+
+    private long delete(PersistencePath path) {
+
+        File[] files = path.toFile().listFiles();
+        if (files == null) {
+            return 0;
+        }
+
+        return Arrays.stream(files)
+                .map(File::delete)
+                .count();
     }
 }
