@@ -17,26 +17,28 @@ public class BasicFlatPersistence extends ConfigPersistence {
     @Getter private final String fileSuffix;
 
     public BasicFlatPersistence(File basePath, String fileSuffix, Configurer configurer, OkaeriSerdesPack... serdesPacks) {
-        super(configurer, serdesPacks);
+        super(PersistencePath.of(basePath), configurer, serdesPacks);
         this.basePath = PersistencePath.of(basePath);
         this.fileSuffix = fileSuffix;
     }
 
     @Override
-    public boolean exists(PersistencePath path) {
-        return this.toFullPath(path).toFile().exists();
+    public boolean exists(PersistencePath collection, PersistencePath path) {
+        return this.toFullPath(collection, path).toFile().exists();
     }
 
     @Override
-    public boolean write(PersistencePath path, ConfigDocument document) {
-        document.save(this.toFullPath(path).toFile());
+    public boolean write(PersistencePath collection, PersistencePath path, ConfigDocument document) {
+        document.save(this.toFullPath(collection, path).toFile());
         return true;
     }
 
     @Override
     @SneakyThrows
     @SuppressWarnings("ResultOfMethodCallIgnored")
-    public void documentCreated(ConfigDocument document, PersistencePath fullPath) {
+    public void documentCreated(ConfigDocument document, PersistencePath collection, PersistencePath path) {
+        // create full path
+        PersistencePath fullPath = this.toFullPath(collection, path);
         // create parent dir
         File dir = fullPath.group().toFile();
         dir.mkdirs();
@@ -53,7 +55,7 @@ public class BasicFlatPersistence extends ConfigPersistence {
     }
 
     @Override
-    public ConfigDocument load(ConfigDocument document, PersistencePath fullPath) {
+    public ConfigDocument load(ConfigDocument document, PersistencePath collection, PersistencePath path) {
         return (ConfigDocument) document.load();
     }
 }

@@ -18,12 +18,12 @@ public class PersistencePath {
         return new PersistencePath(file.getPath().replace(File.separator, SEPARATOR));
     }
 
-    public static PersistencePath of(String path) {
-        return new PersistencePath(path);
+    public static PersistencePath of(UUID uuid) {
+        return new PersistencePath(String.valueOf(uuid));
     }
 
-    public PersistencePath sub(String sub) {
-        return this.sub(PersistencePath.of(sub));
+    public static PersistencePath of(String path) {
+        return new PersistencePath(path);
     }
 
     public PersistencePath sub(UUID sub) {
@@ -31,11 +31,24 @@ public class PersistencePath {
     }
 
     public PersistencePath sub(PersistencePath sub) {
-        return this.append(SEPARATOR + sub.getValue());
+        return this.sub(sub.getValue());
+    }
+
+    public PersistencePath sub(String sub) {
+        String separator = (sub.startsWith(SEPARATOR)) ? "" : SEPARATOR;
+        return this.append(separator + sub);
     }
 
     public PersistencePath append(String element) {
         return PersistencePath.of(this.value + element);
+    }
+
+    public PersistencePath removeStart(String part) {
+        return this.value.startsWith(part) ? PersistencePath.of(this.value.substring(part.length())) : this;
+    }
+
+    public PersistencePath removeStart(PersistencePath path) {
+        return this.removeStart(path.getValue());
     }
 
     public PersistencePath group() {
