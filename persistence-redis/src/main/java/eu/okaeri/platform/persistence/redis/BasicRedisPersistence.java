@@ -40,6 +40,20 @@ public class BasicRedisPersistence extends ConfigPersistence {
     }
 
     @Override
+    public ConfigDocument read(ConfigDocument document, PersistenceCollection collection, PersistencePath path) {
+
+        this.checkCollectionRegistered(collection);
+        String hKey = this.getBasePath().sub(collection).getValue();
+        String configContents = this.connection.sync().hget(hKey, path.getValue());
+
+        if (configContents == null) {
+            return document;
+        }
+
+        return (ConfigDocument) document.load(configContents);
+    }
+
+    @Override
     public Collection<ConfigDocument> readAll(PersistenceCollection collection) {
         this.checkCollectionRegistered(collection);
         return this.connection.sync().hgetall(this.getBasePath().sub(collection).getValue()).entrySet().stream()
@@ -63,20 +77,6 @@ public class BasicRedisPersistence extends ConfigPersistence {
         String hKey = this.getBasePath().sub(collection).getValue();
         this.connection.sync().hset(hKey, path.getValue(), document.saveToString());
         return true;
-    }
-
-    @Override
-    public ConfigDocument load(ConfigDocument document, PersistenceCollection collection, PersistencePath path) {
-
-        this.checkCollectionRegistered(collection);
-        String hKey = this.getBasePath().sub(collection).getValue();
-        String configContents = this.connection.sync().hget(hKey, path.getValue());
-
-        if (configContents == null) {
-            return document;
-        }
-
-        return (ConfigDocument) document.load(configContents);
     }
 
     @Override

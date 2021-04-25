@@ -9,7 +9,7 @@
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>okaeri-platform-persistence</artifactId>
+    <artifactId>okaeri-platform-persistence-jdbc</artifactId>
 
     <properties>
         <maven.compiler.source>8</maven.compiler.source>
@@ -19,8 +19,14 @@
     <dependencies>
         <dependency>
             <groupId>eu.okaeri</groupId>
-            <artifactId>okaeri-configs-core</artifactId>
-            <version>2.7.11</version>
+            <artifactId>okaeri-platform-persistence</artifactId>
+            <version>0.3.6</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.zaxxer</groupId>
+            <artifactId>HikariCP</artifactId>
+            <version>4.0.3</version>
         </dependency>
     </dependencies>
 

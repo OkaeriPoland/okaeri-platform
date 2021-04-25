@@ -141,7 +141,7 @@ public class BeanManifest {
     public BeanManifest update(ComponentCreator creator, Injector injector) {
 
         if (this.object == null) {
-            Optional<? extends Injectable<?>> injectable = injector.getInjectable(this.name, this.type);
+            Optional<? extends Injectable<?>> injectable = injector.getExact(this.name, this.type);
             if (injectable.isPresent()) {
                 this.object = injectable.get().getObject();
             } else if (this.ready(injector) && creator.isComponent(this.type) && (this.source != BeanSource.INJECT)) {
@@ -194,7 +194,7 @@ public class BeanManifest {
             if ((depend.getSource() != BeanSource.INJECT) || (depend.getObject() != null)) {
                 continue;
             }
-            Optional<? extends Injectable<?>> injectable = injector.getInjectable(depend.getName(), depend.getType());
+            Optional<? extends Injectable<?>> injectable = injector.getExact(depend.getName(), depend.getType());
             if (!injectable.isPresent()) {
                 continue;
             }
@@ -208,7 +208,7 @@ public class BeanManifest {
 
             if ((depend.getObject() == null) && (depend.getSource() == BeanSource.INJECT)) {
 
-                Optional<? extends Injectable<?>> injectable = injector.getInjectable(depend.getName(), depend.getType());
+                Optional<? extends Injectable<?>> injectable = injector.getExact(depend.getName(), depend.getType());
 
                 if (!injectable.isPresent()) {
 

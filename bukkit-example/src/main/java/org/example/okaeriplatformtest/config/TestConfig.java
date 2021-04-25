@@ -50,18 +50,28 @@ public class TestConfig extends OkaeriConfig {
     @Comment("Example command")
     private String repeatingCommand = "say from the config for {name}!";
 
-    @Variable("OPE_STORAGE_BACKEND")
-    @Comment("Type of the storage backend: FLAT, REDIS")
-    private StorageBackend storageBackend = StorageBackend.FLAT;
+    @Comment("Storage settings")
+    private StorageConfig storage = new StorageConfig();
 
-    @Variable("OPE_STORAGE_PREFIX")
-    @Comment("Prefix for the storage: allows to have multiple instances using same database")
-    @Comment("FLAT  : no effect due to local nature")
-    @Comment("REDIS : {storagePrefix}:{collection} -> OkaeriPlatformBukkitExample:player")
-//    @Comment("MYSQL : {storagePrefix}:{collection} -> ope_storage_player (recommended shortened [here 'ope:storage'] due to database limitations)")
-    private String storagePrefix = "OkaeriPlatformBukkitExample:storage";
+    @Getter
+    @Setter
+    public class StorageConfig extends OkaeriConfig {
 
-    @Variable("OPE_STORAGE_REDIS_URI")
-    @Comment("Redis URI - used for storage-backend: REDIS")
-    private String storageRedisUri = "redis://localhost";
+        @Variable("OPE_STORAGE_BACKEND")
+        @Comment("Type of the storage backend: FLAT, REDIS, MYSQL")
+        private StorageBackend backend = StorageBackend.FLAT;
+
+        @Variable("OPE_STORAGE_PREFIX")
+        @Comment("Prefix for the storage: allows to have multiple instances using same database")
+        @Comment("FLAT  : no effect due to local nature")
+        @Comment("REDIS : {storagePrefix}:{collection} -> OkaeriPlatformBukkitExample:player")
+        @Comment("MYSQL : {storagePrefix}:{collection} -> ope_storage_player (recommended shortened [here 'ope:storage'] due to database limitations)")
+        private String prefix = "OkaeriPlatformBukkitExample:storage";
+
+        @Variable("OPE_STORAGE_URI")
+        @Comment("FLAT  : not applicable, plugin controlled")
+        @Comment("REDIS : redis://localhost")
+        @Comment("MYSQL : jdbc:mysql://localhost:3306/db?user=root&password=1234")
+        private String uri = "redis://localhost";
+    }
 }

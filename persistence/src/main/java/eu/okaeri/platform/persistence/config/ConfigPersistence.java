@@ -8,7 +8,6 @@ import eu.okaeri.platform.persistence.PersistencePath;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -34,13 +33,7 @@ public abstract class ConfigPersistence implements Persistence<ConfigDocument> {
     @Override
     public ConfigDocument read(PersistenceCollection collection, PersistencePath path) {
         this.checkCollectionRegistered(collection);
-        return this.load(this.createDocument(collection, path), collection, path);
-    }
-
-    @Override
-    public Collection<ConfigDocument> readAll(PersistenceCollection collection) {
-        this.checkCollectionRegistered(collection);
-        throw new RuntimeException("Not implemented yet");
+        return this.read(this.createDocument(collection, path), collection, path);
     }
 
     public PersistencePath toFullPath(PersistenceCollection collection, PersistencePath path) {
@@ -60,6 +53,6 @@ public abstract class ConfigPersistence implements Persistence<ConfigDocument> {
         return config;
     }
 
-    public abstract ConfigDocument load(ConfigDocument document, PersistenceCollection collection, PersistencePath path);
+    public abstract ConfigDocument read(ConfigDocument document, PersistenceCollection collection, PersistencePath path);
 }
 
