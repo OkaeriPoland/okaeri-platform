@@ -10,22 +10,22 @@ public interface Persistence<T> {
     // check if element exists
     // important as it is advised that read returns empty objects
     // instead of throwing an exception
-    boolean exists(PersistencePath collection, PersistencePath path);
+    boolean exists(PersistenceCollection collection, PersistencePath path);
 
     // read saved object at key
-    T read(PersistencePath collection, PersistencePath path);
+    T read(PersistenceCollection collection, PersistencePath path);
 
     // read all saved objects in the path
-    Collection<? extends T> readAll(PersistencePath collection);
+    Collection<? extends T> readAll(PersistenceCollection collection);
 
     // write object to exact key
-    boolean write(PersistencePath collection, PersistencePath path, T object);
+    boolean write(PersistenceCollection collection, PersistencePath path, T object);
 
     // delete single
-    boolean delete(PersistencePath collection, PersistencePath path);
+    boolean delete(PersistenceCollection collection, PersistencePath path);
 
     // delete all from collection
-    boolean deleteAll(PersistencePath collection);
+    boolean deleteAll(PersistenceCollection collection);
 
     // delete all - purge all collections
     long deleteAll();

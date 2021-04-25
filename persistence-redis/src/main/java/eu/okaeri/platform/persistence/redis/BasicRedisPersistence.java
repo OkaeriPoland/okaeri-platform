@@ -1,6 +1,7 @@
 package eu.okaeri.platform.persistence.redis;
 
 import eu.okaeri.configs.serdes.OkaeriSerdesPack;
+import eu.okaeri.platform.persistence.PersistenceCollection;
 import eu.okaeri.platform.persistence.PersistencePath;
 import eu.okaeri.platform.persistence.config.ConfigConfigurerProvider;
 import eu.okaeri.platform.persistence.config.ConfigDocument;
@@ -39,7 +40,7 @@ public class BasicRedisPersistence extends ConfigPersistence {
     }
 
     @Override
-    public Collection<ConfigDocument> readAll(PersistencePath collection) {
+    public Collection<ConfigDocument> readAll(PersistenceCollection collection) {
         this.checkCollectionRegistered(collection);
         return this.connection.sync().hgetall(this.getBasePath().sub(collection).getValue()).entrySet().stream()
                 .map(entry -> {
@@ -50,14 +51,14 @@ public class BasicRedisPersistence extends ConfigPersistence {
     }
 
     @Override
-    public boolean exists(PersistencePath collection, PersistencePath path) {
+    public boolean exists(PersistenceCollection collection, PersistencePath path) {
         this.checkCollectionRegistered(collection);
         String hKey = this.getBasePath().sub(collection).getValue();
         return this.connection.sync().hexists(hKey, path.getValue());
     }
 
     @Override
-    public boolean write(PersistencePath collection, PersistencePath path, ConfigDocument document) {
+    public boolean write(PersistenceCollection collection, PersistencePath path, ConfigDocument document) {
         this.checkCollectionRegistered(collection);
         String hKey = this.getBasePath().sub(collection).getValue();
         this.connection.sync().hset(hKey, path.getValue(), document.saveToString());
@@ -65,7 +66,7 @@ public class BasicRedisPersistence extends ConfigPersistence {
     }
 
     @Override
-    public ConfigDocument load(ConfigDocument document, PersistencePath collection, PersistencePath path) {
+    public ConfigDocument load(ConfigDocument document, PersistenceCollection collection, PersistencePath path) {
 
         this.checkCollectionRegistered(collection);
         String hKey = this.getBasePath().sub(collection).getValue();
@@ -79,14 +80,14 @@ public class BasicRedisPersistence extends ConfigPersistence {
     }
 
     @Override
-    public boolean delete(PersistencePath collection, PersistencePath path) {
+    public boolean delete(PersistenceCollection collection, PersistencePath path) {
         this.checkCollectionRegistered(collection);
         String hKey = this.getBasePath().sub(collection).getValue();
         return this.connection.sync().hdel(hKey, path.getValue()) > 0;
     }
 
     @Override
-    public boolean deleteAll(PersistencePath collection) {
+    public boolean deleteAll(PersistenceCollection collection) {
         this.checkCollectionRegistered(collection);
         String hKey = this.getBasePath().sub(collection).getValue();
         return this.connection.sync().del(hKey) > 0;
@@ -94,6 +95,6 @@ public class BasicRedisPersistence extends ConfigPersistence {
 
     @Override
     public long deleteAll() {
-        return this.connection.sync().del(this.getKnownCollections().toArray(new String[0]));
+        return this.connection.sync().del(this.getKnownCollections().keySet().toArray(new String[0]));
     }
 }
