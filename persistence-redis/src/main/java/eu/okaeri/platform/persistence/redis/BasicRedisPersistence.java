@@ -7,14 +7,17 @@ import eu.okaeri.platform.persistence.config.ConfigDocument;
 import eu.okaeri.platform.persistence.config.ConfigPersistence;
 import io.lettuce.core.RedisClient;
 import io.lettuce.core.api.StatefulRedisConnection;
+import lombok.Getter;
 
-public abstract class BasicRedisPersistence extends ConfigPersistence {
+public class BasicRedisPersistence extends ConfigPersistence {
 
+    @Getter private final PersistencePath basePath;
     private StatefulRedisConnection<String, String> connection;
 
-    public BasicRedisPersistence(RedisClient client, Configurer configurer, OkaeriSerdesPack[] serdesPacks) {
+    public BasicRedisPersistence(PersistencePath basePath, RedisClient client, Configurer configurer, OkaeriSerdesPack... serdesPacks) {
         super(configurer, serdesPacks);
         this.connection = client.connect();
+        this.basePath = basePath;
     }
 
     @Override
@@ -31,6 +34,7 @@ public abstract class BasicRedisPersistence extends ConfigPersistence {
     @Override
     public ConfigDocument load(ConfigDocument document, PersistencePath fullPath) {
         String configContents = this.connection.sync().get(fullPath.getValue());
-        return (ConfigDocument) document.load((configContents == null) ? "" : configContents);
+        if (configContents == null) return document;
+        return (ConfigDocument) document.load(configContents);
     }
 }

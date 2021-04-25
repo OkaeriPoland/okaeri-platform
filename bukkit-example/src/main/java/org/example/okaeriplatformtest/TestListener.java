@@ -43,15 +43,22 @@ public class TestListener implements Listener {
         event.setJoinMessage("Willkommen " + event.getPlayer().getName() + "! " + this.plugin.getName() + " is working!\n" + this.subbeanString);
         event.getPlayer().getInventory().addItem(this.rewardItem.clone());
 
-        // persistence example
-        PlayerProperties playerProperties = this.playerPersistence.get(event.getPlayer());
-        String lastJoined = playerProperties.getLastJoined(); // get current value
-        event.getPlayer().sendMessage("Your last join time: " + lastJoined);
-        playerProperties.setLastJoined(Instant.now().toString()); // update value
+        // accessing persistence layer should be always done async
+        // this is especially true for loading and saving
+        // failing to do this may cause lag spikes which can
+        // range from minor for flat storages and major for databases
+        this.scheduler.runTaskAsynchronously(this.plugin, () -> {
 
-        // save player properties
-        // normally this may not be required if data is not required to be saved immediately, see PlayerPersistence notes
-        this.scheduler.runTaskAsynchronously(this.plugin, playerProperties::save);
+            // read example
+            PlayerProperties playerProperties = this.playerPersistence.get(event.getPlayer());
+            String lastJoined = playerProperties.getLastJoined(); // get current value
+            event.getPlayer().sendMessage("Your last join time: " + lastJoined);
+            playerProperties.setLastJoined(Instant.now().toString()); // update value
+
+            // save player properties
+            // normally this may not be required if data is not required to be saved immediately, see PlayerPersistence notes
+            this.scheduler.runTaskAsynchronously(this.plugin, playerProperties::save);
+        });
     }
 
     @EventHandler
