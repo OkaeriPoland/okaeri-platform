@@ -1,8 +1,8 @@
 package eu.okaeri.platform.persistence.flat;
 
-import eu.okaeri.configs.configurer.Configurer;
 import eu.okaeri.configs.serdes.OkaeriSerdesPack;
 import eu.okaeri.platform.persistence.PersistencePath;
+import eu.okaeri.platform.persistence.config.ConfigConfigurerProvider;
 import eu.okaeri.platform.persistence.config.ConfigDocument;
 import eu.okaeri.platform.persistence.config.ConfigPersistence;
 import lombok.Getter;
@@ -16,8 +16,8 @@ public class BasicFlatPersistence extends ConfigPersistence {
     @Getter private final PersistencePath basePath;
     @Getter private final String fileSuffix;
 
-    public BasicFlatPersistence(File basePath, String fileSuffix, Configurer configurer, OkaeriSerdesPack... serdesPacks) {
-        super(PersistencePath.of(basePath), configurer, serdesPacks);
+    public BasicFlatPersistence(File basePath, String fileSuffix, ConfigConfigurerProvider configurerProvider, OkaeriSerdesPack... serdesPacks) {
+        super(PersistencePath.of(basePath), configurerProvider, serdesPacks);
         this.basePath = PersistencePath.of(basePath);
         this.fileSuffix = fileSuffix;
     }
@@ -36,7 +36,7 @@ public class BasicFlatPersistence extends ConfigPersistence {
     @Override
     @SneakyThrows
     @SuppressWarnings("ResultOfMethodCallIgnored")
-    public void documentCreated(ConfigDocument document, PersistencePath collection, PersistencePath path) {
+    public ConfigDocument createDocument(PersistencePath collection, PersistencePath path) {
         // create full path
         PersistencePath fullPath = this.toFullPath(collection, path);
         // create parent dir
@@ -45,8 +45,10 @@ public class BasicFlatPersistence extends ConfigPersistence {
         // create empty file
         File bindFile = fullPath.toFile();
         bindFile.createNewFile();
-        // add bindFile
+        // create document and add bindFile
+        ConfigDocument document = super.createDocument(collection, path);
         document.withBindFile(fullPath.toFile());
+        return document;
     }
 
     @Override

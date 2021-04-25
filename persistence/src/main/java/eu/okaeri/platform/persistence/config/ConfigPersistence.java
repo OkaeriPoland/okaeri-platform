@@ -1,7 +1,6 @@
 package eu.okaeri.platform.persistence.config;
 
 import eu.okaeri.configs.ConfigManager;
-import eu.okaeri.configs.configurer.Configurer;
 import eu.okaeri.configs.serdes.OkaeriSerdesPack;
 import eu.okaeri.platform.persistence.Persistence;
 import eu.okaeri.platform.persistence.PersistencePath;
@@ -10,23 +9,16 @@ import lombok.Getter;
 
 import java.util.Collection;
 
-// build to store data in the PLUGIN_DIR/storage/*
 @AllArgsConstructor
 public abstract class ConfigPersistence implements Persistence<ConfigDocument> {
 
     @Getter private final PersistencePath basePath;
-    @Getter private final Configurer configurer;
+    @Getter private final ConfigConfigurerProvider configurerProvider;
     @Getter private final OkaeriSerdesPack[] serdesPacks;
 
     @Override
     public ConfigDocument read(PersistencePath collection, PersistencePath path) {
-        PersistencePath fullPath = this.toFullPath(collection, path);
-        System.out.println("READ " + fullPath);
-        ConfigDocument config = ConfigManager.create(ConfigDocument.class);
-        config.withConfigurer(this.configurer, this.serdesPacks);
-        config.setSaver(document -> this.write(collection, path, document));
-        this.documentCreated(config, collection, path);
-        return this.load(config, collection, path);
+        return this.load(this.createDocument(collection, path), collection, path);
     }
 
     @Override
@@ -42,7 +34,11 @@ public abstract class ConfigPersistence implements Persistence<ConfigDocument> {
         return path;
     }
 
-    public void documentCreated(ConfigDocument document, PersistencePath collection, PersistencePath path) {
+    public ConfigDocument createDocument(PersistencePath collection, PersistencePath path) {
+        ConfigDocument config = ConfigManager.create(ConfigDocument.class);
+        config.withConfigurer(this.configurerProvider.get(), this.serdesPacks);
+        config.setSaver(document -> this.write(collection, path, document));
+        return config;
     }
 
     public abstract ConfigDocument load(ConfigDocument document, PersistencePath collection, PersistencePath path);

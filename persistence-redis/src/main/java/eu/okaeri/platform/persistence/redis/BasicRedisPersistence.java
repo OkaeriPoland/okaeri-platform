@@ -1,8 +1,8 @@
 package eu.okaeri.platform.persistence.redis;
 
-import eu.okaeri.configs.configurer.Configurer;
 import eu.okaeri.configs.serdes.OkaeriSerdesPack;
 import eu.okaeri.platform.persistence.PersistencePath;
+import eu.okaeri.platform.persistence.config.ConfigConfigurerProvider;
 import eu.okaeri.platform.persistence.config.ConfigDocument;
 import eu.okaeri.platform.persistence.config.ConfigPersistence;
 import io.lettuce.core.RedisClient;
@@ -15,15 +15,18 @@ public class BasicRedisPersistence extends ConfigPersistence {
 
     private StatefulRedisConnection<String, String> connection;
 
-    public BasicRedisPersistence(PersistencePath basePath, RedisClient client, Configurer configurer, OkaeriSerdesPack... serdesPacks) {
-        super(basePath, configurer, serdesPacks);
+    public BasicRedisPersistence(PersistencePath basePath, RedisClient client, ConfigConfigurerProvider configurerProvider, OkaeriSerdesPack... serdesPacks) {
+        super(basePath, configurerProvider, serdesPacks);
         this.connection = client.connect();
     }
 
     @Override
     public Collection<ConfigDocument> readAll(PersistencePath collection) {
-        return this.connection.sync().hkeys(this.getBasePath().sub(collection).getValue()).stream()
-                .map(key -> this.read(collection, PersistencePath.of(key)))
+        return this.connection.sync().hgetall(this.getBasePath().sub(collection).getValue()).entrySet().stream()
+                .map(entry -> {
+                    PersistencePath path = PersistencePath.of(entry.getKey());
+                    return (ConfigDocument) this.createDocument(collection, path).load(entry.getValue());
+                })
                 .collect(Collectors.toList());
     }
 
