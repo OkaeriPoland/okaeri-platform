@@ -39,6 +39,16 @@ public class PlayerPersistence {
                 .collect(Collectors.toList());
     }
 
+    // delete properties by player
+    public boolean delete(OfflinePlayer player) {
+        return this.persistence.delete(COLLECTION, PersistencePath.of(player.getUniqueId()));
+    }
+
+    // delete all players properties
+    public boolean deleteAll() {
+        return this.persistence.deleteAll(COLLECTION);
+    }
+
     // for the real use case it is recommended
     // to cache PlayerPersistence#get methods
     // calling #read causes disk access, etc.

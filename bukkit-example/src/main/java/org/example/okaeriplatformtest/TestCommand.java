@@ -1,6 +1,7 @@
 package org.example.okaeriplatformtest;
 
 import eu.okaeri.commands.annotation.*;
+import eu.okaeri.commands.bukkit.annotation.Sender;
 import eu.okaeri.commands.bukkit.response.BukkitResponse;
 import eu.okaeri.commands.bukkit.response.ErrorResponse;
 import eu.okaeri.commands.bukkit.response.RawResponse;
@@ -125,6 +126,24 @@ public class TestCommand implements CommandService {
                 .collect(Collectors.joining("\n")));
         long took = System.currentTimeMillis() - start;
         sender.sendMessage(took + " ms");
+    }
+
+    // testcmd|testing deleteallplayers
+    @Executor
+    public void deleteallplayers(CommandSender sender) {
+        long start = System.currentTimeMillis();
+        sender.sendMessage("state: " + this.playerPersistence.deleteAll());
+        long took = System.currentTimeMillis() - start;
+        sender.sendMessage(took + " ms");
+    }
+
+    // testcmd|testing deleteme
+    @Executor
+    public void deleteme(@Sender Player player) {
+        long start = System.currentTimeMillis();
+        player.sendMessage("state: " + this.playerPersistence.delete(player));
+        long took = System.currentTimeMillis() - start;
+        player.sendMessage(took + " ms");
     }
 
     // testcmd|testing eval <message> - looks dangerous tbh
