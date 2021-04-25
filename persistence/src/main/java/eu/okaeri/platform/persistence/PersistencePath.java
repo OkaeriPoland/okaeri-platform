@@ -61,5 +61,13 @@ public class PersistencePath {
         return new File(this.value.replace(SEPARATOR, File.separator));
     }
 
+    public String toSqlIdentifier() {
+        String identifier = this.value.replace(SEPARATOR, "_");
+        if (!identifier.matches("^[a-zA-Z_][a-zA-Z0-9_]*$")) {
+            throw new IllegalArgumentException("identifier '" + identifier + "' cannot be used as sql identifier");
+        }
+        return identifier;
+    }
+
     private String value;
 }

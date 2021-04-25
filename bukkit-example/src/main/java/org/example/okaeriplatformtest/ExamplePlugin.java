@@ -1,5 +1,6 @@
 package org.example.okaeriplatformtest;
 
+import com.zaxxer.hikari.HikariConfig;
 import eu.okaeri.configs.json.simple.JsonSimpleConfigurer;
 import eu.okaeri.configs.yaml.bukkit.serdes.SerdesBukkit;
 import eu.okaeri.injector.annotation.Inject;
@@ -15,8 +16,10 @@ import eu.okaeri.platform.core.annotation.Register;
 import eu.okaeri.platform.persistence.PersistencePath;
 import eu.okaeri.platform.persistence.cache.Cached;
 import eu.okaeri.platform.persistence.config.ConfigPersistence;
+import eu.okaeri.platform.persistence.jdbc.BasicJdbcPersistence;
 import eu.okaeri.platform.persistence.redis.BasicRedisPersistence;
 import io.lettuce.core.RedisClient;
+import io.lettuce.core.RedisURI;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
@@ -67,25 +70,36 @@ public class ExamplePlugin extends OkaeriBukkitPlugin {
     // see persistence/PlayerPersistence for details
     @Bean("persistence")
     public ConfigPersistence configurePersistence(@Inject("dataFolder") File dataFolder, Plugin plugin, TestConfig config) {
-        switch (config.getStorageBackend()) {
+
+        // remember that if plugin is not intended to have shared state
+        // between multiple instances you must allow users to set persistence's
+        // basePath manually or add some other possibility to differ keys
+        // otherwise plugin usage would be limited to one instance per one redis
+        PersistencePath basePath = PersistencePath.of(config.getStorage().getPrefix());
+
+        // multiple backends are possible with an easy switch
+        switch (config.getStorage().getBackend()) {
             case FLAT:
                 // specify custom child dir in dataFolder or other custom location
                 // or use YamlBukkitPersistence.of(plugin) for default pluginFolder/storage/* (best used for simplest plugins with single storage backend)
                 // same as: new BasicFlatPersistence(new File(dataFolder, "storage"), ".yml", new YamlBukkitConfigurer(), new SerdesBukkit())
                 return YamlBukkitPersistence.of(new File(dataFolder, "storage"));
             case REDIS:
-                // multiple backends are possible with an easy switch
-                // remember that if plugin is not intended to have shared state
-                // between multiple instances you must allow users to set persistence's
-                // basePath manually or add some other possibility to differ keys
-                // otherwise plugin usage would be limited to one instance per one redis
-                PersistencePath basePath = PersistencePath.of(config.getStoragePrefix());
                 // construct redis client based on your needs, e.g. using config
-                RedisClient redisClient = RedisClient.create(config.getStorageRedisUri());
-                // it is recommended to use json configurer for the redis backend
+                RedisURI redisUri = RedisURI.create(config.getStorage().getUri());
+                RedisClient redisClient = RedisClient.create(redisUri);
+                // it is HIGHLY recommended to use json configurer for the redis backend
+                // other formats may not be supported in the future, json has native support
+                // on the redis side thanks to cjson available in lua scripting
                 return new BasicRedisPersistence(basePath, redisClient, JsonSimpleConfigurer::new, new SerdesBukkit());
+            case MYSQL:
+                // setup hikari based on your needs, e.g. using config
+                HikariConfig hikari = new HikariConfig();
+                hikari.setJdbcUrl(config.getStorage().getUri());
+                // it is required to use json configurer for the jdbc backend
+                return new BasicJdbcPersistence(basePath, hikari, JsonSimpleConfigurer::new, new SerdesBukkit());
             default:
-                throw new RuntimeException("unsupported storage backend: " + config.getStorageBackend());
+                throw new RuntimeException("unsupported storage backend: " + config.getStorage().getBackend());
         }
     }
 

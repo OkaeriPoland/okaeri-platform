@@ -22,6 +22,14 @@
             <scope>compile</scope>
         </dependency>
 
+        <!-- json configurer for redis/jdbc backends -->
+        <dependency>
+            <groupId>eu.okaeri</groupId>
+            <artifactId>okaeri-configs-json-simple</artifactId>
+            <version>2.7.11</version>
+            <scope>compile</scope>
+        </dependency>
+
         <!-- additional redis backend -->
         <dependency>
             <groupId>eu.okaeri</groupId>
@@ -29,10 +37,18 @@
             <version>0.3.6</version>
             <scope>compile</scope>
         </dependency>
+
+        <!-- additional jdbc backend with the client of choice (mariadb/mysql here) -->
         <dependency>
             <groupId>eu.okaeri</groupId>
-            <artifactId>okaeri-configs-json-simple</artifactId>
-            <version>2.7.9</version>
+            <artifactId>okaeri-platform-persistence-jdbc</artifactId>
+            <version>0.3.6</version>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.mariadb.jdbc</groupId>
+            <artifactId>mariadb-java-client</artifactId>
+            <version>2.7.2</version>
             <scope>compile</scope>
         </dependency>
 
@@ -66,7 +82,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-shade-plugin</artifactId>
-                <version>2.4.3</version>
+                <version>3.2.1</version>
                 <executions>
                     <execution>
                         <phase>package</phase>
@@ -101,7 +117,21 @@
                             <pattern>org.reactivestreams.</pattern>
                             <shadedPattern>org.example.okaeriplatformtest.libs.org.reactivestreams.</shadedPattern>
                         </relocation>
-                        <!-- okaeri-configs json-simple dependency used for redis -->
+                        <!-- jdbc dependencies -->
+                        <relocation>
+                            <pattern>com.zaxxer.hikari.</pattern>
+                            <shadedPattern>org.example.okaeriplatformtest.libs.com.zaxxer.hikari.</shadedPattern>
+                        </relocation>
+                        <relocation>
+                            <pattern>org.slf4j.</pattern>
+                            <shadedPattern>org.example.okaeriplatformtest.libs.org.slf4j.</shadedPattern>
+                        </relocation>
+                        <!-- jdbc - mariadb/mysql driver -->
+                        <relocation>
+                            <pattern>org.mariadb.jdbc.</pattern>
+                            <shadedPattern>org.example.okaeriplatformtest.libs.org.mariadb.jdbc.</shadedPattern>
+                        </relocation>
+                        <!-- okaeri-configs json-simple dependency used for redis/jdbc -->
                         <relocation>
                             <pattern>org.json.simple.</pattern>
                             <shadedPattern>org.example.okaeriplatformtest.libs.org.json.simple.</shadedPattern>

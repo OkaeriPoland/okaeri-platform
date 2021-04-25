@@ -33,6 +33,12 @@ public class BasicFlatPersistence extends ConfigPersistence {
     }
 
     @Override
+    public ConfigDocument read(ConfigDocument document, PersistenceCollection collection, PersistencePath path) {
+        this.checkCollectionRegistered(collection);
+        return (ConfigDocument) document.load(this.toFullPath(collection, path).toFile());
+    }
+
+    @Override
     public Collection<ConfigDocument> readAll(PersistenceCollection collection) {
 
         this.checkCollectionRegistered(collection);
@@ -84,12 +90,6 @@ public class BasicFlatPersistence extends ConfigPersistence {
     @Override
     public PersistencePath convertPath(PersistencePath path) {
         return path.append(this.fileSuffix);
-    }
-
-    @Override
-    public ConfigDocument load(ConfigDocument document, PersistenceCollection collection, PersistencePath path) {
-        this.checkCollectionRegistered(collection);
-        return (ConfigDocument) document.load(this.toFullPath(collection, path).toFile());
     }
 
     @Override
