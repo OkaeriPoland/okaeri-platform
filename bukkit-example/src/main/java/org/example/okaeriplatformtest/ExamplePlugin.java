@@ -1,5 +1,7 @@
 package org.example.okaeriplatformtest;
 
+import eu.okaeri.configs.json.simple.JsonSimpleConfigurer;
+import eu.okaeri.configs.yaml.bukkit.serdes.SerdesBukkit;
 import eu.okaeri.injector.annotation.Inject;
 import eu.okaeri.platform.bukkit.OkaeriBukkitPlugin;
 import eu.okaeri.platform.bukkit.annotation.Timer;
@@ -10,8 +12,11 @@ import eu.okaeri.platform.bukkit.commons.teleport.QueuedTeleportsTask;
 import eu.okaeri.platform.bukkit.commons.time.MinecraftTimeEquivalent;
 import eu.okaeri.platform.core.annotation.Bean;
 import eu.okaeri.platform.core.annotation.Register;
-import eu.okaeri.platform.persistence.Persistence;
+import eu.okaeri.platform.persistence.PersistencePath;
 import eu.okaeri.platform.persistence.cache.Cached;
+import eu.okaeri.platform.persistence.config.ConfigPersistence;
+import eu.okaeri.platform.persistence.redis.BasicRedisPersistence;
+import io.lettuce.core.RedisClient;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
@@ -61,10 +66,27 @@ public class ExamplePlugin extends OkaeriBukkitPlugin {
     // easy storage for e.g. player properties
     // see persistence/PlayerPersistence for details
     @Bean("persistence")
-    public Persistence configurePersistence(@Inject("dataFolder") File dataFolder) {
-        // specify custom child dir in dataFolder or other custom location
-        // or use YamlBukkitPersistence.of(plugin) for default pluginFolder/storage/*
-        return YamlBukkitPersistence.of(new File(dataFolder, "storage"));
+    public ConfigPersistence configurePersistence(@Inject("dataFolder") File dataFolder, Plugin plugin, TestConfig config) {
+        switch (config.getStorageBackend()) {
+            case FLAT:
+                // specify custom child dir in dataFolder or other custom location
+                // or use YamlBukkitPersistence.of(plugin) for default pluginFolder/storage/* (best used for simplest plugins with single storage backend)
+                // same as: new BasicFlatPersistence(new File(dataFolder, "storage"), ".yml", new YamlBukkitConfigurer(), new SerdesBukkit())
+                return YamlBukkitPersistence.of(new File(dataFolder, "storage"));
+            case REDIS:
+                // multiple backends are possible with an easy switch
+                // remember that if plugin is not intended to have shared state
+                // between multiple instances you must allow users to set persistence's
+                // basePath manually or add some other possibility to differ keys
+                // otherwise plugin usage would be limited to one instance per one redis
+                PersistencePath storage = PersistencePath.of(plugin.getName()).sub("storage");
+                // construct redis client based on your needs, e.g. using config
+                RedisClient redisClient = RedisClient.create(config.getStorageRedisUri());
+                // it is recommended to use json configurer for the redis backend
+                return new BasicRedisPersistence(storage, redisClient, new JsonSimpleConfigurer(), new SerdesBukkit());
+            default:
+                throw new RuntimeException("unsupported storage backend: " + config.getStorageBackend());
+        }
     }
 
     // method beans can use DI

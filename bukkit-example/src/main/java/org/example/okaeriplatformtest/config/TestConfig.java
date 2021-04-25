@@ -43,10 +43,18 @@ import lombok.Setter;
 public class TestConfig extends OkaeriConfig {
 
     @Size(min = 1, max = 64) // validation using okaeri-validator
-    @Variable("APP_GREETING") // use jvm property environment variable if available
+    @Variable("OPE_GREETING") // use jvm property environment variable if available
     @Comment("Example config value") // built-in comment support
     private String greeting = "Hi!!!!!!!!1111oneone"; // default values
 
     @Comment("Example command")
     private String repeatingCommand = "say from the config for {name}!";
+
+    @Variable("OPE_STORAGE_BACKEND")
+    @Comment("Type of the storage backend: FLAT, REDIS")
+    private StorageBackend storageBackend = StorageBackend.FLAT;
+
+    @Variable("OPE_STORAGE_REDIS_URI")
+    @Comment("Redis URI - used for storage-backend: REDIS")
+    private String storageRedisUri = "redis://localhost";
 }

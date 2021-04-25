@@ -13,7 +13,8 @@ Whole ecosystems built on top of the best okaeri packages.
   - automatic field injections and bean creation
 - Persistence abstraction (e.g. BasicFlatPersistence, Cached<T>):
   - serialization/deserialization based on okaeri-configs or custom solution
-  - ready to use support for database (redis, mysql, etc.) storage *Coming Soon*™
+  - ready to use support for database storage:
+    - redis/keydb (BasicRedisPersistence)
   - ability to implement custom storage layers easily
 - Lots of platform specific utilities:
   - register platform specific services as components
