@@ -80,10 +80,10 @@
                     <createDependencyReducedPom>false</createDependencyReducedPom>
                     <relocations>
                         <!-- platform -->
-<!--                        <relocation>-->
-<!--                            <pattern>eu.okaeri.</pattern>-->
-<!--                            <shadedPattern>org.example.okaeriplatformtest.platform.</shadedPattern>-->
-<!--                        </relocation>-->
+                        <relocation>
+                            <pattern>eu.okaeri.</pattern>
+                            <shadedPattern>org.example.okaeriplatformtest.platform.</shadedPattern>
+                        </relocation>
                         <!-- redis dependencies -->
                         <relocation>
                             <pattern>io.lettuce.core.</pattern>

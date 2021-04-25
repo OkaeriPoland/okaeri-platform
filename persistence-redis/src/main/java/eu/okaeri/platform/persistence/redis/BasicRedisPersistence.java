@@ -8,6 +8,7 @@ import eu.okaeri.platform.persistence.config.ConfigPersistence;
 import io.lettuce.core.RedisClient;
 import io.lettuce.core.api.StatefulRedisConnection;
 import lombok.Getter;
+import lombok.SneakyThrows;
 
 import java.util.Collection;
 import java.util.stream.Collectors;
@@ -18,7 +19,23 @@ public class BasicRedisPersistence extends ConfigPersistence {
 
     public BasicRedisPersistence(PersistencePath basePath, RedisClient client, ConfigConfigurerProvider configurerProvider, OkaeriSerdesPack... serdesPacks) {
         super(basePath, configurerProvider, serdesPacks);
-        this.connection = client.connect();
+        this.connect(client);
+    }
+
+    @SneakyThrows
+    private void connect(RedisClient client) {
+        do {
+            try {
+                this.connection = client.connect();
+            } catch (Exception exception) {
+                if (exception.getCause() != null) {
+                    System.out.println("Cannot connect with redis (waiting 30s): " + exception.getMessage() + " caused by " + exception.getCause().getMessage());
+                } else {
+                    System.out.println("Cannot connect with redis (waiting 30s): " + exception.getMessage());
+                }
+                Thread.sleep(30_000);
+            }
+        } while (this.connection == null);
     }
 
     @Override
