@@ -22,8 +22,18 @@ public class ConfigDocument extends OkaeriConfig {
     }
 
     @Override
+    public OkaeriConfig load() throws OkaeriException {
+        throw new RuntimeException("load() not available for ConfigDocument, use one of the specific methods instead");
+    }
+
+    @Override
+    public OkaeriConfig load(boolean update) throws OkaeriException {
+        throw new RuntimeException("load(true) not available for ConfigDocument, use one of the specific methods instead");
+    }
+
+    @Override
     public OkaeriConfig saveDefaults() throws OkaeriException {
-        throw new RuntimeException("saveDefaults not available for ConfigPersistenceEntity");
+        throw new RuntimeException("saveDefaults() not available for ConfigDocument");
     }
 
     @SuppressWarnings("unchecked")
