@@ -2,14 +2,17 @@ package eu.okaeri.platform.persistence.config;
 
 import eu.okaeri.configs.ConfigManager;
 import eu.okaeri.configs.OkaeriConfig;
+import eu.okaeri.configs.annotation.Exclude;
 import eu.okaeri.configs.exception.OkaeriException;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.ToString;
 
+@ToString(exclude = "cachedInto")
 public class ConfigDocument extends OkaeriConfig {
 
-    @Getter @Setter private ConfigDocumentSaver saver;
-    private ConfigDocument cachedInto = this;
+    @Exclude @Getter @Setter private ConfigDocumentSaver saver;
+    @Exclude private ConfigDocument cachedInto = this;
 
     @Override
     public OkaeriConfig save() throws OkaeriException {

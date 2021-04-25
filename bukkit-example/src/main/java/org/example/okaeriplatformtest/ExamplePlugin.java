@@ -83,7 +83,7 @@ public class ExamplePlugin extends OkaeriBukkitPlugin {
                 // construct redis client based on your needs, e.g. using config
                 RedisClient redisClient = RedisClient.create(config.getStorageRedisUri());
                 // it is recommended to use json configurer for the redis backend
-                return new BasicRedisPersistence(basePath, redisClient, new JsonSimpleConfigurer(), new SerdesBukkit());
+                return new BasicRedisPersistence(basePath, redisClient, JsonSimpleConfigurer::new, new SerdesBukkit());
             default:
                 throw new RuntimeException("unsupported storage backend: " + config.getStorageBackend());
         }

@@ -13,7 +13,7 @@ import java.io.File;
 public final class YamlBukkitPersistence {
 
     public static BasicFlatPersistence of(File storage) {
-        return new BasicFlatPersistence(storage, ".yml", new YamlBukkitConfigurer(), new SerdesBukkit());
+        return new BasicFlatPersistence(storage, ".yml", YamlBukkitConfigurer::new, new SerdesBukkit());
     }
 
     public static BasicFlatPersistence of(Plugin plugin) {

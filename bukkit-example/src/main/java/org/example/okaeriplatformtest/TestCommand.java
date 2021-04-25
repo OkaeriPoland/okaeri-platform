@@ -109,7 +109,6 @@ public class TestCommand implements CommandService {
         } else if ("you".equals(value)) {
             Message with = this.i18n.get(sender, this.messages.getExampleMessage())
                     .with("who", "you");
-            System.out.println(with);
             this.logger.info(with.apply());
             return with;
         } else {
