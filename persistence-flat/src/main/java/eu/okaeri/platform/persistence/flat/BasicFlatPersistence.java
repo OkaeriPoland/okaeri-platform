@@ -1,6 +1,7 @@
 package eu.okaeri.platform.persistence.flat;
 
 import eu.okaeri.configs.serdes.OkaeriSerdesPack;
+import eu.okaeri.platform.persistence.PersistenceCollection;
 import eu.okaeri.platform.persistence.PersistencePath;
 import eu.okaeri.platform.persistence.config.ConfigConfigurerProvider;
 import eu.okaeri.platform.persistence.config.ConfigDocument;
@@ -32,7 +33,7 @@ public class BasicFlatPersistence extends ConfigPersistence {
     }
 
     @Override
-    public Collection<ConfigDocument> readAll(PersistencePath collection) {
+    public Collection<ConfigDocument> readAll(PersistenceCollection collection) {
 
         this.checkCollectionRegistered(collection);
         File collectionFile = this.getBasePath().sub(collection).toFile();
@@ -51,13 +52,13 @@ public class BasicFlatPersistence extends ConfigPersistence {
     }
 
     @Override
-    public boolean exists(PersistencePath collection, PersistencePath path) {
+    public boolean exists(PersistenceCollection collection, PersistencePath path) {
         this.checkCollectionRegistered(collection);
         return this.toFullPath(collection, path).toFile().exists();
     }
 
     @Override
-    public boolean write(PersistencePath collection, PersistencePath path, ConfigDocument document) {
+    public boolean write(PersistenceCollection collection, PersistencePath path, ConfigDocument document) {
         this.checkCollectionRegistered(collection);
         document.save(this.toFullPath(collection, path).toFile());
         return true;
@@ -66,7 +67,7 @@ public class BasicFlatPersistence extends ConfigPersistence {
     @Override
     @SneakyThrows
     @SuppressWarnings("ResultOfMethodCallIgnored")
-    public ConfigDocument createDocument(PersistencePath collection, PersistencePath path) {
+    public ConfigDocument createDocument(PersistenceCollection collection, PersistencePath path) {
         this.checkCollectionRegistered(collection);
         // create full path
         PersistencePath fullPath = this.toFullPath(collection, path);
@@ -86,20 +87,20 @@ public class BasicFlatPersistence extends ConfigPersistence {
     }
 
     @Override
-    public ConfigDocument load(ConfigDocument document, PersistencePath collection, PersistencePath path) {
+    public ConfigDocument load(ConfigDocument document, PersistenceCollection collection, PersistencePath path) {
         this.checkCollectionRegistered(collection);
         return (ConfigDocument) document.load(this.toFullPath(collection, path).toFile());
     }
 
     @Override
-    public boolean delete(PersistencePath collection, PersistencePath path) {
+    public boolean delete(PersistenceCollection collection, PersistencePath path) {
         this.checkCollectionRegistered(collection);
         return this.toFullPath(collection, path).toFile().delete();
     }
 
     @Override
     @SneakyThrows
-    public boolean deleteAll(PersistencePath collection) {
+    public boolean deleteAll(PersistenceCollection collection) {
 
         this.checkCollectionRegistered(collection);
         File collectionFile = this.getBasePath().sub(collection).toFile();
@@ -116,7 +117,7 @@ public class BasicFlatPersistence extends ConfigPersistence {
         }
 
         return Arrays.stream(files)
-                .filter(file -> this.getKnownCollections().contains(file.getName()))
+                .filter(file -> this.getKnownCollections().keySet().contains(file.getName()))
                 .map(this::delete)
                 .filter(deleted -> deleted > 0)
                 .count();

@@ -9,7 +9,8 @@ import java.util.UUID;
 @Getter
 @ToString
 @EqualsAndHashCode
-@RequiredArgsConstructor(access = AccessLevel.PRIVATE)
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@AllArgsConstructor(access = AccessLevel.PROTECTED)
 public class PersistencePath {
 
     public static final String SEPARATOR = ":";
@@ -60,5 +61,5 @@ public class PersistencePath {
         return new File(this.value.replace(SEPARATOR, File.separator));
     }
 
-    private final String value;
+    private String value;
 }

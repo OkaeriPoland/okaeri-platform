@@ -3,6 +3,7 @@ package org.example.okaeriplatformtest.persistence;
 import eu.okaeri.injector.annotation.Inject;
 import eu.okaeri.injector.annotation.PostConstruct;
 import eu.okaeri.platform.core.annotation.Component;
+import eu.okaeri.platform.persistence.PersistenceCollection;
 import eu.okaeri.platform.persistence.PersistencePath;
 import eu.okaeri.platform.persistence.config.ConfigDocument;
 import eu.okaeri.platform.persistence.config.ConfigPersistence;
@@ -13,11 +14,12 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Component
-// example flat persistence with custom object
-// note that saving is done using CustomObject#save() and not BasicFlatPersistence#write
+// example flat/database persistence with custom object
+// note that saving can be done using PlayerPersistence#save()
+// and BasicFlatPersistence#write is not required
 public class PlayerPersistence {
 
-    private static final PersistencePath COLLECTION = PersistencePath.of("player");
+    private static final PersistenceCollection COLLECTION = PersistenceCollection.of("player", 36);
     @Inject private ConfigPersistence persistence;
 
     // collection MUST be registered to use
