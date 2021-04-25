@@ -1,6 +1,7 @@
 package org.example.okaeriplatformtest.persistence;
 
 import eu.okaeri.injector.annotation.Inject;
+import eu.okaeri.injector.annotation.PostConstruct;
 import eu.okaeri.platform.core.annotation.Component;
 import eu.okaeri.platform.persistence.PersistencePath;
 import eu.okaeri.platform.persistence.config.ConfigDocument;
@@ -18,6 +19,13 @@ public class PlayerPersistence {
 
     private static final PersistencePath COLLECTION = PersistencePath.of("player");
     @Inject private ConfigPersistence persistence;
+
+    // collection MUST be registered to use
+    // this is to allow optimized queries
+    @PostConstruct
+    private void init() {
+        this.persistence.registerCollection(COLLECTION);
+    }
 
     // make sure the method incorporates here some form of caching, see more below
     public PlayerProperties get(OfflinePlayer player) {
