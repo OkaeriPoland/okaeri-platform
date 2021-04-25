@@ -69,17 +69,13 @@ public class BasicFlatPersistence extends ConfigPersistence {
 
     @Override
     public boolean deleteAll(PersistencePath collection) {
-        return this.delete(this.getBasePath().sub(collection)) > 0;
+        return this.getBasePath().sub(collection).toFile().delete();
     }
 
     @Override
     public long deleteAll() {
-        return this.delete(this.getBasePath());
-    }
 
-    private long delete(PersistencePath path) {
-
-        File[] files = path.toFile().listFiles();
+        File[] files = this.getBasePath().toFile().listFiles();
         if (files == null) {
             return 0;
         }
