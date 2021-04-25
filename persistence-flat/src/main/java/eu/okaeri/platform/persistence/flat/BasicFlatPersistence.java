@@ -76,10 +76,8 @@ public class BasicFlatPersistence extends ConfigPersistence {
         // create empty file
         File bindFile = fullPath.toFile();
         bindFile.createNewFile();
-        // create document and add bindFile
-        ConfigDocument document = super.createDocument(collection, path);
-        document.withBindFile(fullPath.toFile());
-        return document;
+        // create document
+        return super.createDocument(collection, path);
     }
 
     @Override
@@ -90,7 +88,7 @@ public class BasicFlatPersistence extends ConfigPersistence {
     @Override
     public ConfigDocument load(ConfigDocument document, PersistencePath collection, PersistencePath path) {
         this.checkCollectionRegistered(collection);
-        return (ConfigDocument) document.load();
+        return (ConfigDocument) document.load(this.toFullPath(collection, path).toFile());
     }
 
     @Override
