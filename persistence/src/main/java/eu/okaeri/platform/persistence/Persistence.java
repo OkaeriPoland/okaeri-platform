@@ -1,8 +1,11 @@
 package eu.okaeri.platform.persistence;
 
-import java.util.Collection;
+import java.util.Map;
 
 public interface Persistence<T> {
+
+    // allows to track tables etc.
+    void registerCollection(PersistenceCollection collection);
 
     // basic group "ExamplePlugin:" -> "example_plugin:player:USER_IDENTIFIER"
     PersistencePath getBasePath();
@@ -16,7 +19,7 @@ public interface Persistence<T> {
     T read(PersistenceCollection collection, PersistencePath path);
 
     // read all saved objects in the path
-    Collection<? extends T> readAll(PersistenceCollection collection);
+    Map<PersistencePath, ? extends T> readAll(PersistenceCollection collection);
 
     // write object to exact key
     boolean write(PersistenceCollection collection, PersistencePath path, T object);

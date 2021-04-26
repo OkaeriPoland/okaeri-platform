@@ -1,25 +1,22 @@
 package eu.okaeri.platform.persistence.redis;
 
-import eu.okaeri.configs.serdes.OkaeriSerdesPack;
 import eu.okaeri.platform.persistence.PersistenceCollection;
 import eu.okaeri.platform.persistence.PersistencePath;
-import eu.okaeri.platform.persistence.config.ConfigConfigurerProvider;
-import eu.okaeri.platform.persistence.config.ConfigDocument;
-import eu.okaeri.platform.persistence.config.ConfigPersistence;
+import eu.okaeri.platform.persistence.raw.RawPersistence;
 import io.lettuce.core.RedisClient;
 import io.lettuce.core.api.StatefulRedisConnection;
 import lombok.Getter;
 import lombok.SneakyThrows;
 
-import java.util.Collection;
+import java.util.Map;
 import java.util.stream.Collectors;
 
-public class BasicRedisPersistence extends ConfigPersistence {
+public class RedisPersistence extends RawPersistence {
 
     @Getter private StatefulRedisConnection<String, String> connection;
 
-    public BasicRedisPersistence(PersistencePath basePath, RedisClient client, ConfigConfigurerProvider configurerProvider, OkaeriSerdesPack... serdesPacks) {
-        super(basePath, configurerProvider, serdesPacks);
+    public RedisPersistence(PersistencePath basePath, RedisClient client) {
+        super(basePath);
         this.connect(client);
     }
 
@@ -40,28 +37,17 @@ public class BasicRedisPersistence extends ConfigPersistence {
     }
 
     @Override
-    public ConfigDocument read(ConfigDocument document, PersistenceCollection collection, PersistencePath path) {
-
+    public String read(PersistenceCollection collection, PersistencePath path) {
         this.checkCollectionRegistered(collection);
         String hKey = this.getBasePath().sub(collection).getValue();
-        String configContents = this.connection.sync().hget(hKey, path.getValue());
-
-        if (configContents == null) {
-            return document;
-        }
-
-        return (ConfigDocument) document.load(configContents);
+        return this.connection.sync().hget(hKey, path.getValue());
     }
 
     @Override
-    public Collection<ConfigDocument> readAll(PersistenceCollection collection) {
+    public Map<PersistencePath, String> readAll(PersistenceCollection collection) {
         this.checkCollectionRegistered(collection);
         return this.connection.sync().hgetall(this.getBasePath().sub(collection).getValue()).entrySet().stream()
-                .map(entry -> {
-                    PersistencePath path = PersistencePath.of(entry.getKey());
-                    return (ConfigDocument) this.createDocument(collection, path).load(entry.getValue());
-                })
-                .collect(Collectors.toList());
+                .collect(Collectors.toMap(entry -> PersistencePath.of(entry.getKey()), Map.Entry::getValue));
     }
 
     @Override
@@ -72,10 +58,10 @@ public class BasicRedisPersistence extends ConfigPersistence {
     }
 
     @Override
-    public boolean write(PersistenceCollection collection, PersistencePath path, ConfigDocument document) {
+    public boolean write(PersistenceCollection collection, PersistencePath path, String raw) {
         this.checkCollectionRegistered(collection);
         String hKey = this.getBasePath().sub(collection).getValue();
-        this.connection.sync().hset(hKey, path.getValue(), document.saveToString());
+        this.connection.sync().hset(hKey, path.getValue(), raw);
         return true;
     }
 

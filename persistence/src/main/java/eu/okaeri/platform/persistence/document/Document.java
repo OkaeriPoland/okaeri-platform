@@ -1,4 +1,4 @@
-package eu.okaeri.platform.persistence.config;
+package eu.okaeri.platform.persistence.document;
 
 import eu.okaeri.configs.ConfigManager;
 import eu.okaeri.configs.OkaeriConfig;
@@ -9,10 +9,10 @@ import lombok.Setter;
 import lombok.ToString;
 
 @ToString(exclude = "cachedInto")
-public class ConfigDocument extends OkaeriConfig {
+public class Document extends OkaeriConfig {
 
-    @Exclude @Getter @Setter private ConfigDocumentSaver saver;
-    @Exclude private ConfigDocument cachedInto = this;
+    @Exclude @Getter @Setter private DocumentSaver saver;
+    @Exclude private Document cachedInto = this;
 
     @Override
     public OkaeriConfig save() throws OkaeriException {
@@ -28,7 +28,7 @@ public class ConfigDocument extends OkaeriConfig {
 
     @Override
     public OkaeriConfig load(boolean update) throws OkaeriException {
-        throw new RuntimeException("load(true) not available for ConfigDocument, use one of the specific methods instead");
+        throw new RuntimeException("load(update) not available for ConfigDocument, use one of the specific methods instead");
     }
 
     @Override
@@ -37,7 +37,7 @@ public class ConfigDocument extends OkaeriConfig {
     }
 
     @SuppressWarnings("unchecked")
-    public <T extends ConfigDocument> T into(Class<T> configClazz) {
+    public <T extends Document> T into(Class<T> configClazz) {
 
         if (!configClazz.isInstance(this.cachedInto)) {
             T newEntity = ConfigManager.transformCopy(this.cachedInto, configClazz);

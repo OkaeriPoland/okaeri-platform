@@ -5,8 +5,8 @@ import eu.okaeri.injector.annotation.PostConstruct;
 import eu.okaeri.platform.core.annotation.Component;
 import eu.okaeri.platform.persistence.PersistenceCollection;
 import eu.okaeri.platform.persistence.PersistencePath;
-import eu.okaeri.platform.persistence.config.ConfigDocument;
-import eu.okaeri.platform.persistence.config.ConfigPersistence;
+import eu.okaeri.platform.persistence.document.Document;
+import eu.okaeri.platform.persistence.document.DocumentPersistence;
 import org.bukkit.OfflinePlayer;
 
 import java.util.List;
@@ -20,7 +20,7 @@ import java.util.stream.Collectors;
 public class PlayerPersistence {
 
     private static final PersistenceCollection COLLECTION = PersistenceCollection.of("player", 36);
-    @Inject private ConfigPersistence persistence;
+    @Inject private DocumentPersistence persistence;
 
     // collection MUST be registered to use
     // this is to allow optimized queries
@@ -44,7 +44,7 @@ public class PlayerPersistence {
     // should be generally avoided unless really necessary
     // the time to fetch increases with saved properties count
     public List<PlayerProperties> getAll() {
-        return this.persistence.readAll(COLLECTION).stream()
+        return this.persistence.readAll(COLLECTION).values().stream()
                 .map(document -> document.into(PlayerProperties.class))
                 .collect(Collectors.toList());
     }
@@ -69,7 +69,7 @@ public class PlayerPersistence {
     private PlayerProperties get(UUID uniqueId, String playerName) {
 
         // load properties from the storage backend
-        ConfigDocument configDocument = this.persistence.read(COLLECTION, PersistencePath.of(uniqueId));
+        Document configDocument = this.persistence.read(COLLECTION, PersistencePath.of(uniqueId));
         PlayerProperties properties = configDocument.into(PlayerProperties.class);
 
         // update basic properties
