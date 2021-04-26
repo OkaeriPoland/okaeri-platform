@@ -15,9 +15,9 @@ import eu.okaeri.platform.core.annotation.Bean;
 import eu.okaeri.platform.core.annotation.Register;
 import eu.okaeri.platform.persistence.PersistencePath;
 import eu.okaeri.platform.persistence.cache.Cached;
-import eu.okaeri.platform.persistence.config.ConfigPersistence;
-import eu.okaeri.platform.persistence.jdbc.BasicJdbcPersistence;
-import eu.okaeri.platform.persistence.redis.BasicRedisPersistence;
+import eu.okaeri.platform.persistence.document.DocumentPersistence;
+import eu.okaeri.platform.persistence.jdbc.JdbcPersistence;
+import eu.okaeri.platform.persistence.redis.RedisPersistence;
 import io.lettuce.core.RedisClient;
 import io.lettuce.core.RedisURI;
 import org.bukkit.Bukkit;
@@ -69,7 +69,7 @@ public class ExamplePlugin extends OkaeriBukkitPlugin {
     // easy storage for e.g. player properties
     // see persistence/PlayerPersistence for details
     @Bean("persistence")
-    public ConfigPersistence configurePersistence(@Inject("dataFolder") File dataFolder, Plugin plugin, TestConfig config) {
+    public DocumentPersistence configurePersistence(@Inject("dataFolder") File dataFolder, Plugin plugin, TestConfig config) {
 
         // remember that if plugin is not intended to have shared state
         // between multiple instances you must allow users to set persistence's
@@ -82,7 +82,7 @@ public class ExamplePlugin extends OkaeriBukkitPlugin {
             case FLAT:
                 // specify custom child dir in dataFolder or other custom location
                 // or use YamlBukkitPersistence.of(plugin) for default pluginFolder/storage/* (best used for simplest plugins with single storage backend)
-                // same as: new BasicFlatPersistence(new File(dataFolder, "storage"), ".yml", YamlBukkitConfigurer::new, new SerdesBukkit())
+                // same as: new DocumentPersistence(new FlatPersistence(new File(dataFolder, "storage"), ".yml"), YamlBukkitConfigurer::new, new SerdesBukkit())
                 return YamlBukkitPersistence.of(new File(dataFolder, "storage"));
             case REDIS:
                 // construct redis client based on your needs, e.g. using config
@@ -91,13 +91,13 @@ public class ExamplePlugin extends OkaeriBukkitPlugin {
                 // it is HIGHLY recommended to use json configurer for the redis backend
                 // other formats may not be supported in the future, json has native support
                 // on the redis side thanks to cjson available in lua scripting
-                return new BasicRedisPersistence(basePath, redisClient, JsonSimpleConfigurer::new, new SerdesBukkit());
+                return new DocumentPersistence(new RedisPersistence(basePath, redisClient), JsonSimpleConfigurer::new, new SerdesBukkit());
             case MYSQL:
                 // setup hikari based on your needs, e.g. using config
                 HikariConfig hikari = new HikariConfig();
                 hikari.setJdbcUrl(config.getStorage().getUri());
                 // it is required to use json configurer for the jdbc backend
-                return new BasicJdbcPersistence(basePath, hikari, JsonSimpleConfigurer::new, new SerdesBukkit());
+                return new DocumentPersistence(new JdbcPersistence(basePath, hikari), JsonSimpleConfigurer::new, new SerdesBukkit());
             default:
                 throw new RuntimeException("unsupported storage backend: " + config.getStorage().getBackend());
         }

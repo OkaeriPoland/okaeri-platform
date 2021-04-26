@@ -2,12 +2,9 @@ package eu.okaeri.platform.persistence.jdbc;
 
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
-import eu.okaeri.configs.serdes.OkaeriSerdesPack;
 import eu.okaeri.platform.persistence.PersistenceCollection;
 import eu.okaeri.platform.persistence.PersistencePath;
-import eu.okaeri.platform.persistence.config.ConfigConfigurerProvider;
-import eu.okaeri.platform.persistence.config.ConfigDocument;
-import eu.okaeri.platform.persistence.config.ConfigPersistence;
+import eu.okaeri.platform.persistence.raw.RawPersistence;
 import lombok.Getter;
 import lombok.SneakyThrows;
 
@@ -15,17 +12,16 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
+import java.util.LinkedHashMap;
+import java.util.Map;
 import java.util.function.Predicate;
 
-public class BasicJdbcPersistence extends ConfigPersistence {
+public class JdbcPersistence extends RawPersistence {
 
     @Getter private HikariDataSource dataSource;
 
-    public BasicJdbcPersistence(PersistencePath basePath, HikariConfig hikariConfig, ConfigConfigurerProvider configurerProvider, OkaeriSerdesPack... serdesPacks) {
-        super(basePath, configurerProvider, serdesPacks);
+    public JdbcPersistence(PersistencePath basePath, HikariConfig hikariConfig) {
+        super(basePath);
         this.connect(hikariConfig);
     }
 
@@ -63,8 +59,9 @@ public class BasicJdbcPersistence extends ConfigPersistence {
     }
 
     @Override
-    public ConfigDocument read(ConfigDocument document, PersistenceCollection collection, PersistencePath path) {
+    public String read(PersistenceCollection collection, PersistencePath path) {
 
+        this.checkCollectionRegistered(collection);
         String sql = "select `value` from `" + this.table(collection) + "` where `key` = ? limit 1";
 
         try (Connection connection = this.dataSource.getConnection()) {
@@ -72,20 +69,21 @@ public class BasicJdbcPersistence extends ConfigPersistence {
             prepared.setString(1, path.getValue());
             ResultSet resultSet = prepared.executeQuery();
             if (resultSet.next()) {
-                document.load(resultSet.getString("value"));
+                return resultSet.getString("value");
             }
         } catch (SQLException exception) {
             throw new RuntimeException("cannot read " + path + " from " + collection, exception);
         }
 
-        return document;
+        return null;
     }
 
     @Override
-    public Collection<ConfigDocument> readAll(PersistenceCollection collection) {
+    public Map<PersistencePath, String> readAll(PersistenceCollection collection) {
 
+        this.checkCollectionRegistered(collection);
         String sql = "select `key`, `value` from `" + this.table(collection) + "`";
-        List<ConfigDocument> list = new ArrayList<>();
+        Map<PersistencePath, String> map = new LinkedHashMap<>();
 
         try (Connection connection = this.dataSource.getConnection()) {
 
@@ -95,19 +93,19 @@ public class BasicJdbcPersistence extends ConfigPersistence {
             while (resultSet.next()) {
                 String key = resultSet.getString("key");
                 String value = resultSet.getString("value");
-                PersistencePath path = PersistencePath.of(key);
-                list.add((ConfigDocument) this.createDocument(collection, path).load(value));
+                map.put(PersistencePath.of(key), value);
             }
         } catch (SQLException exception) {
             throw new RuntimeException("cannot read all from " + collection, exception);
         }
 
-        return list;
+        return map;
     }
 
     @Override
     public boolean exists(PersistenceCollection collection, PersistencePath path) {
 
+        this.checkCollectionRegistered(collection);
         String sql = "select 1 from `" + this.table(collection) + "` where `key` = ? limit 1";
 
         try (Connection connection = this.dataSource.getConnection()) {
@@ -121,16 +119,16 @@ public class BasicJdbcPersistence extends ConfigPersistence {
     }
 
     @Override
-    public boolean write(PersistenceCollection collection, PersistencePath path, ConfigDocument document) {
+    public boolean write(PersistenceCollection collection, PersistencePath path, String raw) {
 
+        this.checkCollectionRegistered(collection);
         String sql = "insert into `" + this.table(collection) + "` (`key`, `value`) values (?, ?) on duplicate key update `value` = ?";
 
         try (Connection connection = this.dataSource.getConnection()) {
             PreparedStatement prepared = connection.prepareStatement(sql);
-            String saved = document.saveToString();
             prepared.setString(1, path.getValue());
-            prepared.setString(2, saved);
-            prepared.setString(3, saved);
+            prepared.setString(2, raw);
+            prepared.setString(3, raw);
             return prepared.executeUpdate() > 0;
         } catch (SQLException exception) {
             throw new RuntimeException("cannot write " + path + " to " + collection, exception);
@@ -140,6 +138,7 @@ public class BasicJdbcPersistence extends ConfigPersistence {
     @Override
     public boolean delete(PersistenceCollection collection, PersistencePath path) {
 
+        this.checkCollectionRegistered(collection);
         String sql = "delete from `" + this.table(collection) + "` where `key` = ?";
 
         try (Connection connection = this.dataSource.getConnection()) {
@@ -154,6 +153,7 @@ public class BasicJdbcPersistence extends ConfigPersistence {
     @Override
     public boolean deleteAll(PersistenceCollection collection) {
 
+        this.checkCollectionRegistered(collection);
         String sql = "truncate table `" + this.table(collection) + "`";
 
         try (Connection connection = this.dataSource.getConnection()) {

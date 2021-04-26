@@ -1,60 +1,62 @@
 package eu.okaeri.platform.persistence.flat;
 
-import eu.okaeri.configs.serdes.OkaeriSerdesPack;
 import eu.okaeri.platform.persistence.PersistenceCollection;
 import eu.okaeri.platform.persistence.PersistencePath;
-import eu.okaeri.platform.persistence.config.ConfigConfigurerProvider;
-import eu.okaeri.platform.persistence.config.ConfigDocument;
-import eu.okaeri.platform.persistence.config.ConfigPersistence;
+import eu.okaeri.platform.persistence.raw.RawPersistence;
+import lombok.AllArgsConstructor;
+import lombok.Data;
 import lombok.Getter;
 import lombok.SneakyThrows;
 
+import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileWriter;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.Map;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-// build to store data in the PLUGIN_DIR/storage/*
-public class BasicFlatPersistence extends ConfigPersistence {
+public class FlatPersistence extends RawPersistence {
 
     @Getter private final PersistencePath basePath;
     @Getter private final String fileSuffix;
 
-    public BasicFlatPersistence(File basePath, String fileSuffix, ConfigConfigurerProvider configurerProvider, OkaeriSerdesPack... serdesPacks) {
-        super(PersistencePath.of(basePath), configurerProvider, serdesPacks);
+    public FlatPersistence(File basePath, String fileSuffix) {
+        super(PersistencePath.of(basePath));
         this.basePath = PersistencePath.of(basePath);
         this.fileSuffix = fileSuffix;
     }
 
     @Override
-    public ConfigDocument read(ConfigDocument document, PersistenceCollection collection, PersistencePath path) {
+    public String read(PersistenceCollection collection, PersistencePath path) {
         this.checkCollectionRegistered(collection);
-        return (ConfigDocument) document.load(this.toFullPath(collection, path).toFile());
+        File file = this.toFullPath(collection, path).toFile();
+        return this.fileToString(file);
     }
 
     @Override
-    public Collection<ConfigDocument> readAll(PersistenceCollection collection) {
+    public Map<PersistencePath, String> readAll(PersistenceCollection collection) {
 
         this.checkCollectionRegistered(collection);
         File collectionFile = this.getBasePath().sub(collection).toFile();
         File[] files = collectionFile.listFiles();
 
         if (files == null) {
-            return Collections.emptySet();
+            return Collections.emptyMap();
         }
 
         return Arrays.stream(files)
                 .map(file -> {
                     PersistencePath path = PersistencePath.of(file.getName().substring(0, file.getName().length() - this.getFileSuffix().length()));
-                    return (ConfigDocument) this.createDocument(collection, path).load(file);
+                    return new Pair<>(path, this.fileToString(file));
                 })
-                .collect(Collectors.toList());
+                .collect(Collectors.toMap(Pair::getLeft, Pair::getRight));
     }
 
     @Override
@@ -64,27 +66,12 @@ public class BasicFlatPersistence extends ConfigPersistence {
     }
 
     @Override
-    public boolean write(PersistenceCollection collection, PersistencePath path, ConfigDocument document) {
-        this.checkCollectionRegistered(collection);
-        document.save(this.toFullPath(collection, path).toFile());
-        return true;
-    }
-
-    @Override
     @SneakyThrows
-    @SuppressWarnings("ResultOfMethodCallIgnored")
-    public ConfigDocument createDocument(PersistenceCollection collection, PersistencePath path) {
+    public boolean write(PersistenceCollection collection, PersistencePath path, String raw) {
         this.checkCollectionRegistered(collection);
-        // create full path
-        PersistencePath fullPath = this.toFullPath(collection, path);
-        // create parent dir
-        File dir = fullPath.group().toFile();
-        dir.mkdirs();
-        // create empty file
-        File bindFile = fullPath.toFile();
-        bindFile.createNewFile();
-        // create document
-        return super.createDocument(collection, path);
+        File file = this.toFullPath(collection, path).toFile();
+        this.writeToFile(file, raw);
+        return true;
     }
 
     @Override
@@ -131,6 +118,25 @@ public class BasicFlatPersistence extends ConfigPersistence {
                     .map(File::delete)
                     .filter(Predicate.isEqual(true))
                     .count();
+        }
+    }
+
+    @Data
+    @AllArgsConstructor
+    private class Pair<L, R> {
+        private L left;
+        private R right;
+    }
+
+    @SneakyThrows
+    private String fileToString(File file) {
+        return new String(Files.readAllBytes(file.toPath()), StandardCharsets.UTF_8);
+    }
+
+    @SneakyThrows
+    private void writeToFile(File file, String text) {
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(file))) {
+            writer.write(text);
         }
     }
 }

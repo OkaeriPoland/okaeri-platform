@@ -1,6 +1,6 @@
 package org.example.okaeriplatformtest.persistence;
 
-import eu.okaeri.platform.persistence.config.ConfigDocument;
+import eu.okaeri.platform.persistence.document.Document;
 import lombok.*;
 import org.bukkit.Location;
 
@@ -12,7 +12,7 @@ import java.util.UUID;
 // custom properties object based on okaeri-configs
 // allows for easy access to player's properties with
 // getters/setters instead of raw values and string keys
-public class PlayerProperties extends ConfigDocument {
+public class PlayerProperties extends Document {
 
     // recommended defaults
     private UUID uuid;
