@@ -7,6 +7,7 @@ import eu.okaeri.configs.serdes.commons.SerdesCommons;
 import eu.okaeri.configs.serdes.standard.StandardSerdes;
 import eu.okaeri.platform.persistence.Persistence;
 import eu.okaeri.platform.persistence.PersistenceCollection;
+import eu.okaeri.platform.persistence.PersistenceEntity;
 import eu.okaeri.platform.persistence.PersistencePath;
 import eu.okaeri.platform.persistence.raw.RawPersistence;
 import lombok.Getter;
@@ -55,6 +56,15 @@ public class DocumentPersistence implements Persistence<Document> {
                     Document document = this.createDocument(collection, entry.getKey());
                     return (Document) document.load(entry.getValue());
                 }));
+    }
+
+    @Override
+    public Stream<PersistenceEntity<Document>> streamAll(PersistenceCollection collection) {
+        return this.getRaw().streamAll(collection).map(entity -> {
+            Document document = this.createDocument(collection, entity.getPath());
+            document.load(entity.getValue());
+            return entity.into(document);
+        });
     }
 
     @Override

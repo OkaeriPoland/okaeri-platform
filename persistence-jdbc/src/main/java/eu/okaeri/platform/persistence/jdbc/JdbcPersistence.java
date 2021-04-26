@@ -4,6 +4,7 @@ import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
 import eu.okaeri.platform.persistence.PersistenceCollection;
 import eu.okaeri.platform.persistence.PersistencePath;
+import eu.okaeri.platform.persistence.PersistenceEntity;
 import eu.okaeri.platform.persistence.raw.RawPersistence;
 import lombok.Getter;
 import lombok.SneakyThrows;
@@ -12,9 +13,10 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.LinkedHashMap;
-import java.util.Map;
+import java.util.*;
 import java.util.function.Predicate;
+import java.util.stream.Stream;
+import java.util.stream.StreamSupport;
 
 public class JdbcPersistence extends RawPersistence {
 
@@ -100,6 +102,31 @@ public class JdbcPersistence extends RawPersistence {
         }
 
         return map;
+    }
+
+    @Override
+    public Stream<PersistenceEntity<String>> streamAll(PersistenceCollection collection) {
+
+        this.checkCollectionRegistered(collection);
+        String sql = "select `key`, `value` from `" + this.table(collection) + "`";
+
+        try (Connection connection = this.dataSource.getConnection()) {
+
+            PreparedStatement prepared = connection.prepareStatement(sql);
+            ResultSet resultSet = prepared.executeQuery();
+            List<PersistenceEntity<String>> results = new ArrayList<>();
+
+            while (resultSet.next()) {
+                String key = resultSet.getString("key");
+                String value = resultSet.getString("value");
+                results.add(new PersistenceEntity<>(PersistencePath.of(key), value));
+            }
+
+            return StreamSupport.stream(Spliterators.spliterator(results.iterator(), resultSet.getFetchSize(), Spliterator.NONNULL), false);
+        }
+        catch (SQLException exception) {
+            throw new RuntimeException("cannot visit all from " + collection, exception);
+        }
     }
 
     @Override
