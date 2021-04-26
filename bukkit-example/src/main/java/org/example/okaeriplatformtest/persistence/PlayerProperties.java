@@ -2,7 +2,9 @@ package org.example.okaeriplatformtest.persistence;
 
 import eu.okaeri.platform.persistence.config.ConfigDocument;
 import lombok.*;
+import org.bukkit.Location;
 
+import java.time.Instant;
 import java.util.UUID;
 
 @Data
@@ -17,5 +19,6 @@ public class PlayerProperties extends ConfigDocument {
     private String name;
 
     // custom values
-    private String lastJoined;
+    private Instant lastJoined;
+    private Location lastJoinedLocation;
 }

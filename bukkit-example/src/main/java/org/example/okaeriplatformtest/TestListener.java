@@ -51,13 +51,14 @@ public class TestListener implements Listener {
 
             // read example
             PlayerProperties playerProperties = this.playerPersistence.get(event.getPlayer());
-            String lastJoined = playerProperties.getLastJoined(); // get current value
+            Instant lastJoined = playerProperties.getLastJoined(); // get current value
             event.getPlayer().sendMessage("Your last join time: " + lastJoined);
-            playerProperties.setLastJoined(Instant.now().toString()); // update value
+            playerProperties.setLastJoined(Instant.now()); // update value
+            playerProperties.setLastJoinedLocation(event.getPlayer().getLocation()); // bukkit types thanks to SerdesBukkit work too
 
             // save player properties
             // normally this may not be required if data is not required to be saved immediately, see PlayerPersistence notes
-            this.scheduler.runTaskAsynchronously(this.plugin, playerProperties::save);
+            playerProperties.save();
         });
     }
 

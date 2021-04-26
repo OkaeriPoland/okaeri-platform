@@ -15,6 +15,7 @@ Whole ecosystems built on top of the best okaeri packages.
   - serialization/deserialization based on okaeri-configs or custom solution
   - ready to use support for database storage:
     - redis/keydb (BasicRedisPersistence)
+    - mysql/mariadb and other jdbc (BasicJdbcPersistence)
   - ability to implement custom storage layers easily
 - Lots of platform specific utilities:
   - register platform specific services as components

@@ -82,7 +82,7 @@ public class ExamplePlugin extends OkaeriBukkitPlugin {
             case FLAT:
                 // specify custom child dir in dataFolder or other custom location
                 // or use YamlBukkitPersistence.of(plugin) for default pluginFolder/storage/* (best used for simplest plugins with single storage backend)
-                // same as: new BasicFlatPersistence(new File(dataFolder, "storage"), ".yml", new YamlBukkitConfigurer(), new SerdesBukkit())
+                // same as: new BasicFlatPersistence(new File(dataFolder, "storage"), ".yml", YamlBukkitConfigurer::new, new SerdesBukkit())
                 return YamlBukkitPersistence.of(new File(dataFolder, "storage"));
             case REDIS:
                 // construct redis client based on your needs, e.g. using config
