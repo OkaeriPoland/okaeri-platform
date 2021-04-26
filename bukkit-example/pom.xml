@@ -18,7 +18,7 @@
         <dependency>
             <groupId>eu.okaeri</groupId>
             <artifactId>okaeri-platform-bukkit</artifactId>
-            <version>0.3.6</version>
+            <version>0.3.7</version>
             <scope>compile</scope>
         </dependency>
 
@@ -34,7 +34,7 @@
         <dependency>
             <groupId>eu.okaeri</groupId>
             <artifactId>okaeri-platform-persistence-redis</artifactId>
-            <version>0.3.6</version>
+            <version>0.3.7</version>
             <scope>compile</scope>
         </dependency>
 
@@ -42,7 +42,7 @@
         <dependency>
             <groupId>eu.okaeri</groupId>
             <artifactId>okaeri-platform-persistence-jdbc</artifactId>
-            <version>0.3.6</version>
+            <version>0.3.7</version>
             <scope>compile</scope>
         </dependency>
         <dependency>
