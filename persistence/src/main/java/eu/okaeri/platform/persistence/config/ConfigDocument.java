@@ -40,7 +40,7 @@ public class ConfigDocument extends OkaeriConfig {
     public <T extends ConfigDocument> T into(Class<T> configClazz) {
 
         if (!configClazz.isInstance(this.cachedInto)) {
-            T newEntity = ConfigManager.copy(this.cachedInto, configClazz);
+            T newEntity = ConfigManager.transformCopy(this.cachedInto, configClazz);
             newEntity.setSaver(this.cachedInto.getSaver());
             this.cachedInto = newEntity;
         }

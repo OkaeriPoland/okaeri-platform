@@ -13,15 +13,19 @@ import eu.okaeri.placeholders.message.CompiledMessage;
 import eu.okaeri.platform.bukkit.commons.i18n.BI18n;
 import eu.okaeri.platform.bukkit.commons.teleport.QueuedTeleports;
 import eu.okaeri.platform.core.annotation.Bean;
-import org.bukkit.Location;
-import org.bukkit.Server;
+import org.apache.commons.lang.RandomStringUtils;
+import org.bukkit.*;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.example.okaeriplatformtest.config.TestConfig;
 import org.example.okaeriplatformtest.config.TestLocaleConfig;
 import org.example.okaeriplatformtest.persistence.PlayerPersistence;
+import org.example.okaeriplatformtest.persistence.PlayerProperties;
 
+import java.time.Instant;
 import java.util.List;
+import java.util.UUID;
+import java.util.concurrent.ThreadLocalRandom;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
@@ -117,19 +121,48 @@ public class TestCommand implements CommandService {
         }
     }
 
-    // testcmd|testing readallplayers
-    @Executor
-    public void readallplayers(CommandSender sender) {
+    // testcmd|testing write1000players
+    @Executor(pattern = "writeplayers *", async = true)
+    public void writeplayers(CommandSender sender, @Arg("num") String num) {
         long start = System.currentTimeMillis();
-        sender.sendMessage(this.playerPersistence.getAll().stream()
-                .map(properties -> properties.getName() + ": " + properties.getLastJoined())
-                .collect(Collectors.joining("\n")));
+        for (int i = 0; i < Integer.parseInt(num); i++) {
+            OfflinePlayer randomPlayer = Bukkit.getOfflinePlayer(UUID.randomUUID());
+            PlayerProperties properties = this.playerPersistence.get(randomPlayer);
+            properties.setName(RandomStringUtils.randomAlphanumeric(8));
+            properties.setLastJoined(Instant.ofEpochMilli(ThreadLocalRandom.current().nextLong(start)));
+            World world = Bukkit.getWorlds().get(ThreadLocalRandom.current().nextInt(Bukkit.getWorlds().size()));
+            int x = ThreadLocalRandom.current().nextInt(20_000);
+            int y = ThreadLocalRandom.current().nextInt(255);
+            int z = ThreadLocalRandom.current().nextInt(20_000);
+            Location location = new Location(world, x, y, z);
+            properties.setLastJoinedLocation(location);
+            properties.save();
+        }
         long took = System.currentTimeMillis() - start;
         sender.sendMessage(took + " ms");
     }
 
+    // testcmd|testing currentthread
+    @Executor(async = true)
+    public String currentthread() {
+        return Thread.currentThread().getName();
+    }
+
+    // testcmd|testing readallplayers
+    @Executor(async = true)
+    public void readallplayers(CommandSender sender) {
+        long start = System.currentTimeMillis();
+        List<PlayerProperties> all = this.playerPersistence.getAll();
+        sender.sendMessage(all.stream()
+                .map(properties -> properties.getName() + ": " + properties.getLastJoined())
+                .limit(100)
+                .collect(Collectors.joining("\n")));
+        long took = System.currentTimeMillis() - start;
+        sender.sendMessage(took + " ms (records total: " + all.size() + ")");
+    }
+
     // testcmd|testing deleteallplayers
-    @Executor
+    @Executor(async = true)
     public void deleteallplayers(CommandSender sender) {
         long start = System.currentTimeMillis();
         sender.sendMessage("state: " + this.playerPersistence.deleteAll());
@@ -138,7 +171,7 @@ public class TestCommand implements CommandService {
     }
 
     // testcmd|testing deleteme
-    @Executor
+    @Executor(async = true)
     public void deleteme(@Sender Player player) {
         long start = System.currentTimeMillis();
         player.sendMessage("state: " + this.playerPersistence.delete(player));
