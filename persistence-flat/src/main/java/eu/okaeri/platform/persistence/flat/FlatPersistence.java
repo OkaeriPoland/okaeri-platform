@@ -2,6 +2,7 @@ package eu.okaeri.platform.persistence.flat;
 
 import eu.okaeri.platform.persistence.PersistenceCollection;
 import eu.okaeri.platform.persistence.PersistencePath;
+import eu.okaeri.platform.persistence.PersistenceEntity;
 import eu.okaeri.platform.persistence.raw.RawPersistence;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -14,13 +15,11 @@ import java.io.FileWriter;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.Map;
+import java.util.*;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+import java.util.stream.StreamSupport;
 
 public class FlatPersistence extends RawPersistence {
 
@@ -46,10 +45,7 @@ public class FlatPersistence extends RawPersistence {
         this.checkCollectionRegistered(collection);
         File collectionFile = this.getBasePath().sub(collection).toFile();
         File[] files = collectionFile.listFiles();
-
-        if (files == null) {
-            return Collections.emptyMap();
-        }
+        if (files == null) return Collections.emptyMap();
 
         return Arrays.stream(files)
                 .map(file -> {
@@ -57,6 +53,29 @@ public class FlatPersistence extends RawPersistence {
                     return new Pair<>(path, this.fileToString(file));
                 })
                 .collect(Collectors.toMap(Pair::getLeft, Pair::getRight));
+    }
+
+    @Override
+    public Stream<PersistenceEntity<String>> streamAll(PersistenceCollection collection) {
+
+        this.checkCollectionRegistered(collection);
+        File collectionFile = this.getBasePath().sub(collection).toFile();
+        File[] files = collectionFile.listFiles();
+        if (files == null) return Stream.of();
+
+        Iterator<File> fileIterator = Arrays.asList(files).iterator();
+        return StreamSupport.stream(Spliterators.spliterator(new Iterator<PersistenceEntity<String>>() {
+            @Override
+            public boolean hasNext() {
+                return fileIterator.hasNext();
+            }
+            @Override
+            public PersistenceEntity<String> next() {
+                File file = fileIterator.next();
+                PersistencePath path = PersistencePath.of(file.getName().substring(0, file.getName().length() - FlatPersistence.this.getFileSuffix().length()));
+                return new PersistenceEntity<>(path, FlatPersistence.this.fileToString(file));
+            }
+        }, files.length, Spliterator.NONNULL), false);
     }
 
     @Override

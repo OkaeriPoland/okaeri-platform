@@ -4,6 +4,7 @@ import eu.okaeri.injector.annotation.Inject;
 import eu.okaeri.injector.annotation.PostConstruct;
 import eu.okaeri.platform.core.annotation.Component;
 import eu.okaeri.platform.persistence.PersistenceCollection;
+import eu.okaeri.platform.persistence.PersistenceEntity;
 import eu.okaeri.platform.persistence.PersistencePath;
 import eu.okaeri.platform.persistence.document.Document;
 import eu.okaeri.platform.persistence.document.DocumentPersistence;
@@ -12,6 +13,7 @@ import org.bukkit.OfflinePlayer;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Component
 // example flat/database persistence with custom object
@@ -47,6 +49,13 @@ public class PlayerPersistence {
         return this.persistence.readAll(COLLECTION).values().stream()
                 .map(document -> document.into(PlayerProperties.class))
                 .collect(Collectors.toList());
+    }
+
+    // stream allows to filter/visit elements
+    // of whole collection more efficiently
+    // using platform specific iterators
+    public Stream<PersistenceEntity<PlayerProperties>> stream() {
+        return this.persistence.streamAll(COLLECTION).map(entity -> entity.into(PlayerProperties.class));
     }
 
     // delete properties by player

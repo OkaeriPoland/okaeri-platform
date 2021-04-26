@@ -1,6 +1,7 @@
 package eu.okaeri.platform.persistence;
 
 import java.util.Map;
+import java.util.stream.Stream;
 
 public interface Persistence<T> {
 
@@ -18,8 +19,11 @@ public interface Persistence<T> {
     // read saved object at key
     T read(PersistenceCollection collection, PersistencePath path);
 
-    // read all saved objects in the path
+    // read all saved objects in the collection
     Map<PersistencePath, ? extends T> readAll(PersistenceCollection collection);
+
+    // visit all saved objects in the collection
+    Stream<PersistenceEntity<T>> streamAll(PersistenceCollection collection);
 
     // write object to exact key
     boolean write(PersistenceCollection collection, PersistencePath path, T object);

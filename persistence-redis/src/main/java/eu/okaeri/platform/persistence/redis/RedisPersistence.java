@@ -2,14 +2,24 @@ package eu.okaeri.platform.persistence.redis;
 
 import eu.okaeri.platform.persistence.PersistenceCollection;
 import eu.okaeri.platform.persistence.PersistencePath;
+import eu.okaeri.platform.persistence.PersistenceEntity;
 import eu.okaeri.platform.persistence.raw.RawPersistence;
+import io.lettuce.core.KeyValue;
 import io.lettuce.core.RedisClient;
+import io.lettuce.core.ScanArgs;
+import io.lettuce.core.ScanIterator;
 import io.lettuce.core.api.StatefulRedisConnection;
+import io.lettuce.core.api.sync.RedisCommands;
 import lombok.Getter;
 import lombok.SneakyThrows;
 
+import java.util.Iterator;
 import java.util.Map;
+import java.util.Spliterator;
+import java.util.Spliterators;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
+import java.util.stream.StreamSupport;
 
 public class RedisPersistence extends RawPersistence {
 
@@ -46,8 +56,36 @@ public class RedisPersistence extends RawPersistence {
     @Override
     public Map<PersistencePath, String> readAll(PersistenceCollection collection) {
         this.checkCollectionRegistered(collection);
-        return this.connection.sync().hgetall(this.getBasePath().sub(collection).getValue()).entrySet().stream()
+        String hKey = this.getBasePath().sub(collection).getValue();
+        return this.connection.sync().hgetall(hKey).entrySet().stream()
                 .collect(Collectors.toMap(entry -> PersistencePath.of(entry.getKey()), Map.Entry::getValue));
+    }
+
+    @Override
+    public Stream<PersistenceEntity<String>> streamAll(PersistenceCollection collection) {
+
+        this.checkCollectionRegistered(collection);
+        RedisCommands<String, String> sync = this.connection.sync();
+        String hKey = this.getBasePath().sub(collection).getValue();
+
+        long totalKeys = sync.hlen(hKey);
+        long step = totalKeys / 100;
+        if (step < 50) {
+            step = 50;
+        }
+
+        ScanIterator<KeyValue<String, String>> iterator = ScanIterator.hscan(sync, hKey, ScanArgs.Builder.limit(step));
+        return StreamSupport.stream(Spliterators.spliterator(new Iterator<PersistenceEntity<String>>() {
+            @Override
+            public boolean hasNext() {
+                return iterator.hasNext();
+            }
+            @Override
+            public PersistenceEntity<String> next() {
+                KeyValue<String, String> next = iterator.next();
+                return new PersistenceEntity<>(PersistencePath.of(next.getKey()), next.getValue());
+            }
+        }, totalKeys, Spliterator.NONNULL), false);
     }
 
     @Override

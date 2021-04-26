@@ -7,12 +7,14 @@ import eu.okaeri.commands.bukkit.response.ErrorResponse;
 import eu.okaeri.commands.bukkit.response.RawResponse;
 import eu.okaeri.commands.bukkit.response.SuccessResponse;
 import eu.okaeri.commands.service.CommandService;
+import eu.okaeri.configs.OkaeriConfig;
 import eu.okaeri.i18n.message.Message;
 import eu.okaeri.injector.annotation.Inject;
 import eu.okaeri.placeholders.message.CompiledMessage;
 import eu.okaeri.platform.bukkit.commons.i18n.BI18n;
 import eu.okaeri.platform.bukkit.commons.teleport.QueuedTeleports;
 import eu.okaeri.platform.core.annotation.Bean;
+import eu.okaeri.platform.persistence.PersistenceEntity;
 import org.apache.commons.lang.RandomStringUtils;
 import org.bukkit.*;
 import org.bukkit.command.CommandSender;
@@ -140,6 +142,17 @@ public class TestCommand implements CommandService {
         }
         long took = System.currentTimeMillis() - start;
         sender.sendMessage(took + " ms");
+    }
+
+    // testcmd|testing visittest
+    @Executor(async = true)
+    public String visittest() {
+        return this.playerPersistence.stream()
+                .map(PersistenceEntity::getValue)
+                .filter(entity -> entity.getLastJoinedLocation().getY() > 250)
+                .findFirst()
+                .map(OkaeriConfig::saveToString)
+                .orElse("no match found");
     }
 
     // testcmd|testing currentthread
