@@ -27,7 +27,7 @@ public class JdbcPersistence extends RawPersistence {
     @Getter private HikariDataSource dataSource;
 
     public JdbcPersistence(PersistencePath basePath, HikariConfig hikariConfig) {
-        super(basePath, true, true);
+        super(basePath, true, true, true);
         this.connect(hikariConfig);
     }
 
@@ -105,7 +105,7 @@ public class JdbcPersistence extends RawPersistence {
                 .collect(Collectors.joining(", "));
 
         String sql = "select `key` from `" + table + "` " +
-                    "where (select count(0) from " + indexTable + " where `key` = `" + table + "`.`key` and `property` in (" + params + ")) != ?";
+                "where (select count(0) from " + indexTable + " where `key` = `" + table + "`.`key` and `property` in (" + params + ")) != ?";
 
         try (Connection connection = this.dataSource.getConnection()) {
             PreparedStatement prepared = connection.prepareStatement(sql);
@@ -279,8 +279,7 @@ public class JdbcPersistence extends RawPersistence {
             }
 
             return StreamSupport.stream(Spliterators.spliterator(results.iterator(), resultSet.getFetchSize(), Spliterator.NONNULL), false);
-        }
-        catch (SQLException exception) {
+        } catch (SQLException exception) {
             throw new RuntimeException("cannot ready by property from " + collection, exception);
         }
     }
@@ -305,8 +304,7 @@ public class JdbcPersistence extends RawPersistence {
             }
 
             return StreamSupport.stream(Spliterators.spliterator(results.iterator(), resultSet.getFetchSize(), Spliterator.NONNULL), false);
-        }
-        catch (SQLException exception) {
+        } catch (SQLException exception) {
             throw new RuntimeException("cannot ready by property from " + collection, exception);
         }
     }
@@ -330,8 +328,7 @@ public class JdbcPersistence extends RawPersistence {
             }
 
             return StreamSupport.stream(Spliterators.spliterator(results.iterator(), resultSet.getFetchSize(), Spliterator.NONNULL), false);
-        }
-        catch (SQLException exception) {
+        } catch (SQLException exception) {
             throw new RuntimeException("cannot stream all from " + collection, exception);
         }
     }

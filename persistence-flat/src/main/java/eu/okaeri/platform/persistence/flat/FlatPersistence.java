@@ -36,7 +36,7 @@ public class FlatPersistence extends RawPersistence {
     @Getter private final String fileSuffix;
 
     public FlatPersistence(File basePath, String fileSuffix) {
-        super(PersistencePath.of(basePath), false, true);
+        super(PersistencePath.of(basePath), false, false, true);
         this.basePath = PersistencePath.of(basePath);
         this.fileSuffix = fileSuffix;
     }

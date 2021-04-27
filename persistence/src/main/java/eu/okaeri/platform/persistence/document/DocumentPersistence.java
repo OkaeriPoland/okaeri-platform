@@ -51,6 +51,11 @@ public class DocumentPersistence implements Persistence<Document> {
     public void registerCollection(PersistenceCollection collection) {
 
         this.getRaw().registerCollection(collection);
+
+        if (!this.getRaw().isNativeIndexes()) {
+            return;
+        }
+
         Set<IndexProperty> indexes = this.getRaw().getKnownIndexes().getOrDefault(collection, new HashSet<>());
         Set<PersistencePath> withMissingIndexes = this.findMissingIndexes(collection, indexes);
 
@@ -76,11 +81,15 @@ public class DocumentPersistence implements Persistence<Document> {
 
     @Override
     public boolean updateIndex(PersistenceCollection collection, IndexProperty property, PersistencePath path, String identity) {
-        return this.getRaw().updateIndex(collection, property, path, identity);
+        return this.getRaw().isNativeIndexes() && this.getRaw().updateIndex(collection, property, path, identity);
     }
 
     @Override
     public boolean updateIndex(PersistenceCollection collection, PersistencePath path, Document document) {
+
+        if (this.getRaw().isNativeIndexes()) {
+            return false;
+        }
 
         Set<IndexProperty> collectionIndexes = this.getRaw().getKnownIndexes().get(collection);
         if (collectionIndexes == null) {
@@ -104,23 +113,28 @@ public class DocumentPersistence implements Persistence<Document> {
 
     @Override
     public boolean updateIndex(PersistenceCollection collection, PersistencePath path) {
+
+        if (this.getRaw().isNativeIndexes()) {
+            return false;
+        }
+
         Document document = this.read(collection, path);
         return this.updateIndex(collection, path, document);
     }
 
     @Override
     public boolean dropIndex(PersistenceCollection collection, IndexProperty property, PersistencePath path) {
-        return this.getRaw().dropIndex(collection, property, path);
+        return this.getRaw().isNativeIndexes() && this.getRaw().dropIndex(collection, property, path);
     }
 
     @Override
     public boolean dropIndex(PersistenceCollection collection, PersistencePath path) {
-        return this.getRaw().dropIndex(collection, path);
+        return this.getRaw().isNativeIndexes() && this.getRaw().dropIndex(collection, path);
     }
 
     @Override
     public boolean dropIndex(PersistenceCollection collection, IndexProperty property) {
-        return this.getRaw().dropIndex(collection, property);
+        return this.getRaw().isNativeIndexes() && this.getRaw().dropIndex(collection, property);
     }
 
     @Override

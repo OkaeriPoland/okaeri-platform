@@ -19,6 +19,7 @@ public abstract class RawPersistence implements Persistence<String> {
     @Getter private final Map<String, PersistenceCollection> knownCollections = new HashMap<>();
     @Getter private final Map<PersistenceCollection, Set<IndexProperty>> knownIndexes = new HashMap<>();
     @Getter private final boolean nativeReadByProperty;
+    @Getter private final boolean nativeIndexes;
     @Getter @Setter private boolean useStringSearch;
 
     @Override
