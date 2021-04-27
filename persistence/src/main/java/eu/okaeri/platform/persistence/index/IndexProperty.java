@@ -20,6 +20,11 @@ public class IndexProperty extends PersistencePath {
         return of(source.replace(".", SEPARATOR));
     }
 
+    @Override
+    public IndexProperty sub(String sub) {
+        return of(super.sub(sub).getValue(), this.maxLength);
+    }
+
     private IndexProperty(String value, int maxLength) {
         super(value);
         this.maxLength = maxLength;
