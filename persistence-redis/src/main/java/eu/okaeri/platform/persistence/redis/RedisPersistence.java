@@ -1,8 +1,8 @@
 package eu.okaeri.platform.persistence.redis;
 
 import eu.okaeri.platform.persistence.PersistenceCollection;
-import eu.okaeri.platform.persistence.PersistencePath;
 import eu.okaeri.platform.persistence.PersistenceEntity;
+import eu.okaeri.platform.persistence.PersistencePath;
 import eu.okaeri.platform.persistence.raw.RawPersistence;
 import io.lettuce.core.KeyValue;
 import io.lettuce.core.RedisClient;
@@ -28,7 +28,7 @@ public class RedisPersistence extends RawPersistence {
     @Getter private StatefulRedisConnection<String, String> connection;
 
     public RedisPersistence(PersistencePath basePath, RedisClient client) {
-        super(basePath, false, true);
+        super(basePath, false, false, true);
         this.connect(client);
     }
 
@@ -82,6 +82,7 @@ public class RedisPersistence extends RawPersistence {
             public boolean hasNext() {
                 return iterator.hasNext();
             }
+
             @Override
             public PersistenceEntity<String> next() {
                 KeyValue<String, String> next = iterator.next();
