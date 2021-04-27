@@ -16,6 +16,7 @@ import lombok.Getter;
 
 import java.util.*;
 import java.util.function.Function;
+import java.util.function.Predicate;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -162,20 +163,26 @@ public class DocumentPersistence implements Persistence<Document> {
     @Override
     public Stream<PersistenceEntity<Document>> readByProperty(PersistenceCollection collection, PersistencePath property, Object propertyValue) {
 
+        List<String> pathParts = property.toParts();
+        Predicate<PersistenceEntity<Document>> documentFilter = entity -> {
+            if (pathParts.size() == 1) {
+                return propertyValue.equals(entity.getValue().get(pathParts.get(0)));
+            }
+            Map<String, Object> document = entity.getValue().asMap(this.simplifier, true);
+            return propertyValue.equals(this.extractValue(document, pathParts));
+        };
+
         if (this.getRaw().isNativeReadByProperty()) {
-            return this.getRaw().readByProperty(collection, property, propertyValue).map(this.entityToDocumentMapper(collection));
+            return this.getRaw().readByProperty(collection, property, propertyValue)
+                    .map(this.entityToDocumentMapper(collection))
+                    .filter(documentFilter);
         }
 
-        List<String> pathParts = property.toParts();
         boolean stringSearch = this.getRaw().isUseStringSearch() && this.canUseToString(propertyValue);
-
         return this.getRaw().streamAll(collection)
                 .filter(entity -> !stringSearch || entity.getValue().contains(String.valueOf(propertyValue)))
                 .map(this.entityToDocumentMapper(collection))
-                .filter(entity -> {
-                    Map<String, Object> document = entity.getValue().asMap(this.simplifier, true);
-                    return propertyValue.equals(this.extractValue(document, pathParts));
-                });
+                .filter(documentFilter);
     }
 
     @Override
