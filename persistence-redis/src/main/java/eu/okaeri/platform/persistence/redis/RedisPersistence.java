@@ -108,10 +108,12 @@ public class RedisPersistence extends RawPersistence {
         changes += sync.del(valuesSet);
 
         // delete all value to keys mappings
-        changes += sync.del(propertyValues.stream()
-                .map(value -> this.toIndexValueToKeys(collection, property, value))
-                .map(PersistencePath::getValue)
-                .toArray(String[]::new));
+        if (!propertyValues.isEmpty()) {
+            changes += sync.del(propertyValues.stream()
+                    .map(value -> this.toIndexValueToKeys(collection, property, value))
+                    .map(PersistencePath::getValue)
+                    .toArray(String[]::new));
+        }
 
         return changes > 0;
     }
