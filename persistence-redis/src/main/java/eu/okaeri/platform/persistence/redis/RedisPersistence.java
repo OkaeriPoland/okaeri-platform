@@ -48,27 +48,39 @@ public class RedisPersistence extends RawPersistence {
     public boolean updateIndex(PersistenceCollection collection, IndexProperty property, PersistencePath path, String identity) {
 
         // remove from old set value_to_keys
+        RedisCommands<String, String> sync = this.connection.sync();
         this.dropIndex(collection, property, path);
-        PersistencePath indexSet = this.toIndexValueToKeys(collection, property, identity);
+        String indexSet = this.toIndexValueToKeys(collection, property, identity).getValue();
+
+        // register new value
+        String valuesSet = this.toValuesSet(collection, property).getValue();
+        sync.sadd(valuesSet, identity);
 
         // add to new value_to_keys
-        this.connection.sync().sadd(indexSet.getValue(), path.getValue());
+        sync.sadd(indexSet, path.getValue());
 
         // update key_to_value
         String keyToValue = this.toIndexKeyToValue(collection, property).getValue();
-        return this.connection.sync().hset(keyToValue, path.getValue(), identity);
+        return sync.hset(keyToValue, path.getValue(), identity);
     }
 
     @Override
     public boolean dropIndex(PersistenceCollection collection, IndexProperty property, PersistencePath path) {
 
+        // get current value by key
         String keyToValue = this.toIndexKeyToValue(collection, property).getValue();
         RedisCommands<String, String> sync = this.connection.sync();
         String currentValue = sync.hget(keyToValue, path.getValue());
 
+        // delete old value mapping
         if (currentValue == null) return false;
         sync.hdel(keyToValue, path.getValue());
 
+        // delete from values set
+        String valuesSet = this.toValuesSet(collection, property).getValue();
+        sync.srem(valuesSet, currentValue);
+
+        // delete from value to set
         PersistencePath indexSet = this.toIndexValueToKeys(collection, property, currentValue);
         return sync.srem(indexSet.getValue(), path.getValue()) > 0;
     }
@@ -84,11 +96,24 @@ public class RedisPersistence extends RawPersistence {
     public boolean dropIndex(PersistenceCollection collection, IndexProperty property) {
 
         RedisCommands<String, String> sync = this.connection.sync();
-        String keyToValue = this.toIndexKeyToValue(collection, property).getValue();
-        if (sync.del(keyToValue) == 0) return false;
+        long changes = 0;
 
-        String valueToKeysPattern = this.getBasePath().sub(collection).sub("index").sub(property).sub("value_to_keys").sub("*").getValue();
-        return sync.del(sync.keys(valueToKeysPattern).toArray(new String[0])) > 0;
+        // delete key to value mappings
+        String keyToValue = this.toIndexKeyToValue(collection, property).getValue();
+        changes += sync.del(keyToValue);
+
+        // gather all used values and delete set
+        String valuesSet = this.toValuesSet(collection, property).getValue();
+        Set<String> propertyValues = sync.smembers(valuesSet);
+        changes += sync.del(valuesSet);
+
+        // delete all value to keys mappings
+        changes += sync.del(propertyValues.stream()
+                .map(value -> this.toIndexValueToKeys(collection, property, value))
+                .map(PersistencePath::getValue)
+                .toArray(String[]::new));
+
+        return changes > 0;
     }
 
     @Override
@@ -273,6 +298,10 @@ public class RedisPersistence extends RawPersistence {
 
     private PersistencePath toIndexKeyToValue(PersistenceCollection collection, PersistencePath property) {
         return this.getBasePath().sub(collection).sub("index").sub(property).sub("key_to_value");
+    }
+
+    private PersistencePath toValuesSet(PersistenceCollection collection, PersistencePath property) {
+        return this.getBasePath().sub(collection).sub("index").sub(property).sub("values");
     }
 
     private static <T> List<List<T>> partition(Collection<T> members, int maxSize) {
