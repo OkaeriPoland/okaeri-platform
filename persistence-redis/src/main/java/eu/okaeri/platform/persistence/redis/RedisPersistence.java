@@ -3,20 +3,16 @@ package eu.okaeri.platform.persistence.redis;
 import eu.okaeri.platform.persistence.PersistenceCollection;
 import eu.okaeri.platform.persistence.PersistenceEntity;
 import eu.okaeri.platform.persistence.PersistencePath;
+import eu.okaeri.platform.persistence.index.IndexProperty;
 import eu.okaeri.platform.persistence.raw.RawPersistence;
-import io.lettuce.core.KeyValue;
-import io.lettuce.core.RedisClient;
-import io.lettuce.core.ScanArgs;
-import io.lettuce.core.ScanIterator;
+import io.lettuce.core.*;
 import io.lettuce.core.api.StatefulRedisConnection;
 import io.lettuce.core.api.sync.RedisCommands;
 import lombok.Getter;
 import lombok.SneakyThrows;
 
-import java.util.Iterator;
-import java.util.Map;
-import java.util.Spliterator;
-import java.util.Spliterators;
+import java.util.*;
+import java.util.function.Predicate;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -28,7 +24,7 @@ public class RedisPersistence extends RawPersistence {
     @Getter private StatefulRedisConnection<String, String> connection;
 
     public RedisPersistence(PersistencePath basePath, RedisClient client) {
-        super(basePath, false, false, true);
+        super(basePath, true, true, true);
         this.connect(client);
     }
 
@@ -46,6 +42,140 @@ public class RedisPersistence extends RawPersistence {
                 Thread.sleep(30_000);
             }
         } while (this.connection == null);
+    }
+
+    @Override
+    public boolean updateIndex(PersistenceCollection collection, IndexProperty property, PersistencePath path, String identity) {
+
+        // remove from old set value_to_keys
+        this.dropIndex(collection, property, path);
+        PersistencePath indexSet = this.toIndexValueToKeys(collection, property, identity);
+
+        // add to new value_to_keys
+        this.connection.sync().sadd(indexSet.getValue(), path.getValue());
+
+        // update key_to_value
+        String keyToValue = this.toIndexKeyToValue(collection, property).getValue();
+        return this.connection.sync().hset(keyToValue, path.getValue(), identity);
+    }
+
+    @Override
+    public boolean dropIndex(PersistenceCollection collection, IndexProperty property, PersistencePath path) {
+
+        String keyToValue = this.toIndexKeyToValue(collection, property).getValue();
+        RedisCommands<String, String> sync = this.connection.sync();
+        String currentValue = sync.hget(keyToValue, path.getValue());
+
+        if (currentValue == null) return false;
+        sync.hdel(keyToValue, path.getValue());
+
+        PersistencePath indexSet = this.toIndexValueToKeys(collection, property, currentValue);
+        return sync.srem(indexSet.getValue(), path.getValue()) > 0;
+    }
+
+    @Override
+    public boolean dropIndex(PersistenceCollection collection, PersistencePath path) {
+        return this.getKnownIndexes().getOrDefault(collection, Collections.emptySet()).stream()
+                .map(index -> this.dropIndex(collection, index, path))
+                .anyMatch(Predicate.isEqual(true));
+    }
+
+    @Override
+    public boolean dropIndex(PersistenceCollection collection, IndexProperty property) {
+
+        RedisCommands<String, String> sync = this.connection.sync();
+        String keyToValue = this.toIndexKeyToValue(collection, property).getValue();
+        if (sync.del(keyToValue) == 0) return false;
+
+        String valueToKeysPattern = this.getBasePath().sub(collection).sub("index").sub(property).sub("value_to_keys").sub("*").getValue();
+        return sync.del(sync.keys(valueToKeysPattern).toArray(new String[0])) > 0;
+    }
+
+    @Override
+    public Set<PersistencePath> findMissingIndexes(PersistenceCollection collection, Set<IndexProperty> indexProperties) {
+
+        String[] args = indexProperties.stream()
+                .map(index -> this.toIndexKeyToValue(collection, index))
+                .map(PersistencePath::getValue)
+                .toArray(String[]::new);
+
+        String script = "local collection = ARGV[1]\n" +
+                "local allKeys = redis.call('hkeys', collection)\n" +
+                "local indexes = KEYS\n" +
+                "local result = {}\n" +
+                "\n" +
+                "for _, key in ipairs(allKeys) do\n" +
+                "\n" +
+                "    local present = true\n" +
+                "\n" +
+                "    for _, index in ipairs(indexes) do\n" +
+                "        if (redis.call('hexists', index, key) == 0) then\n" +
+                "            present = false\n" +
+                "            break\n" +
+                "        end\n" +
+                "    end\n" +
+                "\n" +
+                "    if not present then\n" +
+                "        result[#result+1] = key\n" +
+                "    end\n" +
+                "end\n" +
+                "\n" +
+                "return result\n";
+
+        String hashKey = this.getBasePath().sub(collection).getValue();
+        List<String> out = this.connection.sync().eval(script, ScriptOutputType.MULTI, args, hashKey);
+
+        return out.stream()
+                .map(PersistencePath::of)
+                .collect(Collectors.toSet());
+    }
+
+    @Override
+    public Stream<PersistenceEntity<String>> readByProperty(PersistenceCollection collection, PersistencePath property, Object propertyValue) {
+
+        if (!this.isIndexed(collection, property)) {
+            return this.streamAll(collection);
+        }
+
+        String hashKeyString = this.getBasePath().sub(collection).getValue();
+        PersistencePath indexSet = this.toIndexValueToKeys(collection, property, String.valueOf(propertyValue));
+
+        RedisCommands<String, String> sync = this.connection.sync();
+        Set<String> members = sync.smembers(indexSet.getValue());
+
+        if (members.isEmpty()) {
+            return Stream.of();
+        }
+
+        int totalKeys = members.size();
+        long step = totalKeys / 100;
+        if (step < 50) step = 50;
+
+        String script = sync.scriptLoad("local collection = ARGV[1]\n" +
+                "local result = {}\n" +
+                "\n" +
+                "for _, key in ipairs(KEYS) do\n" +
+                "    result[#result+1] = key\n" +
+                "    result[#result+1] = redis.call('hget', collection, key)\n" +
+                "end\n" +
+                "\n" +
+                "return result\n");
+
+        return partition(members, Math.toIntExact(step)).stream()
+                .flatMap(part -> {
+
+                    String[] keys = part.toArray(new String[part.size()]);
+                    List<String> result = sync.evalsha(script, ScriptOutputType.MULTI, keys, hashKeyString);
+                    List<PersistenceEntity<String>> out = new ArrayList<>();
+
+                    for (int i = 0; i < result.size(); i += 2) {
+                        String key = result.get(i);
+                        String value = result.get(i + 1);
+                        out.add(new PersistenceEntity<>(PersistencePath.of(key), value));
+                    }
+
+                    return out.stream();
+                });
     }
 
     @Override
@@ -72,9 +202,7 @@ public class RedisPersistence extends RawPersistence {
 
         long totalKeys = sync.hlen(hKey);
         long step = totalKeys / 100;
-        if (step < 50) {
-            step = 50;
-        }
+        if (step < 50) step = 50;
 
         ScanIterator<KeyValue<String, String>> iterator = ScanIterator.hscan(sync, hKey, ScanArgs.Builder.limit(step));
         return StreamSupport.stream(Spliterators.spliterator(new Iterator<PersistenceEntity<String>>() {
@@ -123,5 +251,33 @@ public class RedisPersistence extends RawPersistence {
     @Override
     public long deleteAll() {
         return this.connection.sync().del(this.getKnownCollections().keySet().toArray(new String[0]));
+    }
+
+    private PersistencePath toIndexValueToKeys(PersistenceCollection collection, PersistencePath property, String propertyValue) {
+        return this.getBasePath().sub(collection).sub("index").sub(property).sub("value_to_keys").sub(propertyValue);
+    }
+
+    private PersistencePath toIndexKeyToValue(PersistenceCollection collection, PersistencePath property) {
+        return this.getBasePath().sub(collection).sub("index").sub(property).sub("key_to_value");
+    }
+
+    private static <T> List<List<T>> partition(Collection<T> members, int maxSize) {
+
+        List<List<T>> res = new ArrayList<>();
+        List<T> internal = new ArrayList<>();
+
+        for (T member : members) {
+            internal.add(member);
+            if (internal.size() == maxSize) {
+                res.add(internal);
+                internal = new ArrayList<>();
+            }
+        }
+
+        if (!internal.isEmpty()) {
+            res.add(internal);
+        }
+
+        return res;
     }
 }

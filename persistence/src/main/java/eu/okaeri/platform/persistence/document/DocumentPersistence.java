@@ -88,7 +88,7 @@ public class DocumentPersistence implements Persistence<Document> {
     @Override
     public boolean updateIndex(PersistenceCollection collection, PersistencePath path, Document document) {
 
-        if (this.getRaw().isNativeIndexes()) {
+        if (!this.getRaw().isNativeIndexes()) {
             return false;
         }
 
@@ -115,7 +115,7 @@ public class DocumentPersistence implements Persistence<Document> {
     @Override
     public boolean updateIndex(PersistenceCollection collection, PersistencePath path) {
 
-        if (this.getRaw().isNativeIndexes()) {
+        if (!this.getRaw().isNativeIndexes()) {
             return false;
         }
 
@@ -172,12 +172,17 @@ public class DocumentPersistence implements Persistence<Document> {
             return propertyValue.equals(this.extractValue(document, pathParts));
         };
 
+        // native read implementation may or may not filter entries
+        // for every query, depending on the backend supported features
+        // the goal is to allow extensibility - i trust but i verify
         if (this.getRaw().isNativeReadByProperty()) {
             return this.getRaw().readByProperty(collection, property, propertyValue)
                     .map(this.entityToDocumentMapper(collection))
                     .filter(documentFilter);
         }
 
+        // streaming search optimzied with string search can
+        // greatly reduce search time removing parsing overhead
         boolean stringSearch = this.getRaw().isUseStringSearch() && this.canUseToString(propertyValue);
         return this.getRaw().streamAll(collection)
                 .filter(entity -> !stringSearch || entity.getValue().contains(String.valueOf(propertyValue)))

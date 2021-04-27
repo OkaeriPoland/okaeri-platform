@@ -242,14 +242,9 @@ public class JdbcPersistence extends RawPersistence {
 
     @Override
     public Stream<PersistenceEntity<String>> readByProperty(PersistenceCollection collection, PersistencePath property, Object propertyValue) {
-        Set<IndexProperty> collectionIndexes = this.getKnownIndexes().get(collection);
-        if ((collectionIndexes != null)) {
-            IndexProperty indexProperty = IndexProperty.of(property.getValue());
-            if (collectionIndexes.contains(indexProperty)) {
-                return this.readByPropertyIndexed(collection, indexProperty, propertyValue);
-            }
-        }
-        return this.readByPropertyJsonExtract(collection, property, propertyValue);
+        return this.isIndexed(collection, property)
+                ? this.readByPropertyIndexed(collection, IndexProperty.of(property.getValue()), propertyValue)
+                : this.readByPropertyJsonExtract(collection, property, propertyValue);
     }
 
     private Stream<PersistenceEntity<String>> readByPropertyIndexed(PersistenceCollection collection, IndexProperty indexProperty, Object propertyValue) {

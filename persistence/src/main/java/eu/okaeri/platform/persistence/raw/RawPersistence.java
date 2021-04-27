@@ -83,5 +83,16 @@ public abstract class RawPersistence implements Persistence<String> {
     public PersistencePath convertPath(PersistencePath path) {
         return path;
     }
+
+    public boolean isIndexed(PersistenceCollection collection, PersistencePath path) {
+
+        Set<IndexProperty> collectionIndexes = this.getKnownIndexes().get(collection);
+        if (collectionIndexes == null) {
+            return false;
+        }
+
+        IndexProperty indexProperty = IndexProperty.of(path.getValue());
+        return collectionIndexes.contains(indexProperty);
+    }
 }
 
