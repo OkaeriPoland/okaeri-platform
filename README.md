@@ -11,11 +11,11 @@ Whole ecosystems built on top of the best okaeri packages.
 - Based on dependency injection/beans/components schema:
   - subcomponent registration with Register(component class) annotation
   - automatic field injections and bean creation
-- Persistence abstraction (e.g. BasicFlatPersistence, Cached<T>):
+- Persistence abstraction (e.g. FlatPersistence, Cached<T>):
   - serialization/deserialization based on okaeri-configs or custom solution
   - ready to use support for database storage:
-    - redis/keydb (BasicRedisPersistence)
-    - mysql/mariadb and other jdbc (BasicJdbcPersistence)
+    - redis/keydb (RedisPersistence)
+    - mysql/mariadb and other jdbc (JdbcPersistence)
   - ability to implement custom storage layers easily
 - Lots of platform specific utilities:
   - register platform specific services as components
