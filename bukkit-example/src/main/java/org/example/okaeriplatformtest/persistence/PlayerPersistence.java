@@ -8,6 +8,7 @@ import eu.okaeri.platform.persistence.PersistenceEntity;
 import eu.okaeri.platform.persistence.PersistencePath;
 import eu.okaeri.platform.persistence.document.Document;
 import eu.okaeri.platform.persistence.document.DocumentPersistence;
+import eu.okaeri.platform.persistence.index.IndexProperty;
 import org.bukkit.OfflinePlayer;
 
 import java.util.List;
@@ -21,7 +22,9 @@ import java.util.stream.Stream;
 // and BasicFlatPersistence#write is not required
 public class PlayerPersistence {
 
-    private static final PersistenceCollection COLLECTION = PersistenceCollection.of("player", 36);
+    private static final PersistenceCollection COLLECTION = PersistenceCollection.of("player", 36)
+            .index(IndexProperty.of("name", 24))
+            .index(IndexProperty.parse("lastJoinedLocation.world").maxLength(64));
     @Inject private DocumentPersistence persistence;
 
     // collection MUST be registered to use
@@ -56,6 +59,23 @@ public class PlayerPersistence {
     // using platform specific iterators
     public Stream<PersistenceEntity<PlayerProperties>> stream() {
         return this.persistence.streamAll(COLLECTION).map(entity -> entity.into(PlayerProperties.class));
+    }
+
+    // find by property allows to run an easy search
+    // optimized for use with indexed properties
+    // superior to filtering result of getAll by hand
+    // can scan non-indexed fields using stream
+    // filters or platform specific implementation
+    public Stream<PlayerProperties> findByName(String name) {
+        return this.persistence.readByProperty(COLLECTION, PersistencePath.of("name"), name)
+                .map(PersistenceEntity::getValue)
+                .map(document -> document.into(PlayerProperties.class));
+    }
+
+    public Stream<PlayerProperties> findByLastJoinedLocationWorld(String worldName) {
+        return this.persistence.readByProperty(COLLECTION, PersistencePath.of("lastJoinedLocation").sub("world"), worldName)
+                .map(PersistenceEntity::getValue)
+                .map(document -> document.into(PlayerProperties.class));
     }
 
     // delete properties by player
