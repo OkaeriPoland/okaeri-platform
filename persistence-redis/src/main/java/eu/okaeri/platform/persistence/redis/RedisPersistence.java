@@ -236,14 +236,28 @@ public class RedisPersistence extends RawPersistence {
 
     @Override
     public boolean delete(PersistenceCollection collection, PersistencePath path) {
+
         this.checkCollectionRegistered(collection);
+        Set<IndexProperty> collectionIndexes = this.getKnownIndexes().get(collection);
+
+        if (collectionIndexes != null) {
+            collectionIndexes.forEach(index -> this.dropIndex(collection, path));
+        }
+
         String hKey = this.getBasePath().sub(collection).getValue();
         return this.connection.sync().hdel(hKey, path.getValue()) > 0;
     }
 
     @Override
     public boolean deleteAll(PersistenceCollection collection) {
+
         this.checkCollectionRegistered(collection);
+        Set<IndexProperty> collectionIndexes = this.getKnownIndexes().get(collection);
+
+        if (collectionIndexes != null) {
+            collectionIndexes.forEach(index -> this.dropIndex(collection, index));
+        }
+
         String hKey = this.getBasePath().sub(collection).getValue();
         return this.connection.sync().del(hKey) > 0;
     }
