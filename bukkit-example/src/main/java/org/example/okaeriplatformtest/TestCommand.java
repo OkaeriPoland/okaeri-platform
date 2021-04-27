@@ -155,6 +155,31 @@ public class TestCommand implements CommandService {
                 .orElse("no match found");
     }
 
+    // testcmd|testing findplayer <name>
+    @Executor(pattern = "findplayer *", async = true)
+    public String findplayer(@Arg("name") String name) {
+        long start = System.currentTimeMillis();
+        String data = this.playerPersistence.findByName(name).findFirst()
+                .map(OkaeriConfig::saveToString)
+                .orElse("huh");
+        long took = System.currentTimeMillis() - start;
+        data += "\n" + took + " ms";
+        return data;
+    }
+
+    // testcmd|testing findbyworld <world>
+    @Executor(pattern = "findbyworld *", async = true)
+    public String findbyworld(@Arg("world") String worldName) {
+        long start = System.currentTimeMillis();
+        String data = this.playerPersistence.findByLastJoinedLocationWorld(worldName)
+                .limit(10)
+                .map(OkaeriConfig::saveToString)
+                .collect(Collectors.joining("\n"));
+        long took = System.currentTimeMillis() - start;
+        data += "\n" + took + " ms";
+        return data;
+    }
+
     // testcmd|testing currentthread
     @Executor(async = true)
     public String currentthread() {

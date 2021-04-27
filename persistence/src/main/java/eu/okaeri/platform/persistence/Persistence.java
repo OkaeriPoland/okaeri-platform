@@ -1,12 +1,36 @@
 package eu.okaeri.platform.persistence;
 
+import eu.okaeri.platform.persistence.index.IndexProperty;
+
 import java.util.Map;
+import java.util.Set;
 import java.util.stream.Stream;
 
 public interface Persistence<T> {
 
     // allows to track tables etc.
     void registerCollection(PersistenceCollection collection);
+
+    // allows to update entry of entity's index
+    boolean updateIndex(PersistenceCollection collection, IndexProperty property, PersistencePath path, String identity);
+
+    // allows to update whole entity's index using entity
+    boolean updateIndex(PersistenceCollection collection, PersistencePath path, T entity);
+
+    // allows to update whole entity's index by entity's key
+    boolean updateIndex(PersistenceCollection collection, PersistencePath path);
+
+    // allows to delete entity's index
+    boolean dropIndex(PersistenceCollection collection, IndexProperty property, PersistencePath path);
+
+    // allows to delete all entity's indexes
+    boolean dropIndex(PersistenceCollection collection, PersistencePath path);
+
+    // allows to delete whole index
+    boolean dropIndex(PersistenceCollection collection, IndexProperty property);
+
+    // allows to search for missing indexes
+    Set<PersistencePath> findMissingIndexes(PersistenceCollection collection, Set<IndexProperty> indexProperties);
 
     // basic group "ExamplePlugin:" -> "example_plugin:player:USER_IDENTIFIER"
     PersistencePath getBasePath();
@@ -20,13 +44,16 @@ public interface Persistence<T> {
     T read(PersistenceCollection collection, PersistencePath path);
 
     // read all saved objects in the collection
-    Map<PersistencePath, ? extends T> readAll(PersistenceCollection collection);
+    Map<PersistencePath, T> readAll(PersistenceCollection collection);
+
+    // read based on property (mostly for document based implementations)
+    Stream<PersistenceEntity<T>> readByProperty(PersistenceCollection collection, PersistencePath property, Object propertyValue);
 
     // visit all saved objects in the collection
     Stream<PersistenceEntity<T>> streamAll(PersistenceCollection collection);
 
     // write object to exact key
-    boolean write(PersistenceCollection collection, PersistencePath path, T object);
+    boolean write(PersistenceCollection collection, PersistencePath path, T entity);
 
     // delete single
     boolean delete(PersistenceCollection collection, PersistencePath path);

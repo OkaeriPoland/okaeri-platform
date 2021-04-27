@@ -3,7 +3,9 @@ package eu.okaeri.platform.persistence;
 import lombok.*;
 
 import java.io.File;
+import java.nio.file.Path;
 import java.util.Arrays;
+import java.util.List;
 import java.util.UUID;
 
 @Getter
@@ -27,6 +29,10 @@ public class PersistencePath {
         return new PersistencePath(path);
     }
 
+    public static PersistencePath parse(String source, String separator) {
+        return new PersistencePath(source.replace(separator, SEPARATOR));
+    }
+
     public PersistencePath sub(UUID sub) {
         return this.sub(String.valueOf(sub));
     }
@@ -41,11 +47,11 @@ public class PersistencePath {
     }
 
     public PersistencePath append(String element) {
-        return PersistencePath.of(this.value + element);
+        return of(this.value + element);
     }
 
     public PersistencePath removeStart(String part) {
-        return this.value.startsWith(part) ? PersistencePath.of(this.value.substring(part.length())) : this;
+        return this.value.startsWith(part) ? of(this.value.substring(part.length())) : this;
     }
 
     public PersistencePath removeStart(PersistencePath path) {
@@ -54,11 +60,15 @@ public class PersistencePath {
 
     public PersistencePath group() {
         String[] parts = this.value.split(SEPARATOR);
-        return PersistencePath.of(String.join(SEPARATOR, Arrays.copyOfRange(parts, 0, parts.length - 1)));
+        return of(String.join(SEPARATOR, Arrays.copyOfRange(parts, 0, parts.length - 1)));
     }
 
     public File toFile() {
         return new File(this.value.replace(SEPARATOR, File.separator));
+    }
+
+    public Path toPath() {
+        return this.toFile().toPath();
     }
 
     public String toSqlIdentifier() {
@@ -67,6 +77,18 @@ public class PersistencePath {
             throw new IllegalArgumentException("identifier '" + identifier + "' cannot be used as sql identifier");
         }
         return identifier;
+    }
+
+    public String toSqlJsonPath() {
+        String identifier = "$." + this.value.replace(SEPARATOR, ".");
+        if (identifier.contains("'") || identifier.contains("/") || identifier.contains("#") || identifier.contains("--")) {
+            throw new IllegalArgumentException("identifier '" + identifier + "' cannot be used as sql json path");
+        }
+        return identifier;
+    }
+
+    public List<String> toParts() {
+        return Arrays.asList(this.value.split(SEPARATOR));
     }
 
     private String value;

@@ -17,16 +17,18 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Spliterator;
 import java.util.Spliterators;
+import java.util.logging.Logger;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
 public class RedisPersistence extends RawPersistence {
 
+    private static final Logger LOGGER = Logger.getLogger(RedisPersistence.class.getName());
     @Getter private StatefulRedisConnection<String, String> connection;
 
     public RedisPersistence(PersistencePath basePath, RedisClient client) {
-        super(basePath);
+        super(basePath, false, true);
         this.connect(client);
     }
 
@@ -37,9 +39,9 @@ public class RedisPersistence extends RawPersistence {
                 this.connection = client.connect();
             } catch (Exception exception) {
                 if (exception.getCause() != null) {
-                    System.out.println("Cannot connect with redis (waiting 30s): " + exception.getMessage() + " caused by " + exception.getCause().getMessage());
+                    LOGGER.severe("Cannot connect with redis (waiting 30s): " + exception.getMessage() + " caused by " + exception.getCause().getMessage());
                 } else {
-                    System.out.println("Cannot connect with redis (waiting 30s): " + exception.getMessage());
+                    LOGGER.severe("Cannot connect with redis (waiting 30s): " + exception.getMessage());
                 }
                 Thread.sleep(30_000);
             }
