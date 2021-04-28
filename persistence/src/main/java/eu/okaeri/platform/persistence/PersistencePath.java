@@ -7,6 +7,7 @@ import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Getter
 @ToString
@@ -64,7 +65,7 @@ public class PersistencePath {
     }
 
     public File toFile() {
-        return new File(this.value.replace(SEPARATOR, File.separator));
+        return new File(this.toSafeFilePath());
     }
 
     public Path toPath() {
@@ -92,4 +93,14 @@ public class PersistencePath {
     }
 
     private String value;
+
+    public String toSafeFilePath() {
+        return this.toParts().stream()
+                .map(part -> part.replace("^\\.+", "").replaceAll("[\\\\/:*?\"<>|]", ""))
+                .collect(Collectors.joining(File.separator));
+    }
+
+    public String toSafeFileName() {
+        return this.toSafeFilePath().replace(File.separator, "_");
+    }
 }

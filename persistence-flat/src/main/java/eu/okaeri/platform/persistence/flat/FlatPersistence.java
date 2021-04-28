@@ -5,6 +5,7 @@ import eu.okaeri.configs.binary.obdf.ObdfConfigurer;
 import eu.okaeri.platform.persistence.PersistenceCollection;
 import eu.okaeri.platform.persistence.PersistenceEntity;
 import eu.okaeri.platform.persistence.PersistencePath;
+import eu.okaeri.platform.persistence.document.ConfigurerProvider;
 import eu.okaeri.platform.persistence.index.InMemoryIndex;
 import eu.okaeri.platform.persistence.index.IndexProperty;
 import eu.okaeri.platform.persistence.raw.RawPersistence;
@@ -38,17 +39,28 @@ public class FlatPersistence extends RawPersistence {
     private final Map<PersistenceCollection, Map<String, InMemoryIndex>> indexMap = new HashMap<>();
     @Getter private final PersistencePath basePath;
     @Getter private final String fileSuffix;
-    @Getter @Setter private boolean memoryIndex = true;
+    @Getter private final ConfigurerProvider indexProvider;
+    @Getter @Setter private boolean saveIndex;
 
     public FlatPersistence(File basePath, String fileSuffix) {
+        this(basePath, fileSuffix, ObdfConfigurer::new, false);
+    }
+
+    public FlatPersistence(File basePath, String fileSuffix, ConfigurerProvider indexProvider) {
+        this(basePath, fileSuffix, indexProvider, true);
+    }
+
+    public FlatPersistence(File basePath, String fileSuffix, ConfigurerProvider indexProvider, boolean saveIndex) {
         super(PersistencePath.of(basePath), true, true, true, true);
         this.basePath = PersistencePath.of(basePath);
         this.fileSuffix = fileSuffix;
+        this.indexProvider = indexProvider;
+        this.saveIndex = saveIndex;
     }
 
     @Override
     public void flush() {
-        if (this.isMemoryIndex()) return;
+        if (!this.isSaveIndex()) return;
         this.indexMap.forEach((collection, indexes) -> indexes.values().forEach(InMemoryIndex::save));
     }
 
@@ -75,7 +87,7 @@ public class FlatPersistence extends RawPersistence {
         changed = (flatIndex.getKeyToValue().put(path.getValue(), identity) != null) || changed;
 
         // save index
-        if (!this.isMemoryIndex() && this.isAutoFlush()) {
+        if (this.isSaveIndex() && this.isAutoFlush()) {
             flatIndex.save();
         }
 
@@ -97,7 +109,7 @@ public class FlatPersistence extends RawPersistence {
         boolean changed = (currentValue != null) && flatIndex.getValueToKeys().get(currentValue).remove(path.getValue());
 
         // save index
-        if (!this.isMemoryIndex() && this.isAutoFlush()) {
+        if (this.isSaveIndex() && this.isAutoFlush()) {
             flatIndex.save();
         }
 
@@ -171,13 +183,13 @@ public class FlatPersistence extends RawPersistence {
         for (IndexProperty index : collection.getIndexes()) {
 
             InMemoryIndex flatIndex = ConfigManager.create(InMemoryIndex.class);
-            flatIndex.setConfigurer(new ObdfConfigurer());
+            flatIndex.setConfigurer(this.indexProvider.get());
 
-            File file = collectionPath.append("_index_").append(index.toSqlIdentifier()).append(".obdf").toFile();
+            File file = collectionPath.append("_").append(index.toSafeFileName()).append(".index").toFile();
             flatIndex.setSaver(document -> document.save(file));
             flatIndex.setBindFile(file);
 
-            if (!this.isMemoryIndex() && file.exists()) {
+            if (this.isSaveIndex() && file.exists()) {
                 flatIndex.load(file);
             }
 
