@@ -24,7 +24,7 @@ public class RedisPersistence extends RawPersistence {
     @Getter private StatefulRedisConnection<String, String> connection;
 
     public RedisPersistence(PersistencePath basePath, RedisClient client) {
-        super(basePath, true, true, true);
+        super(basePath, true, true, true, true);
         this.connect(client);
     }
 

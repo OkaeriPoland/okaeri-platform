@@ -44,6 +44,16 @@ public class DocumentPersistence implements Persistence<Document> {
     }
 
     @Override
+    public void setAutoFlush(boolean state) {
+        this.getRaw().setAutoFlush(state);
+    }
+
+    @Override
+    public void flush() {
+        this.getRaw().flush();
+    }
+
+    @Override
     public PersistencePath getBasePath() {
         return this.getRaw().getBasePath();
     }
@@ -69,6 +79,7 @@ public class DocumentPersistence implements Persistence<Document> {
         int updated = 0;
         int every = (total > 1000) ? (total / 20) : 50;
         LOGGER.warning("Found " + total + " entries with invalid indexes, updating..");
+        this.setAutoFlush(false);
 
         for (PersistencePath key : withMissingIndexes) {
             this.updateIndex(collection, key);
@@ -78,6 +89,9 @@ public class DocumentPersistence implements Persistence<Document> {
             int percent = (int) (((double) updated / (double) total) * 100);
             LOGGER.warning(updated + " already done (" + percent + "%)");
         }
+
+        this.setAutoFlush(true);
+        this.flush();
     }
 
     @Override

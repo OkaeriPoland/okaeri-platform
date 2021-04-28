@@ -27,7 +27,7 @@ public class JdbcPersistence extends RawPersistence {
     @Getter private HikariDataSource dataSource;
 
     public JdbcPersistence(PersistencePath basePath, HikariConfig hikariConfig) {
-        super(basePath, true, true, true);
+        super(basePath, true, true, true, true);
         this.connect(hikariConfig);
     }
 

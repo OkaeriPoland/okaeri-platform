@@ -11,6 +11,16 @@ public interface Persistence<T> {
     // allows to track tables etc.
     void registerCollection(PersistenceCollection collection);
 
+    // allows to disable flushing to the database
+    // mainly for the filesystem/inmemory persistence backends
+    // not expected to be a guarantee, just something
+    // to use when performing mass changes and hoping
+    // for the implementation to take care of it
+    void setAutoFlush(boolean state);
+
+    // allows to flush/save when autoflush is disabled
+    void flush();
+
     // allows to update entry of entity's index
     boolean updateIndex(PersistenceCollection collection, IndexProperty property, PersistencePath path, String identity);
 
