@@ -90,7 +90,8 @@ public class OkaeriBukkitPlugin extends JavaPlugin {
             try {
                 runnable.run();
                 asyncLoader.setDone(true);
-            } catch (Throwable ignored) {
+            } catch (Throwable exception) {
+                this.getLogger().warning(name + ": " + exception.getMessage());
             }
         });
 
