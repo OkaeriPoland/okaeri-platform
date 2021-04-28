@@ -8,16 +8,32 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 
+import java.util.logging.Logger;
+
 @ToString(exclude = "cachedInto")
 public class Document extends OkaeriConfig {
+
+    @Exclude private static final boolean DEBUG = Boolean.parseBoolean(System.getProperty("okaeri.platform.debug", "false"));
+    @Exclude private static final Logger LOGGER = Logger.getLogger(Document.class.getName());
 
     @Exclude @Getter @Setter private DocumentSaver saver;
     @Exclude private Document cachedInto = this;
 
     @Override
     public OkaeriConfig save() throws OkaeriException {
-        if (this.saver == null) throw new IllegalArgumentException("cannot #save() without saver");
+
+        if (this.saver == null) {
+            throw new IllegalArgumentException("cannot #save() without saver");
+        }
+
+        long start = System.currentTimeMillis();
         this.saver.save(this);
+
+        if (DEBUG) {
+            long took = System.currentTimeMillis() - start;
+            LOGGER.info("[" + this.getBindFile() + "] Document save took " + took + " ms");
+        }
+
         return this;
     }
 
