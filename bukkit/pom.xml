@@ -27,8 +27,8 @@
         <!-- persistence -->
         <dependency>
             <groupId>eu.okaeri</groupId>
-            <artifactId>okaeri-platform-persistence-flat</artifactId>
-            <version>0.3.7</version>
+            <artifactId>okaeri-persistence-flat</artifactId>
+            <version>1.0.0</version>
         </dependency>
 
         <!-- configs -->

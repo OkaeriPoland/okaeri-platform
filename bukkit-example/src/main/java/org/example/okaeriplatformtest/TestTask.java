@@ -4,7 +4,7 @@ import eu.okaeri.injector.annotation.Inject;
 import eu.okaeri.platform.bukkit.annotation.Timer;
 import eu.okaeri.platform.bukkit.commons.command.CommandRunner;
 import eu.okaeri.platform.bukkit.commons.time.MinecraftTimeEquivalent;
-import eu.okaeri.platform.persistence.cache.Cached;
+import eu.okaeri.persistence.cache.Cached;
 import org.bukkit.Bukkit;
 import org.bukkit.Server;
 import org.bukkit.entity.HumanEntity;

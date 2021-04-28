@@ -11,10 +11,6 @@
     <modules>
         <module>core</module>
         <module>bukkit</module>
-        <module>persistence</module>
-        <module>persistence-flat</module>
-        <module>persistence-redis</module>
-        <module>persistence-jdbc</module>
     </modules>
 
     <properties>

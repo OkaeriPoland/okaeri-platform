@@ -33,16 +33,16 @@
         <!-- additional redis backend -->
         <dependency>
             <groupId>eu.okaeri</groupId>
-            <artifactId>okaeri-platform-persistence-redis</artifactId>
-            <version>0.3.7</version>
+            <artifactId>okaeri-persistence-redis</artifactId>
+            <version>1.0.0</version>
             <scope>compile</scope>
         </dependency>
 
         <!-- additional jdbc backend with the client of choice (mariadb/mysql here) -->
         <dependency>
             <groupId>eu.okaeri</groupId>
-            <artifactId>okaeri-platform-persistence-jdbc</artifactId>
-            <version>0.3.7</version>
+            <artifactId>okaeri-persistence-jdbc</artifactId>
+            <version>1.0.0</version>
             <scope>compile</scope>
         </dependency>
         <dependency>
