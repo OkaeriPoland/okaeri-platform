@@ -7,10 +7,7 @@ import eu.okaeri.platform.persistence.PersistenceEntity;
 import eu.okaeri.platform.persistence.PersistencePath;
 import eu.okaeri.platform.persistence.index.IndexProperty;
 import eu.okaeri.platform.persistence.raw.RawPersistence;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.Getter;
-import lombok.SneakyThrows;
+import lombok.*;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -40,6 +37,7 @@ public class FlatPersistence extends RawPersistence {
     private final Map<PersistenceCollection, Map<String, FlatIndex>> indexMap = new HashMap<>();
     @Getter private final PersistencePath basePath;
     @Getter private final String fileSuffix;
+    @Getter @Setter private boolean memoryIndex = true;
 
     public FlatPersistence(File basePath, String fileSuffix) {
         super(PersistencePath.of(basePath), true, true, true, true);
@@ -49,6 +47,7 @@ public class FlatPersistence extends RawPersistence {
 
     @Override
     public void flush() {
+        if (this.isMemoryIndex()) return;
         this.indexMap.forEach((collection, indexes) -> indexes.values().forEach(FlatIndex::save));
     }
 
@@ -75,7 +74,7 @@ public class FlatPersistence extends RawPersistence {
         changed = (flatIndex.getKeyToValue().put(path.getValue(), identity) != null) || changed;
 
         // save index
-        if (this.isAutoFlush()) {
+        if (!this.isMemoryIndex() && this.isAutoFlush()) {
             flatIndex.save();
         }
 
@@ -97,7 +96,7 @@ public class FlatPersistence extends RawPersistence {
         boolean changed = (currentValue != null) && flatIndex.getValueToKeys().get(currentValue).remove(path.getValue());
 
         // save index
-        if (this.isAutoFlush()) {
+        if (!this.isMemoryIndex() && this.isAutoFlush()) {
             flatIndex.save();
         }
 
@@ -177,7 +176,7 @@ public class FlatPersistence extends RawPersistence {
             flatIndex.setSaver(document -> document.save(file));
             flatIndex.setBindFile(file);
 
-            if (file.exists()) {
+            if (!this.isMemoryIndex() && file.exists()) {
                 flatIndex.load(file);
             }
 

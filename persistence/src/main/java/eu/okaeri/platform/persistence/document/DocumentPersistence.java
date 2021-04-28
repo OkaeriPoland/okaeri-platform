@@ -76,22 +76,22 @@ public class DocumentPersistence implements Persistence<Document> {
 
         int total = withMissingIndexes.size();
         long start = System.currentTimeMillis();
+        long lastInfo = System.currentTimeMillis();
         int updated = 0;
-        int every = (total > 1000) ? (total / 20) : 50;
-        LOGGER.warning("Found " + total + " entries with invalid indexes, updating..");
+        LOGGER.warning("Found " + total + " entries with missing indexes, updating..");
         this.setAutoFlush(false);
 
         for (PersistencePath key : withMissingIndexes) {
             this.updateIndex(collection, key);
-            if ((++updated % every) != 0) {
-                continue;
-            }
+            if ((lastInfo - start) <= 5_000) continue;
             int percent = (int) (((double) updated / (double) total) * 100);
             LOGGER.warning(updated + " already done (" + percent + "%)");
+            lastInfo = System.currentTimeMillis();
         }
 
         this.setAutoFlush(true);
         this.flush();
+        LOGGER.warning("Finished creating indexes! (took: " + (System.currentTimeMillis() - start) + " ms)");
     }
 
     @Override
