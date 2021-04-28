@@ -14,7 +14,7 @@ import eu.okaeri.placeholders.message.CompiledMessage;
 import eu.okaeri.platform.bukkit.commons.i18n.BI18n;
 import eu.okaeri.platform.bukkit.commons.teleport.QueuedTeleports;
 import eu.okaeri.platform.core.annotation.Bean;
-import eu.okaeri.platform.persistence.PersistenceEntity;
+import eu.okaeri.persistence.PersistenceEntity;
 import org.apache.commons.lang.RandomStringUtils;
 import org.bukkit.*;
 import org.bukkit.command.CommandSender;

@@ -1,6 +1,6 @@
 package org.example.okaeriplatformtest.persistence;
 
-import eu.okaeri.platform.persistence.document.Document;
+import eu.okaeri.persistence.document.Document;
 import lombok.*;
 import org.bukkit.Location;
 

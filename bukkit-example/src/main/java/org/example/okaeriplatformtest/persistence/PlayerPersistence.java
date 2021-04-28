@@ -3,12 +3,12 @@ package org.example.okaeriplatformtest.persistence;
 import eu.okaeri.injector.annotation.Inject;
 import eu.okaeri.injector.annotation.PostConstruct;
 import eu.okaeri.platform.core.annotation.Component;
-import eu.okaeri.platform.persistence.PersistenceCollection;
-import eu.okaeri.platform.persistence.PersistenceEntity;
-import eu.okaeri.platform.persistence.PersistencePath;
-import eu.okaeri.platform.persistence.document.Document;
-import eu.okaeri.platform.persistence.document.DocumentPersistence;
-import eu.okaeri.platform.persistence.index.IndexProperty;
+import eu.okaeri.persistence.PersistenceCollection;
+import eu.okaeri.persistence.PersistenceEntity;
+import eu.okaeri.persistence.PersistencePath;
+import eu.okaeri.persistence.document.Document;
+import eu.okaeri.persistence.document.DocumentPersistence;
+import eu.okaeri.persistence.index.IndexProperty;
 import org.bukkit.OfflinePlayer;
 
 import java.util.List;

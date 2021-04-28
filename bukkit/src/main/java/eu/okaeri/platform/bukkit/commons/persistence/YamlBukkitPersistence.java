@@ -2,8 +2,8 @@ package eu.okaeri.platform.bukkit.commons.persistence;
 
 import eu.okaeri.configs.yaml.bukkit.YamlBukkitConfigurer;
 import eu.okaeri.configs.yaml.bukkit.serdes.SerdesBukkit;
-import eu.okaeri.platform.persistence.document.DocumentPersistence;
-import eu.okaeri.platform.persistence.flat.FlatPersistence;
+import eu.okaeri.persistence.document.DocumentPersistence;
+import eu.okaeri.persistence.flat.FlatPersistence;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.bukkit.plugin.Plugin;
