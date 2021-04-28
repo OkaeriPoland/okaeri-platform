@@ -11,12 +11,7 @@ Whole ecosystems built on top of the best okaeri packages.
 - Based on dependency injection/beans/components schema:
   - subcomponent registration with Register(component class) annotation
   - automatic field injections and bean creation
-- Persistence abstraction (e.g. FlatPersistence, Cached<T>):
-  - serialization/deserialization based on okaeri-configs or custom solution
-  - ready to use support for database storage:
-    - redis/keydb (RedisPersistence)
-    - mysql/mariadb and other jdbc (JdbcPersistence)
-  - ability to implement custom storage layers easily
+
 - Lots of platform specific utilities:
   - register platform specific services as components
   - use commons for the most boring tasks and cleaner code
@@ -43,6 +38,9 @@ Currently the only target (about 300kB total of additional jar size), integrates
   - [okaeri-i18n](https://github.com/OkaeriPoland/okaeri-i18n): translation library with compile time key checking (getters possible instead of string keys),
     built using amazing [okaeri-placeholders](https://github.com/OkaeriPoland/okaeri-placeholders) with pluralization for 143 locales, subfields, default values, boolean/floating point formatting,
     placeholder arguments (`{player.healthBar(20)}`, `{top.guild(1)}`, `{top.guild(1,kills)}`)
+- **Persistence**
+  - [okaeri-persistence](https://github.com/OkaeriPoland/okaeri-persistence): Object Document Mapping (ODM) library allowing to focus on data instead of the storage layer. Integrates seamlessly
+    with configuration (okaeri-configs) objects and allows to store, index, and filter them with almost no additional work needed. Supports multiple backends like files, mysql, redis with just an easy switch.
 
 ### Example
 
