@@ -5,6 +5,7 @@ import eu.okaeri.configs.binary.obdf.ObdfConfigurer;
 import eu.okaeri.platform.persistence.PersistenceCollection;
 import eu.okaeri.platform.persistence.PersistenceEntity;
 import eu.okaeri.platform.persistence.PersistencePath;
+import eu.okaeri.platform.persistence.index.InMemoryIndex;
 import eu.okaeri.platform.persistence.index.IndexProperty;
 import eu.okaeri.platform.persistence.raw.RawPersistence;
 import lombok.*;
@@ -34,7 +35,7 @@ public class FlatPersistence extends RawPersistence {
         return new PersistenceEntity<>(persistencePath, this.fileToString(path.toFile()));
     };
 
-    private final Map<PersistenceCollection, Map<String, FlatIndex>> indexMap = new HashMap<>();
+    private final Map<PersistenceCollection, Map<String, InMemoryIndex>> indexMap = new HashMap<>();
     @Getter private final PersistencePath basePath;
     @Getter private final String fileSuffix;
     @Getter @Setter private boolean memoryIndex = true;
@@ -48,14 +49,14 @@ public class FlatPersistence extends RawPersistence {
     @Override
     public void flush() {
         if (this.isMemoryIndex()) return;
-        this.indexMap.forEach((collection, indexes) -> indexes.values().forEach(FlatIndex::save));
+        this.indexMap.forEach((collection, indexes) -> indexes.values().forEach(InMemoryIndex::save));
     }
 
     @Override
     public boolean updateIndex(PersistenceCollection collection, IndexProperty property, PersistencePath path, String identity) {
 
         // get index
-        FlatIndex flatIndex = this.indexMap.get(collection).get(property.getValue());
+        InMemoryIndex flatIndex = this.indexMap.get(collection).get(property.getValue());
         if (flatIndex == null) throw new IllegalArgumentException("non-indexed property used: " + property);
 
         // get current value by key and remove from mapping
@@ -86,7 +87,7 @@ public class FlatPersistence extends RawPersistence {
     public boolean dropIndex(PersistenceCollection collection, IndexProperty property, PersistencePath path) {
 
         // get index
-        FlatIndex flatIndex = this.indexMap.get(collection).get(property.getValue());
+        InMemoryIndex flatIndex = this.indexMap.get(collection).get(property.getValue());
         if (flatIndex == null) throw new IllegalArgumentException("non-indexed property used: " + property);
 
         // get current value by key and remove from mapping
@@ -115,7 +116,7 @@ public class FlatPersistence extends RawPersistence {
     public boolean dropIndex(PersistenceCollection collection, IndexProperty property) {
 
         // remove from list and get index
-        FlatIndex flatIndex = this.indexMap.get(collection).remove(property.getValue());
+        InMemoryIndex flatIndex = this.indexMap.get(collection).remove(property.getValue());
 
         // delete index file
         return (flatIndex != null) && flatIndex.getBindFile().delete();
@@ -125,7 +126,7 @@ public class FlatPersistence extends RawPersistence {
     @SneakyThrows
     public Set<PersistencePath> findMissingIndexes(PersistenceCollection collection, Set<IndexProperty> indexProperties) {
 
-        Map<String, FlatIndex> collectionIndexes = this.indexMap.get(collection);
+        Map<String, InMemoryIndex> collectionIndexes = this.indexMap.get(collection);
         if (collectionIndexes.isEmpty()) {
             return Collections.emptySet();
         }
@@ -143,7 +144,7 @@ public class FlatPersistence extends RawPersistence {
     @Override
     public Stream<PersistenceEntity<String>> readByProperty(PersistenceCollection collection, PersistencePath property, Object propertyValue) {
 
-        FlatIndex flatIndex = this.indexMap.get(collection).get(property.getValue());
+        InMemoryIndex flatIndex = this.indexMap.get(collection).get(property.getValue());
         if (flatIndex == null) return this.streamAll(collection);
 
         Set<String> keys = flatIndex.getValueToKeys().get(String.valueOf(propertyValue));
@@ -165,11 +166,11 @@ public class FlatPersistence extends RawPersistence {
         File collectionFile = collectionPath.toFile();
         collectionFile.mkdirs();
 
-        Map<String, FlatIndex> indexes = this.indexMap.computeIfAbsent(collection, col -> new HashMap<>());
+        Map<String, InMemoryIndex> indexes = this.indexMap.computeIfAbsent(collection, col -> new HashMap<>());
 
         for (IndexProperty index : collection.getIndexes()) {
 
-            FlatIndex flatIndex = ConfigManager.create(FlatIndex.class);
+            InMemoryIndex flatIndex = ConfigManager.create(InMemoryIndex.class);
             flatIndex.setConfigurer(new ObdfConfigurer());
 
             File file = collectionPath.append("_index_").append(index.toSqlIdentifier()).append(".obdf").toFile();
