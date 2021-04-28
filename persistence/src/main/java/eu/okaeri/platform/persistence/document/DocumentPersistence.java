@@ -91,7 +91,7 @@ public class DocumentPersistence implements Persistence<Document> {
             }
 
             int percent = (int) (((double) updated / (double) total) * 100);
-            LOGGER.warning(updated + " already done (" + percent + "%)");
+            LOGGER.warning("[" + this.getBasePath().sub(collection).getValue() + "] " + updated + " already done (" + percent + "%)");
             lastInfo = System.currentTimeMillis();
         }
 
