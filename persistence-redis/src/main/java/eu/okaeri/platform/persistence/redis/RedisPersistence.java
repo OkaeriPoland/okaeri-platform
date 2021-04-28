@@ -35,9 +35,9 @@ public class RedisPersistence extends RawPersistence {
                 this.connection = client.connect();
             } catch (Exception exception) {
                 if (exception.getCause() != null) {
-                    LOGGER.severe("Cannot connect with redis (waiting 30s): " + exception.getMessage() + " caused by " + exception.getCause().getMessage());
+                    LOGGER.severe("[" + this.getBasePath().getValue() + "] Cannot connect with redis (waiting 30s): " + exception.getMessage() + " caused by " + exception.getCause().getMessage());
                 } else {
-                    LOGGER.severe("Cannot connect with redis (waiting 30s): " + exception.getMessage());
+                    LOGGER.severe("[" + this.getBasePath().getValue() + "] Cannot connect with redis (waiting 30s): " + exception.getMessage());
                 }
                 Thread.sleep(30_000);
             }
