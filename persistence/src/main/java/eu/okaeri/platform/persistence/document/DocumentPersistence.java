@@ -78,12 +78,18 @@ public class DocumentPersistence implements Persistence<Document> {
         long start = System.currentTimeMillis();
         long lastInfo = System.currentTimeMillis();
         int updated = 0;
-        LOGGER.warning("Found " + total + " entries with missing indexes, updating..");
+        LOGGER.warning("[" + this.getBasePath().sub(collection).getValue() + "] Found " + total + " entries with missing indexes, updating..");
         this.setAutoFlush(false);
 
         for (PersistencePath key : withMissingIndexes) {
+
             this.updateIndex(collection, key);
-            if ((lastInfo - start) <= 5_000) continue;
+            updated++;
+
+            if ((System.currentTimeMillis() - lastInfo) <= 5_000) {
+                continue;
+            }
+
             int percent = (int) (((double) updated / (double) total) * 100);
             LOGGER.warning(updated + " already done (" + percent + "%)");
             lastInfo = System.currentTimeMillis();
@@ -91,7 +97,7 @@ public class DocumentPersistence implements Persistence<Document> {
 
         this.setAutoFlush(true);
         this.flush();
-        LOGGER.warning("Finished creating indexes! (took: " + (System.currentTimeMillis() - start) + " ms)");
+        LOGGER.warning("[" + this.getBasePath().sub(collection).getValue() + "] Finished creating indexes! (took: " + (System.currentTimeMillis() - start) + " ms)");
     }
 
     @Override
