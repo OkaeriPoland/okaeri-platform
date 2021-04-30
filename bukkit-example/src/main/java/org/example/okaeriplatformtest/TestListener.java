@@ -14,7 +14,7 @@ import org.bukkit.event.player.AsyncPlayerChatEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitScheduler;
-import org.example.okaeriplatformtest.persistence.PlayerPersistence;
+import org.example.okaeriplatformtest.persistence.PlayerRepository;
 import org.example.okaeriplatformtest.persistence.PlayerProperties;
 
 import java.io.PrintWriter;
@@ -31,7 +31,7 @@ public class TestListener implements Listener {
     @Inject private BukkitScheduler scheduler;
 
     @Inject private QueuedTeleports queuedTeleports;
-    @Inject private PlayerPersistence playerPersistence;
+    @Inject private PlayerRepository playerPersistence;
 
     @Inject("subbean") private String subbeanString;
     @Inject("joinReward") ItemStack rewardItem;

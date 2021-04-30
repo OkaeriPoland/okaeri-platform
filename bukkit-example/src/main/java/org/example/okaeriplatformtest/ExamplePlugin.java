@@ -4,6 +4,12 @@ import com.zaxxer.hikari.HikariConfig;
 import eu.okaeri.configs.json.simple.JsonSimpleConfigurer;
 import eu.okaeri.configs.yaml.bukkit.serdes.SerdesBukkit;
 import eu.okaeri.injector.annotation.Inject;
+import eu.okaeri.persistence.PersistencePath;
+import eu.okaeri.persistence.cache.Cached;
+import eu.okaeri.persistence.document.DocumentPersistence;
+import eu.okaeri.persistence.jdbc.H2Persistence;
+import eu.okaeri.persistence.jdbc.MariaDbPersistence;
+import eu.okaeri.persistence.redis.RedisPersistence;
 import eu.okaeri.platform.bukkit.OkaeriBukkitPlugin;
 import eu.okaeri.platform.bukkit.annotation.Timer;
 import eu.okaeri.platform.bukkit.commons.item.ItemStackBuilder;
@@ -13,11 +19,6 @@ import eu.okaeri.platform.bukkit.commons.teleport.QueuedTeleportsTask;
 import eu.okaeri.platform.bukkit.commons.time.MinecraftTimeEquivalent;
 import eu.okaeri.platform.core.annotation.Bean;
 import eu.okaeri.platform.core.annotation.Register;
-import eu.okaeri.persistence.PersistencePath;
-import eu.okaeri.persistence.cache.Cached;
-import eu.okaeri.persistence.document.DocumentPersistence;
-import eu.okaeri.persistence.jdbc.JdbcPersistence;
-import eu.okaeri.persistence.redis.RedisPersistence;
 import io.lettuce.core.RedisClient;
 import io.lettuce.core.RedisURI;
 import org.bukkit.Bukkit;
@@ -28,7 +29,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.Plugin;
 import org.example.okaeriplatformtest.config.TestConfig;
 import org.example.okaeriplatformtest.config.TestLocaleConfig;
-import org.example.okaeriplatformtest.persistence.PlayerPersistence;
+import org.example.okaeriplatformtest.persistence.PlayerRepository;
 
 import java.io.File;
 import java.time.Duration;
@@ -46,14 +47,11 @@ import java.util.concurrent.atomic.AtomicInteger;
 // skip registration using register=false
 @Register(TestConfig.class)
 @Register(TestLocaleConfig.class)
-@Register(PlayerPersistence.class)
+@Register(PlayerRepository.class)
 @Register(TestCommand.class)
 @Register(TestListener.class)
 @Register(TestTask.class)
 public class ExamplePlugin extends OkaeriBukkitPlugin {
-
-    @Inject("subbean")
-    private String subbeanStr;
 
     @Override // do not use onEnable (especially without calling super)
     public void onPlatformEnabled() {
@@ -70,6 +68,10 @@ public class ExamplePlugin extends OkaeriBukkitPlugin {
     // see persistence/PlayerPersistence for details
     @Bean("persistence")
     public DocumentPersistence configurePersistence(@Inject("dataFolder") File dataFolder, Plugin plugin, TestConfig config) {
+
+        // jdbc drivers may require initialization for jdbc urls to work
+        try { Class.forName("org.mariadb.jdbc.Driver"); } catch (ClassNotFoundException ignored) { }
+        try { Class.forName("org.h2.Driver"); } catch (ClassNotFoundException ignored) { }
 
         // remember that if plugin is not intended to have shared state
         // between multiple instances you must allow users to set persistence's
@@ -94,10 +96,16 @@ public class ExamplePlugin extends OkaeriBukkitPlugin {
                 return new DocumentPersistence(new RedisPersistence(basePath, redisClient), JsonSimpleConfigurer::new, new SerdesBukkit());
             case MYSQL:
                 // setup hikari based on your needs, e.g. using config
-                HikariConfig hikari = new HikariConfig();
-                hikari.setJdbcUrl(config.getStorage().getUri());
-                // it is required to use json configurer for the jdbc backend
-                return new DocumentPersistence(new JdbcPersistence(basePath, hikari), JsonSimpleConfigurer::new, new SerdesBukkit());
+                HikariConfig mariadbHikari = new HikariConfig();
+                mariadbHikari.setJdbcUrl(config.getStorage().getUri());
+                // it is REQUIRED to use json configurer for the mariadb backend
+                return new DocumentPersistence(new MariaDbPersistence(basePath, mariadbHikari), JsonSimpleConfigurer::new, new SerdesBukkit());
+            case H2:
+                // setup hikari based on your needs, e.g. using config
+                HikariConfig jdbcHikari = new HikariConfig();
+                jdbcHikari.setJdbcUrl(config.getStorage().getUri());
+                //it is HIGHLY recommended to use json configurer for the jdbc backend
+                return new DocumentPersistence(new H2Persistence(basePath, jdbcHikari), JsonSimpleConfigurer::new, new SerdesBukkit());
             default:
                 throw new RuntimeException("unsupported storage backend: " + config.getStorage().getBackend());
         }
