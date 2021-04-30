@@ -21,7 +21,7 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.example.okaeriplatformtest.config.TestConfig;
 import org.example.okaeriplatformtest.config.TestLocaleConfig;
-import org.example.okaeriplatformtest.persistence.PlayerPersistence;
+import org.example.okaeriplatformtest.persistence.PlayerRepository;
 import org.example.okaeriplatformtest.persistence.PlayerProperties;
 
 import java.time.Instant;
@@ -43,7 +43,7 @@ public class TestCommand implements CommandService {
     @Inject private BI18n i18n;
     @Inject private TestLocaleConfig messages;
     @Inject private Logger logger;
-    @Inject private PlayerPersistence playerPersistence;
+    @Inject private PlayerRepository playerPersistence;
 
     // testcmd|testing example
     @Executor
@@ -147,7 +147,7 @@ public class TestCommand implements CommandService {
     // testcmd|testing visittest
     @Executor(async = true)
     public String visittest() {
-        return this.playerPersistence.stream()
+        return this.playerPersistence.findAll()
                 .map(PersistenceEntity::getValue)
                 .filter(entity -> entity.getLastJoinedLocation().getY() > 250)
                 .findFirst()
@@ -159,7 +159,7 @@ public class TestCommand implements CommandService {
     @Executor(pattern = "findplayer *", async = true)
     public String findplayer(@Arg("name") String name) {
         long start = System.currentTimeMillis();
-        String data = this.playerPersistence.findByName(name).findFirst()
+        String data = this.playerPersistence.findByName(name)
                 .map(OkaeriConfig::saveToString)
                 .orElse("huh");
         long took = System.currentTimeMillis() - start;
@@ -180,6 +180,19 @@ public class TestCommand implements CommandService {
         return data;
     }
 
+    // testcmd|testing findbyworld <world>
+    @Executor(pattern = "findbyy *", async = true)
+    public String findbyy(@Arg("world") String y) {
+        long start = System.currentTimeMillis();
+        String data = this.playerPersistence.findByLastJoinedLocationY(Integer.parseInt(y))
+                .limit(10)
+                .map(OkaeriConfig::saveToString)
+                .collect(Collectors.joining("\n"));
+        long took = System.currentTimeMillis() - start;
+        data += "\n" + took + " ms";
+        return data;
+    }
+
     // testcmd|testing currentthread
     @Executor(async = true)
     public String currentthread() {
@@ -190,8 +203,9 @@ public class TestCommand implements CommandService {
     @Executor(async = true)
     public void readallplayers(CommandSender sender) {
         long start = System.currentTimeMillis();
-        List<PlayerProperties> all = this.playerPersistence.getAll();
+        List<PersistenceEntity<PlayerProperties>> all = this.playerPersistence.findAll().collect(Collectors.toList());
         sender.sendMessage(all.stream()
+                .map(PersistenceEntity::getValue)
                 .map(properties -> properties.getName() + ": " + properties.getLastJoined())
                 .limit(100)
                 .collect(Collectors.joining("\n")));
@@ -212,7 +226,7 @@ public class TestCommand implements CommandService {
     @Executor(async = true)
     public void deleteme(@Sender Player player) {
         long start = System.currentTimeMillis();
-        player.sendMessage("state: " + this.playerPersistence.delete(player));
+        player.sendMessage("state: " + this.playerPersistence.deleteByPath(player.getUniqueId()));
         long took = System.currentTimeMillis() - start;
         player.sendMessage(took + " ms");
     }

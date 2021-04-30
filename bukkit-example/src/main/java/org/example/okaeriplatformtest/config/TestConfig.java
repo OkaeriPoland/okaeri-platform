@@ -58,20 +58,22 @@ public class TestConfig extends OkaeriConfig {
     public class StorageConfig extends OkaeriConfig {
 
         @Variable("OPE_STORAGE_BACKEND")
-        @Comment("Type of the storage backend: FLAT, REDIS, MYSQL")
+        @Comment("Type of the storage backend: FLAT, REDIS, MYSQL, SQLITE")
         private StorageBackend backend = StorageBackend.FLAT;
 
         @Variable("OPE_STORAGE_PREFIX")
         @Comment("Prefix for the storage: allows to have multiple instances using same database")
-        @Comment("FLAT  : no effect due to local nature")
-        @Comment("REDIS : {storagePrefix}:{collection} -> OkaeriPlatformBukkitExample:player")
-        @Comment("MYSQL : {storagePrefix}:{collection} -> ope_storage_player (recommended shortened [here 'ope:storage'] due to database limitations)")
-        private String prefix = "OkaeriPlatformBukkitExample:storage";
+        @Comment("FLAT   : no effect due to local nature")
+        @Comment("REDIS  : {storagePrefix}:{collection} -> ope:player")
+        @Comment("MYSQL  : {storagePrefix}:{collection} -> ope_player")
+        @Comment("H2     : {storagePrefix}:{collection} -> ope_player")
+        private String prefix = "ope";
 
         @Variable("OPE_STORAGE_URI")
-        @Comment("FLAT  : not applicable, plugin controlled")
-        @Comment("REDIS : redis://localhost")
-        @Comment("MYSQL : jdbc:mysql://localhost:3306/db?user=root&password=1234")
+        @Comment("FLAT   : not applicable, plugin controlled")
+        @Comment("REDIS  : redis://localhost")
+        @Comment("MYSQL  : jdbc:mysql://localhost:3306/db?user=root&password=1234")
+        @Comment("H2     : jdbc:h2:file:./plugins/OkaeriPlatformBukkitExample/storage;mode=mysql")
         private String uri = "redis://localhost";
     }
 }

@@ -34,21 +34,27 @@
         <dependency>
             <groupId>eu.okaeri</groupId>
             <artifactId>okaeri-persistence-redis</artifactId>
-            <version>1.0.0</version>
+            <version>1.2.0</version>
             <scope>compile</scope>
         </dependency>
 
-        <!-- additional jdbc backend with the client of choice (mariadb/mysql here) -->
+        <!-- additional jdbc backend with the clients of choice (mariadb/mysql here) -->
         <dependency>
             <groupId>eu.okaeri</groupId>
             <artifactId>okaeri-persistence-jdbc</artifactId>
-            <version>1.0.0</version>
+            <version>1.2.0</version>
             <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>org.mariadb.jdbc</groupId>
             <artifactId>mariadb-java-client</artifactId>
             <version>2.7.2</version>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.h2database</groupId>
+            <artifactId>h2</artifactId>
+            <version>1.4.200</version>
             <scope>compile</scope>
         </dependency>
 
@@ -78,11 +84,12 @@
                 <filtering>true</filtering>
             </resource>
         </resources>
+
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-shade-plugin</artifactId>
-                <version>3.2.1</version>
+                <version>3.2.4</version>
                 <executions>
                     <execution>
                         <phase>package</phase>
@@ -94,6 +101,12 @@
                 <configuration>
                     <minimizeJar>false</minimizeJar>
                     <createDependencyReducedPom>false</createDependencyReducedPom>
+                    <transformers>
+                        <!-- support for multiple jdbc drivers -->
+                        <transformer implementation="org.apache.maven.plugins.shade.resource.AppendingTransformer">
+                            <resource>META-INF/services/java.sql.Driver</resource>
+                        </transformer>
+                    </transformers>
                     <relocations>
                         <!-- platform -->
 <!--                        <relocation>-->
@@ -130,6 +143,11 @@
                         <relocation>
                             <pattern>org.mariadb.jdbc.</pattern>
                             <shadedPattern>org.example.okaeriplatformtest.libs.org.mariadb.jdbc.</shadedPattern>
+                        </relocation>
+                        <!-- jdbc - h2 driver -->
+                        <relocation>
+                            <pattern>org.h2.</pattern>
+                            <shadedPattern>org.example.okaeriplatformtest.libs.org.h2.</shadedPattern>
                         </relocation>
                         <!-- okaeri-configs json-simple dependency used for redis/jdbc -->
                         <relocation>

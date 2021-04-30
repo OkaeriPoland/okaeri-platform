@@ -13,7 +13,13 @@ import eu.okaeri.configs.yaml.bukkit.YamlBukkitConfigurer;
 import eu.okaeri.configs.yaml.bukkit.serdes.SerdesBukkit;
 import eu.okaeri.i18n.configs.LocaleConfig;
 import eu.okaeri.i18n.configs.LocaleConfigManager;
+import eu.okaeri.injector.Injectable;
 import eu.okaeri.injector.Injector;
+import eu.okaeri.persistence.PersistenceCollection;
+import eu.okaeri.persistence.document.DocumentPersistence;
+import eu.okaeri.persistence.repository.DocumentRepository;
+import eu.okaeri.persistence.repository.RepositoryDeclaration;
+import eu.okaeri.persistence.repository.annotation.Collection;
 import eu.okaeri.placeholders.Placeholders;
 import eu.okaeri.placeholders.bukkit.BukkitPlaceholders;
 import eu.okaeri.platform.bukkit.annotation.Timer;
@@ -21,6 +27,7 @@ import eu.okaeri.platform.bukkit.commons.i18n.BI18n;
 import eu.okaeri.platform.bukkit.commons.i18n.I18nColorsConfig;
 import eu.okaeri.platform.bukkit.commons.i18n.I18nCommandsMessages;
 import eu.okaeri.platform.bukkit.commons.i18n.PlayerLocaleProvider;
+import eu.okaeri.platform.core.DependsOn;
 import eu.okaeri.platform.core.annotation.Bean;
 import eu.okaeri.platform.core.annotation.Component;
 import eu.okaeri.platform.core.annotation.Configuration;
@@ -90,6 +97,7 @@ public class BukkitComponentCreator implements ComponentCreator {
                 || (type.getAnnotation(Timer.class) != null)
                 || (type.getAnnotation(Configuration.class) != null)
                 || (type.getAnnotation(Messages.class) != null)
+                || (type.getAnnotation(Collection.class) != null)
                 || CommandService.class.isAssignableFrom(type)
                 || OkaeriBukkitPlugin.class.isAssignableFrom(type);
     }
@@ -115,6 +123,32 @@ public class BukkitComponentCreator implements ComponentCreator {
         Object beanObject = manifest.getObject();
         Class<?> manifestType = manifest.getType();
         boolean changed = false;
+
+        // create persistence repository
+        if (register && (DocumentRepository.class.isAssignableFrom(manifestType)) && (manifest.getSource() == BeanSource.COMPONENT)) {
+
+            List<DependsOn> dependsOn = new ArrayList<>();
+            dependsOn.add(manifestType.getAnnotation(DependsOn.class));
+            DependsOn.List dependsOnAnnotations = manifestType.getAnnotation(DependsOn.List.class);
+            dependsOn.addAll((dependsOnAnnotations == null) ? Collections.emptyList() : Arrays.asList(dependsOnAnnotations.value()));
+
+            DependsOn dependsOnPersistence = dependsOn.stream()
+                    .filter(on -> on.type().isAssignableFrom(DocumentPersistence.class))
+                    .findAny()
+                    .orElseThrow(() -> new IllegalArgumentException("no @DependsOn for DocumentPersistence found on " + manifestType));
+
+            Injectable<?> injectable = this.injector.getExact(dependsOnPersistence.name(), dependsOnPersistence.type())
+                    .orElseThrow(() -> new IllegalArgumentException("no " + dependsOnPersistence.name() + " of " + dependsOnPersistence.type() + " found to create " + manifestType));
+            DocumentPersistence persistence = (DocumentPersistence) injectable.getObject();
+            PersistenceCollection collection = PersistenceCollection.of(manifestType);
+            persistence.registerCollection(collection);
+
+            Class<? extends DocumentRepository> repositoryType = (Class<? extends DocumentRepository>) manifestType;
+            RepositoryDeclaration<? extends DocumentRepository> repositoryDeclaration = RepositoryDeclaration.of(repositoryType);
+            manifest.setName(BeanManifest.nameClass(manifestType));
+
+            return repositoryDeclaration.newProxy(persistence, collection, manifestType.getClassLoader());
+        }
 
         // create config instance if applicable - @Register only - allows method component (manually created config) to be processed
         if (register && (!LocaleConfig.class.isAssignableFrom(manifestType)) && (OkaeriConfig.class.isAssignableFrom(manifestType)) && (manifest.getSource() == BeanSource.COMPONENT)) {

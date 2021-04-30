@@ -3,9 +3,11 @@ package eu.okaeri.platform.core.component.manifest;
 import eu.okaeri.injector.Injectable;
 import eu.okaeri.injector.Injector;
 import eu.okaeri.injector.annotation.Inject;
+import eu.okaeri.platform.core.DependsOn;
 import eu.okaeri.platform.core.annotation.Bean;
 import eu.okaeri.platform.core.annotation.Register;
 import eu.okaeri.platform.core.component.ComponentCreator;
+import lombok.AllArgsConstructor;
 import lombok.Data;
 
 import java.lang.reflect.Field;
@@ -13,10 +15,13 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
+import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
 @Data
 public class BeanManifest {
+
+    private static final Logger LOGGER = Logger.getLogger(BeanManifest.class.getName());
 
     public static BeanManifest of(Parameter parameter) {
 
@@ -54,6 +59,7 @@ public class BeanManifest {
 
         BeanManifest manifest = new BeanManifest();
         manifest.setType(clazz);
+//        manifest.setName(decapitalize(clazz.getSimpleName()));
         manifest.setName("");
         manifest.setSource(BeanSource.COMPONENT);
         manifest.setFullLoad(fullLoad);
@@ -76,10 +82,31 @@ public class BeanManifest {
                 .map(reg -> BeanManifest.of(reg, creator))
                 .collect(Collectors.toList()));
 
+        List<DependsOn> dependsOn = new ArrayList<>();
+        dependsOn.add(clazz.getAnnotation(DependsOn.class));
+        DependsOn.List dependsOnAnnotations = clazz.getAnnotation(DependsOn.List.class);
+        dependsOn.addAll((dependsOnAnnotations == null) ? Collections.emptyList() : Arrays.asList(dependsOnAnnotations.value()));
+
+        depends.addAll(dependsOn.stream()
+                .filter(Objects::nonNull)
+                .map(dependency -> BeanManifest.ofRequirement(dependency.type(), dependency.name()))
+                .collect(Collectors.toList()));
+
         depends.addAll(Arrays.stream(clazz.getDeclaredMethods())
                 .filter(creator::isComponentMethod)
                 .map(method -> BeanManifest.of(method, creator))
                 .collect(Collectors.toList()));
+
+        return manifest;
+    }
+
+    private static BeanManifest ofRequirement(Class<?> type, String name) {
+
+        BeanManifest manifest = new BeanManifest();
+        manifest.setName(name);
+        manifest.setType(type);
+        manifest.setDepends(Collections.emptyList());
+        manifest.setSource(BeanSource.INJECT);
 
         return manifest;
     }
@@ -94,9 +121,12 @@ public class BeanManifest {
         BeanManifest manifest = new BeanManifest();
         manifest.setType(method.getReturnType());
         manifest.setName((annotation == null) ? "" : annotation.value());
-        manifest.setDepends(Arrays.stream(method.getParameters())
-                .map(BeanManifest::of)
-                .collect(Collectors.toList()));
+
+        List<BeanManifest> depends = new ArrayList<>();
+//        depends.add(ofRequirement(method.getDeclaringClass(), decapitalize(method.getDeclaringClass().getSimpleName())));
+        depends.addAll(Arrays.stream(method.getParameters()).map(BeanManifest::of).collect(Collectors.toList()));
+        manifest.setDepends(depends);
+
         manifest.setSource(BeanSource.METHOD);
         manifest.setMethod(method);
         manifest.setRegister((annotation == null) || annotation.register());
@@ -121,7 +151,14 @@ public class BeanManifest {
     private boolean register = true;
     private boolean fullLoad = false;
     private List<BeanManifest> depends;
-    private Map<Class<?>, Integer> failCounter = new HashMap<>();
+    private Map<DependencyPair, Integer> failCounter = new HashMap<>();
+
+    @Data
+    @AllArgsConstructor
+    class DependencyPair {
+        private String name;
+        private Class<?> type;
+    }
 
     public BeanManifest withDepend(int pos, BeanManifest beanManifest) {
         this.depends.add(pos, beanManifest);
@@ -213,10 +250,15 @@ public class BeanManifest {
                 if (!injectable.isPresent()) {
 
                     Class<?> dependClass = depend.getType();
-                    int newValue = this.failCounter.getOrDefault(dependClass, 0) + 1;
-                    this.failCounter.put(dependClass, newValue);
+                    DependencyPair dependencyPair = new DependencyPair(depend.getName(), dependClass);
+                    int newValue = this.failCounter.getOrDefault(dependencyPair, 0) + 1;
+                    this.failCounter.put(dependencyPair, newValue);
 
                     if (newValue > 100) {
+                        this.failCounter.entrySet().stream()
+                                .sorted(Collections.reverseOrder(Map.Entry.comparingByValue()))
+                                .filter(entry -> entry.getValue() > 10)
+                                .forEach((entry) -> LOGGER.severe(entry.getKey() + " - " + entry.getValue() + " fails"));
                         throw new RuntimeException("Failed to resolve component/bean " + dependClass + " (" + depend.getName() + "=" + depend.getSource() + ")");
                     }
 
@@ -250,5 +292,12 @@ public class BeanManifest {
         }
 
         return this;
+    }
+
+    public static String nameClass(Class<?> clazz) {
+        String text = clazz.getSimpleName();
+        char chars[] = text.toCharArray();
+        chars[0] = Character.toLowerCase(chars[0]);
+        return new String(chars);
     }
 }
