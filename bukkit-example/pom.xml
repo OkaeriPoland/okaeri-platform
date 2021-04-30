@@ -34,7 +34,7 @@
         <dependency>
             <groupId>eu.okaeri</groupId>
             <artifactId>okaeri-persistence-redis</artifactId>
-            <version>1.2.0</version>
+            <version>1.3.0</version>
             <scope>compile</scope>
         </dependency>
 
@@ -42,7 +42,7 @@
         <dependency>
             <groupId>eu.okaeri</groupId>
             <artifactId>okaeri-persistence-jdbc</artifactId>
-            <version>1.2.0</version>
+            <version>1.3.0</version>
             <scope>compile</scope>
         </dependency>
         <dependency>

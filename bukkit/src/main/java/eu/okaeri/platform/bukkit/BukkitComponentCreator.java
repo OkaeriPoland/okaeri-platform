@@ -19,7 +19,7 @@ import eu.okaeri.persistence.PersistenceCollection;
 import eu.okaeri.persistence.document.DocumentPersistence;
 import eu.okaeri.persistence.repository.DocumentRepository;
 import eu.okaeri.persistence.repository.RepositoryDeclaration;
-import eu.okaeri.persistence.repository.annotation.Collection;
+import eu.okaeri.persistence.repository.annotation.DocumentCollection;
 import eu.okaeri.placeholders.Placeholders;
 import eu.okaeri.placeholders.bukkit.BukkitPlaceholders;
 import eu.okaeri.platform.bukkit.annotation.Timer;
@@ -97,7 +97,7 @@ public class BukkitComponentCreator implements ComponentCreator {
                 || (type.getAnnotation(Timer.class) != null)
                 || (type.getAnnotation(Configuration.class) != null)
                 || (type.getAnnotation(Messages.class) != null)
-                || (type.getAnnotation(Collection.class) != null)
+                || (type.getAnnotation(DocumentCollection.class) != null)
                 || CommandService.class.isAssignableFrom(type)
                 || OkaeriBukkitPlugin.class.isAssignableFrom(type);
     }
