@@ -14,15 +14,14 @@ import eu.okaeri.placeholders.message.CompiledMessage;
 import eu.okaeri.platform.bukkit.commons.i18n.BI18n;
 import eu.okaeri.platform.bukkit.commons.teleport.QueuedTeleports;
 import eu.okaeri.platform.core.annotation.Bean;
-import eu.okaeri.persistence.PersistenceEntity;
 import org.apache.commons.lang.RandomStringUtils;
 import org.bukkit.*;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.example.okaeriplatformtest.config.TestConfig;
 import org.example.okaeriplatformtest.config.TestLocaleConfig;
-import org.example.okaeriplatformtest.persistence.PlayerRepository;
 import org.example.okaeriplatformtest.persistence.PlayerProperties;
+import org.example.okaeriplatformtest.persistence.PlayerRepository;
 
 import java.time.Instant;
 import java.util.List;
@@ -148,7 +147,6 @@ public class TestCommand implements CommandService {
     @Executor(async = true)
     public String visittest() {
         return this.playerPersistence.findAll()
-                .map(PersistenceEntity::getValue)
                 .filter(entity -> entity.getLastJoinedLocation().getY() > 250)
                 .findFirst()
                 .map(OkaeriConfig::saveToString)
@@ -203,9 +201,8 @@ public class TestCommand implements CommandService {
     @Executor(async = true)
     public void readallplayers(CommandSender sender) {
         long start = System.currentTimeMillis();
-        List<PersistenceEntity<PlayerProperties>> all = this.playerPersistence.findAll().collect(Collectors.toList());
+        List<PlayerProperties> all = this.playerPersistence.findAll().collect(Collectors.toList());
         sender.sendMessage(all.stream()
-                .map(PersistenceEntity::getValue)
                 .map(properties -> properties.getName() + ": " + properties.getLastJoined())
                 .limit(100)
                 .collect(Collectors.joining("\n")));

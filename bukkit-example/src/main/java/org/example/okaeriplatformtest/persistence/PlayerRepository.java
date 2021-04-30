@@ -2,9 +2,9 @@ package org.example.okaeriplatformtest.persistence;
 
 import eu.okaeri.persistence.document.DocumentPersistence;
 import eu.okaeri.persistence.repository.DocumentRepository;
-import eu.okaeri.persistence.repository.annotation.Collection;
-import eu.okaeri.persistence.repository.annotation.Index;
-import eu.okaeri.persistence.repository.annotation.PropertyPath;
+import eu.okaeri.persistence.repository.annotation.DocumentCollection;
+import eu.okaeri.persistence.repository.annotation.DocumentIndex;
+import eu.okaeri.persistence.repository.annotation.DocumentPath;
 import eu.okaeri.platform.core.DependsOn;
 import org.bukkit.OfflinePlayer;
 
@@ -23,9 +23,9 @@ import java.util.stream.Stream;
 // and DocumentRepository#save is not required
 // DocumentRepository provides multiple default methods
 // to create, read, update and delete entities
-@Collection(path = "player", keyLength = 36, indexes = {
-        @Index(path = "name", maxLength = 24),
-        @Index(path = "lastJoinedLocation.world", maxLength = 64)
+@DocumentCollection(path = "player", keyLength = 36, indexes = {
+        @DocumentIndex(path = "name", maxLength = 24),
+        @DocumentIndex(path = "lastJoinedLocation.world", maxLength = 64)
 })
 public interface PlayerRepository extends DocumentRepository<UUID, PlayerProperties> {
 
@@ -34,13 +34,13 @@ public interface PlayerRepository extends DocumentRepository<UUID, PlayerPropert
     // superior to filtering result of findAll by hand
     // can scan non-indexed fields using stream
     // filters or platform specific implementation
-    @PropertyPath("name")
+    @DocumentPath("name")
     Optional<PlayerProperties> findByName(String name);
 
-    @PropertyPath("lastJoinedLocation.world")
+    @DocumentPath("lastJoinedLocation.world")
     Stream<PlayerProperties> findByLastJoinedLocationWorld(String name);
 
-    @PropertyPath("lastJoinedLocation.y")
+    @DocumentPath("lastJoinedLocation.y")
     Stream<PlayerProperties> findByLastJoinedLocationY(int y);
 
     // custom methods may be implemented
