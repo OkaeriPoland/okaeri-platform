@@ -28,6 +28,7 @@ import org.bukkit.plugin.java.JavaPluginLoader;
 
 import java.io.File;
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.logging.Level;
 import java.util.stream.Collectors;
@@ -36,6 +37,7 @@ import java.util.stream.Collectors;
 public class OkaeriBukkitPlugin extends JavaPlugin {
 
     private static boolean useParallelism = Boolean.parseBoolean(System.getProperty("okaeri.platform.parallelism", "true"));
+    private static final Map<Class<?>, Boolean> IS_UNSAFE_ASYNC_CACHE = new ConcurrentHashMap<>();
     private static final Set<String> ASYNC_BANNED_TYPES = new HashSet<>(Arrays.asList(
             "org.bukkit.block.Block",
             "org.bukkit.Location",
@@ -141,6 +143,11 @@ public class OkaeriBukkitPlugin extends JavaPlugin {
     private boolean isUnsafeAsync(Class<?> configType) {
 
         ConfigDeclaration declaration = ConfigDeclaration.of(configType);
+        Boolean cachedResult = IS_UNSAFE_ASYNC_CACHE.get(configType);
+
+        if (cachedResult != null) {
+            return cachedResult;
+        }
 
         for (FieldDeclaration field : declaration.getFields()) {
 
@@ -149,15 +156,18 @@ public class OkaeriBukkitPlugin extends JavaPlugin {
             if (OkaeriConfig.class.isAssignableFrom(fieldRealType)) {
                 // subconfig - deep check
                 if (!this.isUnsafeAsync(fieldRealType)) {
+                    IS_UNSAFE_ASYNC_CACHE.put(configType, true);
                     return true;
                 }
             }
 
             if (ASYNC_BANNED_TYPES.contains(fieldRealType.getCanonicalName())) {
+                IS_UNSAFE_ASYNC_CACHE.put(configType, true);
                 return true;
             }
         }
 
+        IS_UNSAFE_ASYNC_CACHE.put(configType, false);
         return false;
     }
 
