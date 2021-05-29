@@ -20,6 +20,10 @@ public class CommandRunner<T> {
     private Map<String, CommandFieldReplacer<T>> dynamicFields = new LinkedHashMap<>();
     private Plugin plugin;
 
+    public static CommandRunner<?> of(Plugin plugin) {
+        return of(plugin, Bukkit.getConsoleSender());
+    }
+
     public static <T> CommandRunner<T> of(Plugin plugin, T target) {
         return new CommandRunner<T>(plugin, Collections.singletonList(target));
     }
@@ -58,6 +62,10 @@ public class CommandRunner<T> {
     }
 
     public CommandRunner<T> execute(List<String> commands) {
+
+        if (commands.isEmpty()) {
+            return this;
+        }
 
         for (T target : this.targets) {
             commands.stream()
