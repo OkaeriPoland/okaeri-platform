@@ -24,6 +24,7 @@ import org.example.okaeriplatformtest.persistence.PlayerProperties;
 import org.example.okaeriplatformtest.persistence.PlayerRepository;
 
 import java.time.Instant;
+import java.util.Collection;
 import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.ThreadLocalRandom;
@@ -146,7 +147,7 @@ public class TestCommand implements CommandService {
     // testcmd|testing visittest
     @Executor(async = true)
     public String visittest() {
-        return this.playerPersistence.findAll()
+        return this.playerPersistence.streamAll()
                 .filter(entity -> entity.getLastJoinedLocation().getY() > 250)
                 .findFirst()
                 .map(OkaeriConfig::saveToString)
@@ -201,7 +202,7 @@ public class TestCommand implements CommandService {
     @Executor(async = true)
     public void readallplayers(CommandSender sender) {
         long start = System.currentTimeMillis();
-        List<PlayerProperties> all = this.playerPersistence.findAll().collect(Collectors.toList());
+        Collection<PlayerProperties> all = this.playerPersistence.findAll();
         sender.sendMessage(all.stream()
                 .map(properties -> properties.getName() + ": " + properties.getLastJoined())
                 .limit(100)
