@@ -8,6 +8,7 @@ import eu.okaeri.configs.OkaeriConfig;
 import eu.okaeri.configs.schema.ConfigDeclaration;
 import eu.okaeri.configs.schema.FieldDeclaration;
 import eu.okaeri.i18n.configs.LocaleConfig;
+import eu.okaeri.injector.Injectable;
 import eu.okaeri.injector.Injector;
 import eu.okaeri.injector.OkaeriInjector;
 import eu.okaeri.placeholders.bukkit.BukkitPlaceholders;
@@ -16,6 +17,7 @@ import eu.okaeri.platform.bukkit.commons.i18n.I18nCommandsMessages;
 import eu.okaeri.platform.bukkit.commons.i18n.I18nCommandsTextHandler;
 import eu.okaeri.platform.bukkit.commons.i18n.I18nPrefixProvider;
 import eu.okaeri.platform.core.component.ComponentHelper;
+import eu.okaeri.platform.core.component.ExternalResourceProvider;
 import eu.okaeri.platform.core.component.manifest.BeanManifest;
 import eu.okaeri.platform.core.exception.BreakException;
 import lombok.Data;
@@ -43,6 +45,25 @@ public class OkaeriBukkitPlugin extends JavaPlugin {
             "org.bukkit.Location",
             "org.bukkit.World"
     ));
+
+    @SuppressWarnings("unchecked") private static final ExternalResourceProvider EXTERNAL_RESOURCE_PROVIDER = (name, type, source) -> {
+
+        Class<? extends JavaPlugin> sourcePlugin = (Class<? extends JavaPlugin>) source;
+        JavaPlugin plugin = JavaPlugin.getPlugin(sourcePlugin);
+
+        if (plugin == null) {
+            throw new BreakException("cannot provide external resource: " + name + ", " + type + " from " + source + ": cannot find source");
+        }
+
+        Injector externalInjector = ((OkaeriBukkitPlugin) plugin).getInjector();
+        Optional<? extends Injectable<?>> injectable = externalInjector.getInjectable(name, type);
+
+        if (!injectable.isPresent()) {
+            throw new BreakException("cannot provide external resource: " + name + ", " + type + " from " + source + ": cannot find injectable");
+        }
+
+        return injectable.get().getObject();
+    };
 
     @Getter private Injector injector;
     @Getter private Commands commands;
@@ -249,7 +270,7 @@ public class OkaeriBukkitPlugin extends JavaPlugin {
         // load commands/other beans
         try {
             // execute component tree and register everything
-            this.beanManifest.execute(this.creator, this.injector);
+            this.beanManifest.execute(this.creator, this.injector, EXTERNAL_RESOURCE_PROVIDER);
             // sub-components do not require manual injecting because
             // these are filled at the initialization by the DI itself
             // plugin instance however is not, so here it goes

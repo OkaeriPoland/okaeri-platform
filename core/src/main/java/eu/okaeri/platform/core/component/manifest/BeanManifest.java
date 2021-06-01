@@ -5,8 +5,10 @@ import eu.okaeri.injector.Injector;
 import eu.okaeri.injector.annotation.Inject;
 import eu.okaeri.platform.core.DependsOn;
 import eu.okaeri.platform.core.annotation.Bean;
+import eu.okaeri.platform.core.annotation.External;
 import eu.okaeri.platform.core.annotation.Register;
 import eu.okaeri.platform.core.component.ComponentCreator;
+import eu.okaeri.platform.core.component.ExternalResourceProvider;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
@@ -32,6 +34,7 @@ public class BeanManifest {
         manifest.setType(parameter.getType());
         manifest.setName(name);
         manifest.setDepends(Collections.emptyList());
+        manifest.setExternals(Collections.emptyList());
         manifest.setSource(BeanSource.INJECT);
 
         return manifest;
@@ -46,6 +49,7 @@ public class BeanManifest {
         manifest.setName(name);
         manifest.setType(field.getType());
         manifest.setDepends(Collections.emptyList());
+        manifest.setExternals(Collections.emptyList());
         manifest.setSource(BeanSource.INJECT);
 
         return manifest;
@@ -63,6 +67,13 @@ public class BeanManifest {
         manifest.setName("");
         manifest.setSource(BeanSource.COMPONENT);
         manifest.setFullLoad(fullLoad);
+
+        List<External> externals = new ArrayList<>();
+        External.List listAnnotation = clazz.getAnnotation(External.List.class);
+        if (listAnnotation != null) externals.addAll(Arrays.asList(listAnnotation.value()));
+        External externalAnnotation = clazz.getAnnotation(External.class);
+        if (externalAnnotation != null) externals.add(externalAnnotation);
+        manifest.setExternals(externals);
 
         List<BeanManifest> depends = new ArrayList<>();
         manifest.setDepends(depends);
@@ -106,6 +117,7 @@ public class BeanManifest {
         manifest.setName(name);
         manifest.setType(type);
         manifest.setDepends(Collections.emptyList());
+        manifest.setExternals(Collections.emptyList());
         manifest.setSource(BeanSource.INJECT);
 
         return manifest;
@@ -126,6 +138,7 @@ public class BeanManifest {
 //        depends.add(ofRequirement(method.getDeclaringClass(), decapitalize(method.getDeclaringClass().getSimpleName())));
         depends.addAll(Arrays.stream(method.getParameters()).map(BeanManifest::of).collect(Collectors.toList()));
         manifest.setDepends(depends);
+        manifest.setExternals(Collections.emptyList());
 
         manifest.setSource(BeanSource.METHOD);
         manifest.setMethod(method);
@@ -151,6 +164,7 @@ public class BeanManifest {
     private boolean register = true;
     private boolean fullLoad = false;
     private List<BeanManifest> depends;
+    private List<External> externals;
     private Map<DependencyPair, Integer> failCounter = new HashMap<>();
 
     @Data
@@ -239,6 +253,24 @@ public class BeanManifest {
         }
     }
 
+    private void injectExternals(Injector injector, ExternalResourceProvider resourceProvider) {
+
+        for (External external : this.getExternals()) {
+            if (injector.getExact(external.name(), external.type()).isPresent()) {
+                continue;
+            }
+            Object value = resourceProvider.provide(external.name(), external.type(), external.of());
+            injector.registerInjectable(external.name(), value);
+        }
+
+        for (BeanManifest depend : this.getDepends()) {
+            if (depend.getSource() == BeanSource.INJECT) {
+                continue;
+            }
+            depend.injectExternals(injector, resourceProvider);
+        }
+    }
+
     public boolean ready(Injector injector) {
 
         for (BeanManifest depend : this.depends) {
@@ -277,9 +309,10 @@ public class BeanManifest {
         return this.depends.stream().noneMatch(depend -> depend.getObject() == null);
     }
 
-    public BeanManifest execute(ComponentCreator creator, Injector injector) {
+    public BeanManifest execute(ComponentCreator creator, Injector injector, ExternalResourceProvider resourceProvider) {
 
         long start = System.currentTimeMillis();
+        this.injectExternals(injector, resourceProvider);
 
         while (!this.ready(injector) || (this.fullLoad && !this.fullLoadReady(injector))) {
 
