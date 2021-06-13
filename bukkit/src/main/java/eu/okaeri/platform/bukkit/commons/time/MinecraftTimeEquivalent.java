@@ -5,9 +5,10 @@ import java.util.concurrent.TimeUnit;
 
 // utility exposing easy ready-to-use time->ticks values
 // remember the final time is dependant on the server performance (tps)
-@SuppressWarnings("PointlessArithmeticExpression")
+@SuppressWarnings({"PointlessArithmeticExpression", "FieldNamingConvention"})
 public final class MinecraftTimeEquivalent {
 
+    public static final int SECOND = 1 * 20;
     public static final int SECONDS_1 = 1 * 20;
     public static final int SECONDS_2 = 2 * 20;
     public static final int SECONDS_3 = 3 * 20;
@@ -29,6 +30,7 @@ public final class MinecraftTimeEquivalent {
     public static final int SECONDS_55 = 55 * 20;
     public static final int SECONDS_60 = 60 * 20;
 
+    public static final int MINUTE = 1 * 60 * 20;
     public static final int MINUTES_1 = 1 * 60 * 20;
     public static final int MINUTES_2 = 2 * 60 * 20;
     public static final int MINUTES_3 = 3 * 60 * 20;
@@ -50,6 +52,7 @@ public final class MinecraftTimeEquivalent {
     public static final int MINUTES_55 = 55 * 60 * 20;
     public static final int MINUTES_60 = 60 * 60 * 20;
 
+    public static final int HOUR = 1 * 60 * 60 * 20;
     public static final int HOURS_1 = 1 * 60 * 60 * 20;
     public static final int HOURS_2 = 2 * 60 * 60 * 20;
     public static final int HOURS_3 = 3 * 60 * 60 * 20;

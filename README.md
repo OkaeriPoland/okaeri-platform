@@ -112,7 +112,7 @@ public class ExamplePlugin extends OkaeriBukkitPlugin {
   // delay: time before first call (defaults to same as rate)
   // rate: time between executions (in ticks)
   // async: should runTaskTimerAsynchronously be used
-  @Timer(rate = MinecraftTimeEquivalent.MINUTES_1, async = true)
+  @Timer(rate = MinecraftTimeEquivalent.MINUTE, async = true)
   public void exampleTimer(TestConfig config, @Inject("exampleCounter") AtomicInteger counter) {
     Bukkit.broadcastMessage(config.getGreeting() + " [" + counter.getAndIncrement() + "]");
   }
@@ -130,7 +130,7 @@ public class ExamplePlugin extends OkaeriBukkitPlugin {
   // this also demonstrates using @Timer with classes implementing Runnable
   // SECONDS_1/5 = 20/4 = 4 ticks = tries to teleport 1 player (3rd argument) every 4 ticks
   // it is always recommended to decrease rate before increasing teleportsPerRun
-  @Timer(rate = MinecraftTimeEquivalent.SECONDS_1 / 5)
+  @Timer(rate = MinecraftTimeEquivalent.SECOND / 5)
   public QueuedTeleportsTask configureTeleportsTask(QueuedTeleports teleports) {
     return new QueuedTeleportsTask(teleports, this, 1);
   }
@@ -244,7 +244,7 @@ public class TestListener implements Listener {
 ```java
 // example of timer component class
 // async=true - simulating blocking fetching scenario
-@Timer(rate = MinecraftTimeEquivalent.MINUTES_5, async = true)
+@Timer(rate = MinecraftTimeEquivalent.MINUTES * 5, async = true)
 public class TestTask implements Runnable {
 
   @Inject private TestConfig config;

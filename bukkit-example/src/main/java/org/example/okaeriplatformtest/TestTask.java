@@ -15,7 +15,7 @@ import java.util.Arrays;
 
 // example of timer component class
 // async=true - simulating blocking fetching scenario
-@Timer(rate = MinecraftTimeEquivalent.MINUTES_5, async = true)
+@Timer(rate = MinecraftTimeEquivalent.MINUTE * 5, async = true)
 public class TestTask implements Runnable {
 
     @Inject private TestConfig config;
