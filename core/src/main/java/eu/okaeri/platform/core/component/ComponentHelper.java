@@ -37,7 +37,7 @@ public final class ComponentHelper {
 
             Optional<? extends Injectable<?>> injectable = injector.getInjectable(name, paramType);
             if (!injectable.isPresent()) {
-                throw new RuntimeException("Cannot create @Bean " + displayMethod(method) + ", no injectable of type " + paramType + " [" + name + "] found");
+                throw new RuntimeException("Cannot invoke " + displayMethod(method) + ", no injectable of type " + paramType + " [" + name + "] found");
             }
 
             call[i] = paramType.cast(injectable.get().getObject());
@@ -52,9 +52,9 @@ public final class ComponentHelper {
                 if (exception.getCause() instanceof BreakException) {
                     throw (BreakException) exception.getCause();
                 }
-                throw new RuntimeException("Error creating @Bean " + displayMethod(method), exception.getCause());
+                throw new RuntimeException("Error invoking " + displayMethod(method), exception.getCause());
             }
-            throw new RuntimeException("Error creating @Bean " + displayMethod(method), exception);
+            throw new RuntimeException("Error invoking " + displayMethod(method), exception);
         }
 
         return result;

@@ -125,9 +125,9 @@ public class TestCommand implements CommandService {
 
     // testcmd|testing write1000players
     @Executor(pattern = "writeplayers *", async = true)
-    public void writeplayers(CommandSender sender, @Arg("num") String num) {
+    public void writeplayers(CommandSender sender, @Arg("num") long num) {
         long start = System.currentTimeMillis();
-        for (int i = 0; i < Integer.parseInt(num); i++) {
+        for (int i = 0; i < num; i++) {
             OfflinePlayer randomPlayer = Bukkit.getOfflinePlayer(UUID.randomUUID());
             PlayerProperties properties = this.playerPersistence.get(randomPlayer);
             properties.setName(RandomStringUtils.randomAlphanumeric(8));
@@ -181,9 +181,9 @@ public class TestCommand implements CommandService {
 
     // testcmd|testing findbyworld <world>
     @Executor(pattern = "findbyy *", async = true)
-    public String findbyy(@Arg("world") String y) {
+    public String findbyy(@Arg("world") int y) {
         long start = System.currentTimeMillis();
-        String data = this.playerPersistence.findByLastJoinedLocationY(Integer.parseInt(y))
+        String data = this.playerPersistence.findByLastJoinedLocationY(y)
                 .limit(10)
                 .map(OkaeriConfig::saveToString)
                 .collect(Collectors.joining("\n"));

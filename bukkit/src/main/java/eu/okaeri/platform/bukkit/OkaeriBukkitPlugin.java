@@ -3,6 +3,7 @@ package eu.okaeri.platform.bukkit;
 import eu.okaeri.commands.Commands;
 import eu.okaeri.commands.CommandsManager;
 import eu.okaeri.commands.bukkit.CommandsBukkit;
+import eu.okaeri.commands.bukkit.type.CommandsBukkitTypes;
 import eu.okaeri.commands.injector.CommandsInjector;
 import eu.okaeri.configs.OkaeriConfig;
 import eu.okaeri.configs.schema.ConfigDeclaration;
@@ -11,6 +12,7 @@ import eu.okaeri.i18n.configs.LocaleConfig;
 import eu.okaeri.injector.Injectable;
 import eu.okaeri.injector.Injector;
 import eu.okaeri.injector.OkaeriInjector;
+import eu.okaeri.injector.annotation.PostConstruct;
 import eu.okaeri.placeholders.bukkit.BukkitPlaceholders;
 import eu.okaeri.platform.bukkit.commons.i18n.BI18n;
 import eu.okaeri.platform.bukkit.commons.i18n.I18nCommandsMessages;
@@ -29,6 +31,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.plugin.java.JavaPluginLoader;
 
 import java.io.File;
+import java.lang.reflect.Method;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicReference;
@@ -129,7 +132,7 @@ public class OkaeriBukkitPlugin extends JavaPlugin {
         this.injector.registerInjectable("injector", this.injector);
         // commands
         this.commandsBukkit = CommandsBukkit.of(this).resultHandler(new BukkitCommandsResultHandler());
-        this.commands = CommandsManager.create(CommandsInjector.of(this.commandsBukkit, this.injector));
+        this.commands = CommandsManager.create(CommandsInjector.of(this.commandsBukkit, this.injector)).register(new CommandsBukkitTypes());
         this.injector.registerInjectable("commands", this.commands);
         // manifest
         this.creator = new BukkitComponentCreator(this, this.commands, this.injector);
@@ -275,6 +278,10 @@ public class OkaeriBukkitPlugin extends JavaPlugin {
             // these are filled at the initialization by the DI itself
             // plugin instance however is not, so here it goes
             ComponentHelper.injectComponentFields(this, this.injector);
+            // call PostConstruct
+            this.invokePostConstruct();
+            // call custom enable method
+            this.onPlatformEnabled();
         }
         // handle break signal
         catch (BreakException exception) {
@@ -290,9 +297,24 @@ public class OkaeriBukkitPlugin extends JavaPlugin {
                 "timers: " + this.creator.getLoadedTimers().size() + ", " +
                 "localeConfigs: " + this.creator.getLoadedLocaleConfigs().size() +
                 ") [blocking: " + took + " ms]");
+    }
 
-        // call custom enable method
-        this.onPlatformEnabled();
+    private void invokePostConstruct() {
+
+        List<Method> postConstructs = Arrays.stream(this.getClass().getDeclaredMethods())
+                .filter(method -> method.getAnnotation(PostConstruct.class) != null)
+                .sorted(Comparator.comparingInt(method -> method.getAnnotation(PostConstruct.class).order()))
+                .collect(Collectors.toList());
+
+        for (Method postConstruct : postConstructs) {
+
+            Object result = ComponentHelper.invokeMethod(this, postConstruct, this.injector);
+            if (result == null) {
+                continue;
+            }
+
+            this.injector.registerInjectable(postConstruct.getName(), result);
+        }
     }
 
     @Override
