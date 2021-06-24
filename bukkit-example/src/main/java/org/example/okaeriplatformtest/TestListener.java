@@ -2,8 +2,8 @@ package org.example.okaeriplatformtest;
 
 import eu.okaeri.commands.bukkit.handler.CommandsUnknownErrorEvent;
 import eu.okaeri.commands.service.CommandContext;
+import eu.okaeri.commons.bukkit.teleport.QueuedTeleports;
 import eu.okaeri.injector.annotation.Inject;
-import eu.okaeri.platform.bukkit.commons.teleport.QueuedTeleports;
 import eu.okaeri.platform.core.annotation.Component;
 import org.bukkit.Location;
 import org.bukkit.Server;
@@ -14,8 +14,8 @@ import org.bukkit.event.player.AsyncPlayerChatEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitScheduler;
-import org.example.okaeriplatformtest.persistence.PlayerRepository;
 import org.example.okaeriplatformtest.persistence.PlayerProperties;
+import org.example.okaeriplatformtest.persistence.PlayerRepository;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
