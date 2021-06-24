@@ -1,6 +1,10 @@
 package org.example.okaeriplatformtest;
 
 import com.zaxxer.hikari.HikariConfig;
+import eu.okaeri.commons.bukkit.item.ItemStackBuilder;
+import eu.okaeri.commons.bukkit.teleport.QueuedTeleports;
+import eu.okaeri.commons.bukkit.teleport.QueuedTeleportsTask;
+import eu.okaeri.commons.bukkit.time.MinecraftTimeEquivalent;
 import eu.okaeri.configs.json.simple.JsonSimpleConfigurer;
 import eu.okaeri.configs.yaml.bukkit.serdes.SerdesBukkit;
 import eu.okaeri.injector.annotation.Inject;
@@ -12,11 +16,7 @@ import eu.okaeri.persistence.jdbc.MariaDbPersistence;
 import eu.okaeri.persistence.redis.RedisPersistence;
 import eu.okaeri.platform.bukkit.OkaeriBukkitPlugin;
 import eu.okaeri.platform.bukkit.annotation.Timer;
-import eu.okaeri.platform.bukkit.commons.item.ItemStackBuilder;
-import eu.okaeri.platform.bukkit.commons.persistence.YamlBukkitPersistence;
-import eu.okaeri.platform.bukkit.commons.teleport.QueuedTeleports;
-import eu.okaeri.platform.bukkit.commons.teleport.QueuedTeleportsTask;
-import eu.okaeri.platform.bukkit.commons.time.MinecraftTimeEquivalent;
+import eu.okaeri.platform.bukkit.persistence.YamlBukkitPersistence;
 import eu.okaeri.platform.core.annotation.Bean;
 import eu.okaeri.platform.core.annotation.Register;
 import io.lettuce.core.RedisClient;

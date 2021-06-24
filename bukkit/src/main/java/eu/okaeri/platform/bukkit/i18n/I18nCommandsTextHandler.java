@@ -1,4 +1,4 @@
-package eu.okaeri.platform.bukkit.commons.i18n;
+package eu.okaeri.platform.bukkit.i18n;
 
 import eu.okaeri.commands.handler.TextHandler;
 import eu.okaeri.commands.service.CommandContext;

@@ -1,4 +1,4 @@
-package eu.okaeri.platform.bukkit.commons.i18n;
+package eu.okaeri.platform.bukkit.i18n;
 
 import eu.okaeri.configs.OkaeriConfig;
 import lombok.Getter;

@@ -1,4 +1,4 @@
-package eu.okaeri.platform.bukkit.commons.persistence;
+package eu.okaeri.platform.bukkit.persistence;
 
 import eu.okaeri.configs.yaml.bukkit.YamlBukkitConfigurer;
 import eu.okaeri.configs.yaml.bukkit.serdes.SerdesBukkit;
