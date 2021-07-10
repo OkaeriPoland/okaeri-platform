@@ -37,6 +37,7 @@ import eu.okaeri.platform.core.component.ComponentHelper;
 import eu.okaeri.platform.core.component.manifest.BeanManifest;
 import eu.okaeri.platform.core.component.manifest.BeanSource;
 import lombok.Getter;
+import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.bukkit.Bukkit;
 import org.bukkit.event.EventHandler;
@@ -82,7 +83,7 @@ public class BukkitComponentCreator implements ComponentCreator {
                 .forEach(line -> this.plugin.getLogger().info(line));
     }
 
-    private void log(String message) {
+    private void log(@NonNull String message) {
         if (Bukkit.isPrimaryThread()) {
             Arrays.stream(("- " + message).split("\n"))
                     .forEach(line -> this.plugin.getLogger().info(line));
@@ -92,7 +93,7 @@ public class BukkitComponentCreator implements ComponentCreator {
     }
 
     @Override
-    public boolean isComponent(Class<?> type) {
+    public boolean isComponent(@NonNull Class<?> type) {
         return (type.getAnnotation(Component.class) != null)
                 || (type.getAnnotation(Timer.class) != null)
                 || (type.getAnnotation(Configuration.class) != null)
@@ -103,14 +104,14 @@ public class BukkitComponentCreator implements ComponentCreator {
     }
 
     @Override
-    public boolean isComponentMethod(Method method) {
+    public boolean isComponentMethod(@NonNull Method method) {
         return (method.getAnnotation(Bean.class) != null)
                 || (method.getAnnotation(Timer.class) != null);
     }
 
     @Override
     @SuppressWarnings({"unchecked", "ResultOfMethodCallIgnored"})
-    public Object makeObject(BeanManifest manifest, Injector injector) {
+    public Object makeObject(@NonNull BeanManifest manifest, @NonNull Injector injector) {
 
         // validation
         if (!Arrays.asList(BeanSource.METHOD, BeanSource.COMPONENT).contains(manifest.getSource())) {
@@ -411,7 +412,7 @@ public class BukkitComponentCreator implements ComponentCreator {
         return beanObject;
     }
 
-    private void registerListener(Listener listener) {
+    private void registerListener(@NonNull Listener listener) {
 
         this.plugin.getServer().getPluginManager().registerEvents(listener, this.plugin);
         this.loadedListeners.add(listener);
@@ -424,7 +425,7 @@ public class BukkitComponentCreator implements ComponentCreator {
         this.log("Added listener: " + listener.getClass().getSimpleName() + " { " + listenerMethods + " }");
     }
 
-    private void registerCommand(CommandService commandService) {
+    private void registerCommand(@NonNull CommandService commandService) {
 
         if (this.commands == null) {
             throw new IllegalArgumentException("cannot register command service with commands provider being null");
@@ -447,7 +448,7 @@ public class BukkitComponentCreator implements ComponentCreator {
         this.log("Added command: " + commandService.getClass().getSimpleName() + " { " + commandMetaString + " }");
     }
 
-    private void registerTimer(Timer timer, Runnable runnable, String nameOverride) {
+    private void registerTimer(@NonNull Timer timer, @NonNull Runnable runnable, String nameOverride) {
 
         int delay = (timer.delay() == -1) ? timer.rate() : timer.delay();
         BukkitScheduler scheduler = this.plugin.getServer().getScheduler();

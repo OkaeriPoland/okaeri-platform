@@ -22,10 +22,7 @@ import eu.okaeri.platform.core.component.ComponentHelper;
 import eu.okaeri.platform.core.component.ExternalResourceProvider;
 import eu.okaeri.platform.core.component.manifest.BeanManifest;
 import eu.okaeri.platform.core.exception.BreakException;
-import lombok.Data;
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
-import lombok.SneakyThrows;
+import lombok.*;
 import org.bukkit.plugin.PluginDescriptionFile;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.plugin.java.JavaPluginLoader;
@@ -103,13 +100,13 @@ public class OkaeriBukkitPlugin extends JavaPlugin {
         this.preloadData("LocaleConfig", this::preloadLocaleConfig);
     }
 
-    private Thread createPreloadThread(String name, Runnable runnable) {
+    private Thread createPreloadThread(@NonNull String name, @NonNull Runnable runnable) {
         Thread preloader = new Thread(runnable);
         preloader.setName("Okaeri Platform Preloader (" + this.getName() + ") - " + name);
         return preloader;
     }
 
-    private void preloadData(String name, Runnable runnable) {
+    private void preloadData(@NonNull String name, @NonNull Runnable runnable) {
 
         AsyncLoader asyncLoader = new AsyncLoader(name, runnable);
         Thread preloader = this.createPreloadThread(name, () -> {
@@ -164,7 +161,7 @@ public class OkaeriBukkitPlugin extends JavaPlugin {
     }
 
     @SuppressWarnings("unchecked")
-    private boolean isUnsafeAsync(Class<?> configType) {
+    private boolean isUnsafeAsync(@NonNull Class<?> configType) {
 
         ConfigDeclaration declaration = ConfigDeclaration.of(configType);
         Boolean cachedResult = IS_UNSAFE_ASYNC_CACHE.get(configType);
