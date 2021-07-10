@@ -11,6 +11,7 @@ import eu.okaeri.platform.core.component.ComponentCreator;
 import eu.okaeri.platform.core.component.ExternalResourceProvider;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NonNull;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
@@ -25,7 +26,7 @@ public class BeanManifest {
 
     private static final Logger LOGGER = Logger.getLogger(BeanManifest.class.getName());
 
-    public static BeanManifest of(Parameter parameter) {
+    public static BeanManifest of(@NonNull Parameter parameter) {
 
         Inject inject = parameter.getAnnotation(Inject.class);
         String name = (inject == null) ? "" : inject.value();
@@ -40,7 +41,7 @@ public class BeanManifest {
         return manifest;
     }
 
-    private static BeanManifest of(Field field) {
+    private static BeanManifest of(@NonNull Field field) {
 
         Inject inject = field.getAnnotation(Inject.class);
         String name = (inject == null) ? "" : inject.value();
@@ -55,7 +56,7 @@ public class BeanManifest {
         return manifest;
     }
 
-    public static BeanManifest of(Class<?> clazz, ComponentCreator creator, boolean fullLoad) {
+    public static BeanManifest of(@NonNull Class<?> clazz, @NonNull ComponentCreator creator, boolean fullLoad) {
 
         if (!creator.isComponent(clazz)) {
             throw new IllegalArgumentException("Cannot create manifest of non-component " + clazz);
@@ -111,7 +112,7 @@ public class BeanManifest {
         return manifest;
     }
 
-    private static BeanManifest ofRequirement(Class<?> type, String name) {
+    private static BeanManifest ofRequirement(@NonNull Class<?> type, @NonNull String name) {
 
         BeanManifest manifest = new BeanManifest();
         manifest.setName(name);
@@ -123,7 +124,7 @@ public class BeanManifest {
         return manifest;
     }
 
-    public static BeanManifest of(Method method, ComponentCreator creator) {
+    public static BeanManifest of(@NonNull Method method, @NonNull ComponentCreator creator) {
 
         Bean annotation = method.getAnnotation(Bean.class);
         if ((annotation == null) && !creator.isComponentMethod(method)) {
@@ -147,7 +148,7 @@ public class BeanManifest {
         return manifest;
     }
 
-    public static BeanManifest of(Register register, ComponentCreator creator) {
+    public static BeanManifest of(@NonNull Register register, @NonNull ComponentCreator creator) {
 
         BeanManifest manifest = of(register.value(), creator, false);
         manifest.setRegister(register.register());
@@ -174,22 +175,22 @@ public class BeanManifest {
         private Class<?> type;
     }
 
-    public BeanManifest withDepend(int pos, BeanManifest beanManifest) {
+    public BeanManifest withDepend(@NonNull int pos, BeanManifest beanManifest) {
         this.depends.add(pos, beanManifest);
         return this;
     }
 
-    public BeanManifest withDepend(BeanManifest beanManifest) {
+    public BeanManifest withDepend(@NonNull BeanManifest beanManifest) {
         this.depends.add(beanManifest);
         return this;
     }
 
-    public BeanManifest name(String name) {
+    public BeanManifest name(@NonNull String name) {
         this.name = name;
         return this;
     }
 
-    public BeanManifest update(ComponentCreator creator, Injector injector) {
+    public BeanManifest update(@NonNull ComponentCreator creator, @NonNull Injector injector) {
 
         if (this.object == null) {
             Optional<? extends Injectable<?>> injectable = injector.getExact(this.name, this.type);
@@ -207,13 +208,13 @@ public class BeanManifest {
         return this;
     }
 
-    private void updateAllDependencies(ComponentCreator creator, Injector injector) {
+    private void updateAllDependencies(@NonNull ComponentCreator creator, @NonNull Injector injector) {
         for (BeanManifest depend : this.depends) {
             depend.update(creator, injector);
         }
     }
 
-    private void invokeMethodDependencies(ComponentCreator creator, Injector injector) {
+    private void invokeMethodDependencies(@NonNull ComponentCreator creator, @NonNull Injector injector) {
         for (BeanManifest depend : this.depends) {
 
             if ((this.object == null) || !depend.ready(injector) || (depend.getSource() != BeanSource.METHOD) || (depend.getObject() != null)) {
@@ -240,7 +241,7 @@ public class BeanManifest {
         }
     }
 
-    private void invokeInjectDependencies(Injector injector) {
+    private void invokeInjectDependencies(@NonNull Injector injector) {
         for (BeanManifest depend : this.depends) {
             if ((depend.getSource() != BeanSource.INJECT) || (depend.getObject() != null)) {
                 continue;
@@ -253,7 +254,7 @@ public class BeanManifest {
         }
     }
 
-    private void injectExternals(Injector injector, ExternalResourceProvider resourceProvider) {
+    private void injectExternals(@NonNull Injector injector, @NonNull ExternalResourceProvider resourceProvider) {
 
         for (External external : this.getExternals()) {
             if (injector.getExact(external.name(), external.type()).isPresent()) {
@@ -271,7 +272,7 @@ public class BeanManifest {
         }
     }
 
-    public boolean ready(Injector injector) {
+    public boolean ready(@NonNull Injector injector) {
 
         for (BeanManifest depend : this.depends) {
 
@@ -305,11 +306,11 @@ public class BeanManifest {
         return true;
     }
 
-    private boolean fullLoadReady(Injector injector) {
+    private boolean fullLoadReady(@NonNull Injector injector) {
         return this.depends.stream().noneMatch(depend -> depend.getObject() == null);
     }
 
-    public BeanManifest execute(ComponentCreator creator, Injector injector, ExternalResourceProvider resourceProvider) {
+    public BeanManifest execute(@NonNull ComponentCreator creator, @NonNull Injector injector, @NonNull ExternalResourceProvider resourceProvider) {
 
         long start = System.currentTimeMillis();
         this.injectExternals(injector, resourceProvider);
@@ -327,7 +328,7 @@ public class BeanManifest {
         return this;
     }
 
-    public static String nameClass(Class<?> clazz) {
+    public static String nameClass(@NonNull Class<?> clazz) {
         String text = clazz.getSimpleName();
         char chars[] = text.toCharArray();
         chars[0] = Character.toLowerCase(chars[0]);

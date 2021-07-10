@@ -8,6 +8,7 @@ import eu.okaeri.i18n.configs.impl.MOCI18n;
 import eu.okaeri.i18n.message.Message;
 import eu.okaeri.placeholders.message.CompiledMessage;
 import lombok.Getter;
+import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import org.bukkit.ChatColor;
@@ -32,7 +33,7 @@ public class BI18n extends MOCI18n {
     private I18nPrefixProvider prefixProvider;
 
     @Override
-    public OCI18n<CompiledMessage, Message> registerConfig(Locale locale, LocaleConfig config) {
+    public OCI18n<CompiledMessage, Message> registerConfig(@NonNull Locale locale, @NonNull LocaleConfig config) {
         this.update(config);
         this.configs.put(locale, config);
         return super.registerConfig(locale, config);
@@ -52,7 +53,7 @@ public class BI18n extends MOCI18n {
     }
 
     @Override
-    public Message get(Object entity, String key) {
+    public Message get(@NonNull Object entity, @NonNull String key) {
 
         Message message = super.get(entity, key);
         String raw = message.raw();
@@ -66,7 +67,7 @@ public class BI18n extends MOCI18n {
         return message;
     }
 
-    private void update(LocaleConfig config) {
+    private void update(@NonNull LocaleConfig config) {
 
         if ((config.getBindFile() != null) && config.getBindFile().exists()) config.load(true);
         ConfigDeclaration declaration = config.getDeclaration();
@@ -121,7 +122,7 @@ public class BI18n extends MOCI18n {
         this.prefixProvider = (entity, key) -> prefix;
     }
 
-    private boolean hasColors(String text) {
+    private boolean hasColors(@NonNull String text) {
         return ALT_COLOR_PATTERN.matcher(text).find();
     }
 }

@@ -5,6 +5,7 @@ import eu.okaeri.injector.Injector;
 import eu.okaeri.injector.annotation.Inject;
 import eu.okaeri.platform.core.component.manifest.BeanManifest;
 import eu.okaeri.platform.core.exception.BreakException;
+import lombok.NonNull;
 import lombok.SneakyThrows;
 
 import java.lang.reflect.Field;
@@ -17,11 +18,11 @@ import java.util.stream.Collectors;
 
 public final class ComponentHelper {
 
-    public static Object invokeMethod(BeanManifest manifest, Injector injector) {
+    public static Object invokeMethod(@NonNull BeanManifest manifest, @NonNull Injector injector) {
         return invokeMethod(manifest.getParent(), manifest.getMethod(), injector);
     }
 
-    public static Object invokeMethod(Object object, Method method, Injector injector) {
+    public static Object invokeMethod(@NonNull Object object, @NonNull Method method, @NonNull Injector injector) {
 
         // gain access *hackerman*
         method.setAccessible(true);
@@ -61,7 +62,7 @@ public final class ComponentHelper {
     }
 
     @SneakyThrows
-    public static void injectComponentFields(Object component, Injector injector) {
+    public static void injectComponentFields(Object component, @NonNull Injector injector) {
 
         if (component == null) return;
         Class<?> beanClazz = component.getClass();
@@ -85,7 +86,7 @@ public final class ComponentHelper {
         }
     }
 
-    public static String displayMethod(Method method) {
+    public static String displayMethod(@NonNull Method method) {
         return  method.getReturnType().getSimpleName() + "->" + method.getName()
                 + "(" + Arrays.stream(method.getParameters())
                 .map(parameter -> parameter.getType().getSimpleName())

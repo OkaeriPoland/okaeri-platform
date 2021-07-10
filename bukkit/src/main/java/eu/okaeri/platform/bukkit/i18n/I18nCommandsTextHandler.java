@@ -4,6 +4,7 @@ import eu.okaeri.commands.handler.TextHandler;
 import eu.okaeri.commands.service.CommandContext;
 import eu.okaeri.commands.service.InvocationContext;
 import eu.okaeri.i18n.message.Message;
+import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.bukkit.command.CommandSender;
 
@@ -16,12 +17,12 @@ public class I18nCommandsTextHandler implements TextHandler {
 
     private final Set<BI18n> i18n;
 
-    public I18nCommandsTextHandler(BI18n i18n) {
+    public I18nCommandsTextHandler(@NonNull BI18n i18n) {
         this(new HashSet<>(Collections.singletonList(i18n)));
     }
 
     @Override
-    public String resolve(CommandContext commandContext, InvocationContext invocationContext, String text) {
+    public String resolve(@NonNull CommandContext commandContext, @NonNull InvocationContext invocationContext, @NonNull String text) {
 
         if (!text.startsWith("!")) {
             return text;
@@ -40,7 +41,7 @@ public class I18nCommandsTextHandler implements TextHandler {
         return this.isValid(value, key) ? value : text;
     }
 
-    private boolean isValid(String value, String key) {
+    private boolean isValid(String value, @NonNull String key) {
         return (value != null) && !("<" + key + ">").equals(value);
     }
 }
