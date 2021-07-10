@@ -5,7 +5,7 @@
     <parent>
         <artifactId>okaeri-platform</artifactId>
         <groupId>eu.okaeri</groupId>
-        <version>0.3.12</version>
+        <version>0.3.13</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
@@ -21,43 +21,43 @@
         <dependency>
             <groupId>eu.okaeri</groupId>
             <artifactId>okaeri-platform-core</artifactId>
-            <version>0.3.12</version>
+            <version>0.3.13</version>
         </dependency>
 
         <!-- commons -->
         <dependency>
             <groupId>eu.okaeri</groupId>
             <artifactId>okaeri-commons-bukkit</artifactId>
-            <version>0.1.0</version>
+            <version>0.1.1</version>
         </dependency>
 
         <!-- persistence -->
         <dependency>
             <groupId>eu.okaeri</groupId>
             <artifactId>okaeri-persistence-flat</artifactId>
-            <version>1.4.5</version>
+            <version>1.4.8</version>
         </dependency>
 
         <!-- configs -->
         <dependency>
             <groupId>eu.okaeri</groupId>
             <artifactId>okaeri-configs-yaml-bukkit</artifactId>
-            <version>2.7.20</version>
+            <version>2.7.23</version>
         </dependency>
         <dependency>
             <groupId>eu.okaeri</groupId>
             <artifactId>okaeri-configs-serdes-bukkit</artifactId>
-            <version>2.7.20</version>
+            <version>2.7.23</version>
         </dependency>
         <dependency>
             <groupId>eu.okaeri</groupId>
             <artifactId>okaeri-configs-serdes-commons</artifactId>
-            <version>2.7.20</version>
+            <version>2.7.23</version>
         </dependency>
         <dependency>
             <groupId>eu.okaeri</groupId>
             <artifactId>okaeri-configs-validator-okaeri</artifactId>
-            <version>2.7.20</version>
+            <version>2.7.23</version>
         </dependency>
 
         <!-- messages -->
@@ -71,12 +71,12 @@
         <dependency>
             <groupId>eu.okaeri</groupId>
             <artifactId>okaeri-commands-bukkit</artifactId>
-            <version>0.5.0</version>
+            <version>0.5.1</version>
         </dependency>
         <dependency>
             <groupId>eu.okaeri</groupId>
             <artifactId>okaeri-commands-injector</artifactId>
-            <version>0.5.0</version>
+            <version>0.5.1</version>
         </dependency>
 
         <!-- spigot -->
