@@ -5,6 +5,7 @@ import eu.okaeri.commands.CommandsManager;
 import eu.okaeri.commands.bukkit.CommandsBukkit;
 import eu.okaeri.commands.bukkit.type.CommandsBukkitTypes;
 import eu.okaeri.commands.injector.CommandsInjector;
+import eu.okaeri.commons.cache.CacheMap;
 import eu.okaeri.configs.OkaeriConfig;
 import eu.okaeri.configs.schema.ConfigDeclaration;
 import eu.okaeri.configs.schema.FieldDeclaration;
@@ -30,7 +31,6 @@ import org.bukkit.plugin.java.JavaPluginLoader;
 import java.io.File;
 import java.lang.reflect.Method;
 import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.logging.Level;
 import java.util.stream.Collectors;
@@ -39,7 +39,8 @@ import java.util.stream.Collectors;
 public class OkaeriBukkitPlugin extends JavaPlugin {
 
     private static boolean useParallelism = Boolean.parseBoolean(System.getProperty("okaeri.platform.parallelism", "true"));
-    private static final Map<Class<?>, Boolean> IS_UNSAFE_ASYNC_CACHE = new ConcurrentHashMap<>();
+
+    private static final Map<Class<?>, Boolean> IS_UNSAFE_ASYNC_CACHE = new CacheMap<>();
     private static final Set<String> ASYNC_BANNED_TYPES = new HashSet<>(Arrays.asList(
             "org.bukkit.block.Block",
             "org.bukkit.Location",
@@ -160,36 +161,18 @@ public class OkaeriBukkitPlugin extends JavaPlugin {
         }
     }
 
-    @SuppressWarnings("unchecked")
-    private boolean isUnsafeAsync(@NonNull Class<?> configType) {
+    private boolean isUnsafeAsync(@NonNull Class<?> fieldType) {
+        return IS_UNSAFE_ASYNC_CACHE.computeIfAbsent(fieldType, (type) -> {
 
-        ConfigDeclaration declaration = ConfigDeclaration.of(configType);
-        Boolean cachedResult = IS_UNSAFE_ASYNC_CACHE.get(configType);
-
-        if (cachedResult != null) {
-            return cachedResult;
-        }
-
-        for (FieldDeclaration field : declaration.getFields()) {
-
-            Class<?> fieldRealType = field.getType().getType();
-
-            if (OkaeriConfig.class.isAssignableFrom(fieldRealType)) {
-                // subconfig - deep check
-                if (!this.isUnsafeAsync(fieldRealType)) {
-                    IS_UNSAFE_ASYNC_CACHE.put(configType, true);
-                    return true;
-                }
+            if (!OkaeriConfig.class.isAssignableFrom(type)) {
+                return ASYNC_BANNED_TYPES.contains(type.getCanonicalName());
             }
 
-            if (ASYNC_BANNED_TYPES.contains(fieldRealType.getCanonicalName())) {
-                IS_UNSAFE_ASYNC_CACHE.put(configType, true);
-                return true;
-            }
-        }
+            ConfigDeclaration declaration = ConfigDeclaration.of(fieldType);
+            Collection<FieldDeclaration> fields = declaration.getFields();
 
-        IS_UNSAFE_ASYNC_CACHE.put(configType, false);
-        return false;
+            return fields.stream().anyMatch((field) -> this.isUnsafeAsync(field.getType().getType()));
+        });
     }
 
     @SneakyThrows
