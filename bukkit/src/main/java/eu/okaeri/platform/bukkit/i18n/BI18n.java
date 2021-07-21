@@ -13,6 +13,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import org.bukkit.ChatColor;
 
+import java.nio.file.Files;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
@@ -41,7 +42,7 @@ public class BI18n extends MOCI18n {
 
     public void load() {
 
-        if ((this.colorsConfig.getBindFile() != null) && this.colorsConfig.getBindFile().exists()) {
+        if ((this.colorsConfig.getBindFile() != null) && Files.exists(this.colorsConfig.getBindFile())) {
             this.colorsConfig.load();
         }
 
@@ -69,7 +70,7 @@ public class BI18n extends MOCI18n {
 
     private void update(@NonNull LocaleConfig config) {
 
-        if ((config.getBindFile() != null) && config.getBindFile().exists()) config.load(true);
+        if ((config.getBindFile() != null) && Files.exists(config.getBindFile())) config.load(true);
         ConfigDeclaration declaration = config.getDeclaration();
 
         for (FieldDeclaration field : declaration.getFields()) {

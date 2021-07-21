@@ -50,6 +50,7 @@ import java.io.*;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.util.*;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
@@ -272,7 +273,7 @@ public class BukkitComponentCreator implements ComponentCreator {
                 Configurer configurer = (provider == Messages.DEFAULT.class) ? new YamlBukkitConfigurer() : this.injector.createInstance(provider);
                 it.withConfigurer(configurer, new SerdesCommons());
                 it.withBindFile(new File(directory, "colors" + suffix));
-                if (it.getBindFile().exists()) it.load(true);
+                if (Files.exists(it.getBindFile())) it.load(true);
                 if (unpack && !directoryExisted) it.saveDefaults();
             });
 
