@@ -14,6 +14,7 @@ import org.bukkit.event.player.AsyncPlayerChatEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitScheduler;
+import org.example.okaeriplatformtest.config.TestConfig;
 import org.example.okaeriplatformtest.persistence.PlayerProperties;
 import org.example.okaeriplatformtest.persistence.PlayerRepository;
 
@@ -29,6 +30,7 @@ public class TestListener implements Listener {
     @Inject private Logger logger; // plugin's logger (name=logger)
     @Inject private Server server;
     @Inject private BukkitScheduler scheduler;
+    @Inject private TestConfig config;
 
     @Inject private QueuedTeleports queuedTeleports;
     @Inject private PlayerRepository playerPersistence;
@@ -42,6 +44,9 @@ public class TestListener implements Listener {
         // subbeans example
         event.setJoinMessage("Willkommen " + event.getPlayer().getName() + "! " + this.plugin.getName() + " is working!\n" + this.subbeanString);
         event.getPlayer().getInventory().addItem(this.rewardItem.clone());
+
+        // get serialized itemstacks from config
+        this.config.getWelcomeItems().forEach(event.getPlayer().getInventory()::addItem);
 
         // accessing persistence layer should be always done async
         // this is especially true for loading and saving

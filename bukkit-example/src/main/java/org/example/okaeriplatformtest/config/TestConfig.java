@@ -1,11 +1,19 @@
 package org.example.okaeriplatformtest.config;
 
+import eu.okaeri.commons.bukkit.item.ItemStackBuilder;
 import eu.okaeri.configs.OkaeriConfig;
 import eu.okaeri.configs.annotation.*;
 import eu.okaeri.platform.core.annotation.Configuration;
 import eu.okaeri.validator.annotation.Size;
 import lombok.Getter;
 import lombok.Setter;
+import org.bukkit.Material;
+import org.bukkit.enchantments.Enchantment;
+import org.bukkit.inventory.ItemFlag;
+import org.bukkit.inventory.ItemStack;
+
+import java.util.Arrays;
+import java.util.Collection;
 
 // automatically created in the plugin dir
 // updates comments and changes (new keys) automatically
@@ -76,4 +84,24 @@ public class TestConfig extends OkaeriConfig {
         @Comment("H2     : jdbc:h2:file:./plugins/OkaeriPlatformBukkitExample/storage;mode=mysql")
         private String uri = "redis://localhost";
     }
+
+    @Comment("Welcome items")
+    private Collection<ItemStack> welcomeItems = Arrays.asList(
+            ItemStackBuilder.of(Material.STONE_PICKAXE, 1)
+                    .withName("&7Picky")
+                    .withLore(Arrays.asList("&fYour first,", "&fpickaxe!"))
+                    .withEnchantment(Enchantment.DURABILITY, 2)
+                    .withFlag(ItemFlag.HIDE_ENCHANTS)
+                    .makeUnbreakable()
+                    .manipulate((item) -> item)
+                    .get(),
+            ItemStackBuilder.of(Material.STONE_SPADE, 1)
+                    .withName("&7Spady")
+                    .withLore(Arrays.asList("&fYour first,", "&fspade!"))
+                    .withEnchantment(Enchantment.DURABILITY, 3)
+                    .withFlag(ItemFlag.HIDE_ENCHANTS)
+                    .makeUnbreakable()
+                    .manipulate((item) -> item)
+                    .get()
+    );
 }
