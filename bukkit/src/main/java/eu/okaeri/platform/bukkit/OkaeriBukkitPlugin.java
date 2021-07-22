@@ -161,18 +161,33 @@ public class OkaeriBukkitPlugin extends JavaPlugin {
         }
     }
 
-    private boolean isUnsafeAsync(@NonNull Class<?> fieldType) {
-        return IS_UNSAFE_ASYNC_CACHE.computeIfAbsent(fieldType, (type) -> {
+    private boolean isUnsafeAsync(@NonNull Class<?> configType) {
 
-            if (!OkaeriConfig.class.isAssignableFrom(type)) {
-                return ASYNC_BANNED_TYPES.contains(type.getCanonicalName());
+        Boolean cachedResult = IS_UNSAFE_ASYNC_CACHE.get(configType);
+        if (cachedResult != null) {
+            return cachedResult;
+        }
+
+        ConfigDeclaration declaration = ConfigDeclaration.of(configType);
+        for (FieldDeclaration field : declaration.getFields()) {
+
+            Class<?> fieldRealType = field.getType().getType();
+            if (field.getType().isConfig()) {
+                // subconfig - deep check
+                if (!this.isUnsafeAsync(fieldRealType)) {
+                    IS_UNSAFE_ASYNC_CACHE.put(configType, true);
+                    return true;
+                }
             }
 
-            ConfigDeclaration declaration = ConfigDeclaration.of(fieldType);
-            Collection<FieldDeclaration> fields = declaration.getFields();
+            if (ASYNC_BANNED_TYPES.contains(fieldRealType.getCanonicalName())) {
+                IS_UNSAFE_ASYNC_CACHE.put(configType, true);
+                return true;
+            }
+        }
 
-            return fields.stream().anyMatch((field) -> this.isUnsafeAsync(field.getType().getType()));
-        });
+        IS_UNSAFE_ASYNC_CACHE.put(configType, false);
+        return false;
     }
 
     @SneakyThrows
