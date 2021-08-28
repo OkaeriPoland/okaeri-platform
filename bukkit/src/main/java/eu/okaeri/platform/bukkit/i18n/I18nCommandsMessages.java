@@ -11,6 +11,7 @@ import eu.okaeri.platform.core.annotation.Messages;
 public class I18nCommandsMessages extends LocaleConfig {
     String commandsSystemUsageTemplate;
     String commandsSystemUsageEntry;
+    String commandsSystemUsageEntryDescription;
     String commandsSystemPermissionError;
     String commandsSystemCommandError;
     String commandsSystemUnknownError;
