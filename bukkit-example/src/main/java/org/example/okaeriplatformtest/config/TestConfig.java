@@ -12,6 +12,7 @@ import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 
@@ -85,6 +86,8 @@ public class TestConfig extends OkaeriConfig {
         private String uri = "redis://localhost";
     }
 
+    // example of Collection/Iterable type fields
+    @TargetType(ArrayList.class)
     @Comment("Welcome items")
     private Collection<ItemStack> welcomeItems = Arrays.asList(
             ItemStackBuilder.of(Material.STONE_PICKAXE, 1)
@@ -93,7 +96,6 @@ public class TestConfig extends OkaeriConfig {
                     .withEnchantment(Enchantment.DURABILITY, 2)
                     .withFlag(ItemFlag.HIDE_ENCHANTS)
                     .makeUnbreakable()
-                    .manipulate((item) -> item)
                     .get(),
             ItemStackBuilder.of(Material.STONE_SPADE, 1)
                     .withName("&7Spady")
@@ -101,7 +103,6 @@ public class TestConfig extends OkaeriConfig {
                     .withEnchantment(Enchantment.DURABILITY, 3)
                     .withFlag(ItemFlag.HIDE_ENCHANTS)
                     .makeUnbreakable()
-                    .manipulate((item) -> item)
                     .get()
     );
 }

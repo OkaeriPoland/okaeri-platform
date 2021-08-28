@@ -18,7 +18,7 @@
         <dependency>
             <groupId>eu.okaeri</groupId>
             <artifactId>okaeri-platform-bukkit</artifactId>
-            <version>0.3.19</version>
+            <version>0.3.20</version>
             <scope>compile</scope>
         </dependency>
 
@@ -26,7 +26,7 @@
         <dependency>
             <groupId>eu.okaeri</groupId>
             <artifactId>okaeri-configs-json-simple</artifactId>
-            <version>3.1.0</version>
+            <version>3.2.2</version>
             <scope>compile</scope>
         </dependency>
 
@@ -109,10 +109,10 @@
                     </transformers>
                     <relocations>
                         <!-- platform -->
-                        <relocation>
-                            <pattern>eu.okaeri.</pattern>
-                            <shadedPattern>org.example.okaeriplatformtest.platform.</shadedPattern>
-                        </relocation>
+<!--                        <relocation>-->
+<!--                            <pattern>eu.okaeri.</pattern>-->
+<!--                            <shadedPattern>org.example.okaeriplatformtest.platform.</shadedPattern>-->
+<!--                        </relocation>-->
                         <!-- redis dependencies -->
                         <relocation>
                             <pattern>io.lettuce.core.</pattern>
