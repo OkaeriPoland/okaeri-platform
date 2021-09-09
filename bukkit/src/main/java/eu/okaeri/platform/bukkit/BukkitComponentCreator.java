@@ -157,6 +157,12 @@ public class BukkitComponentCreator implements ComponentCreator {
 
             long start = System.currentTimeMillis();
             Class<? extends OkaeriConfig> beanClazz = (Class<? extends OkaeriConfig>) manifestType;
+
+            Messages messages = beanClazz.getAnnotation(Messages.class);
+            if (messages != null) {
+                throw new IllegalArgumentException("Cannot register @Messages with raw OkaeriConfig type, use LocaleConfig: " + beanClazz);
+            }
+
             Configuration configuration = beanClazz.getAnnotation(Configuration.class);
             if (configuration == null) {
                 throw new IllegalArgumentException("Cannot auto-register OkaeriConfig without @Configuration annotation, use register=false to just register as instance: " + beanClazz);
