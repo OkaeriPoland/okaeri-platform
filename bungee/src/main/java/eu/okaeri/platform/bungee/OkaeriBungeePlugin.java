@@ -1,60 +1,45 @@
-package eu.okaeri.platform.bukkit;
+package eu.okaeri.platform.bungee;
 
 import eu.okaeri.commands.Commands;
-import eu.okaeri.commands.CommandsManager;
-import eu.okaeri.commands.bukkit.CommandsBukkit;
-import eu.okaeri.commands.bukkit.type.CommandsBukkitTypes;
-import eu.okaeri.commands.injector.CommandsInjector;
-import eu.okaeri.commons.cache.CacheMap;
 import eu.okaeri.configs.OkaeriConfig;
-import eu.okaeri.configs.schema.ConfigDeclaration;
-import eu.okaeri.configs.schema.FieldDeclaration;
 import eu.okaeri.i18n.configs.LocaleConfig;
 import eu.okaeri.injector.Injectable;
 import eu.okaeri.injector.Injector;
 import eu.okaeri.injector.OkaeriInjector;
-import eu.okaeri.placeholders.bukkit.BukkitPlaceholders;
-import eu.okaeri.platform.bukkit.i18n.BI18n;
-import eu.okaeri.platform.bukkit.i18n.I18nCommandsMessages;
-import eu.okaeri.platform.bukkit.i18n.I18nCommandsTextHandler;
-import eu.okaeri.platform.bukkit.i18n.I18nPrefixProvider;
+import eu.okaeri.platform.bungee.i18n.I18nCommandsMessages;
 import eu.okaeri.platform.core.component.ComponentHelper;
 import eu.okaeri.platform.core.component.ExternalResourceProvider;
 import eu.okaeri.platform.core.component.manifest.BeanManifest;
 import eu.okaeri.platform.core.exception.BreakException;
 import lombok.*;
-import org.bukkit.plugin.PluginDescriptionFile;
-import org.bukkit.plugin.java.JavaPlugin;
-import org.bukkit.plugin.java.JavaPluginLoader;
+import net.md_5.bungee.api.ProxyServer;
+import net.md_5.bungee.api.plugin.Plugin;
+import net.md_5.bungee.api.plugin.PluginDescription;
 
-import java.io.File;
-import java.util.*;
-import java.util.concurrent.atomic.AtomicReference;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Optional;
 import java.util.logging.Level;
 import java.util.stream.Collectors;
 
 
-public class OkaeriBukkitPlugin extends JavaPlugin {
+public class OkaeriBungeePlugin extends Plugin {
 
     private static boolean useParallelism = Boolean.parseBoolean(System.getProperty("okaeri.platform.parallelism", "true"));
 
-    private static final Map<Class<?>, Boolean> IS_UNSAFE_ASYNC_CACHE = new CacheMap<>();
-    private static final Set<String> ASYNC_BANNED_TYPES = new HashSet<>(Arrays.asList(
-            "org.bukkit.block.Block",
-            "org.bukkit.Location",
-            "org.bukkit.World"
-    ));
-
     @SuppressWarnings("unchecked") private static final ExternalResourceProvider EXTERNAL_RESOURCE_PROVIDER = (name, type, source) -> {
 
-        Class<? extends JavaPlugin> sourcePlugin = (Class<? extends JavaPlugin>) source;
-        JavaPlugin plugin = JavaPlugin.getPlugin(sourcePlugin);
+        Plugin plugin = ProxyServer.getInstance().getPluginManager().getPlugins().stream()
+                .filter(proxyPlugin -> proxyPlugin.getClass() == source)
+                .findAny()
+                .orElse(null);
 
         if (plugin == null) {
             throw new BreakException("cannot provide external resource: " + name + ", " + type + " from " + source + ": cannot find source");
         }
 
-        Injector externalInjector = ((OkaeriBukkitPlugin) plugin).getInjector();
+        Injector externalInjector = ((OkaeriBungeePlugin) plugin).getInjector();
         Optional<? extends Injectable<?>> injectable = externalInjector.getInjectable(name, type);
 
         if (!injectable.isPresent()) {
@@ -66,19 +51,19 @@ public class OkaeriBukkitPlugin extends JavaPlugin {
 
     @Getter private Injector injector;
     @Getter private Commands commands;
-    @Getter private CommandsBukkit commandsBukkit;
+//    @Getter private CommandsBukkit commandsBukkit; TODO: commands
 
     private BeanManifest beanManifest;
     private BukkitComponentCreator creator;
     private List<AsyncLoader> preloaders = Collections.synchronizedList(new ArrayList<>());
 
-    public OkaeriBukkitPlugin() {
-        this.postBukkitConstruct();
+    public OkaeriBungeePlugin() {
+        this.postBungeeConstruct();
     }
 
-    public OkaeriBukkitPlugin(JavaPluginLoader loader, PluginDescriptionFile description, File dataFolder, File file) {
-        super(loader, description, dataFolder, file);
-        this.postBukkitConstruct();
+    public OkaeriBungeePlugin(ProxyServer proxy, PluginDescription description) {
+        super(proxy, description);
+        this.postBungeeConstruct();
     }
 
     @Data
@@ -91,9 +76,9 @@ public class OkaeriBukkitPlugin extends JavaPlugin {
     }
 
     // let's see who is faster
-    private void postBukkitConstruct() {
-        this.getLogger().info("Preloading " + this.getName() + " " + this.getDescription().getVersion());
-        this.preloadData("Placeholders", () -> BukkitComponentCreator.defaultPlaceholders = BukkitPlaceholders.create(true));
+    private void postBungeeConstruct() {
+        this.getLogger().info("Preloading " + this.getDescription().getName() + " " + this.getDescription().getVersion());
+//        this.preloadData("Placeholders", () -> BukkitComponentCreator.defaultPlaceholders = BukkitPlaceholders.create(true)); TODO: placeholders
         this.preloadData("BeanManifest", this::preloadManifest);
         this.preloadData("Config", this::preloadConfig);
         this.preloadData("LocaleConfig", this::preloadLocaleConfig);
@@ -101,7 +86,7 @@ public class OkaeriBukkitPlugin extends JavaPlugin {
 
     private Thread createPreloadThread(@NonNull String name, @NonNull Runnable runnable) {
         Thread preloader = new Thread(runnable);
-        preloader.setName("Okaeri Platform Preloader (" + this.getName() + ") - " + name);
+        preloader.setName("Okaeri Platform Preloader (" + this.getDescription().getName() + ") - " + name);
         return preloader;
     }
 
@@ -126,10 +111,10 @@ public class OkaeriBukkitPlugin extends JavaPlugin {
         // injector
         this.injector = OkaeriInjector.create(true);
         this.injector.registerInjectable("injector", this.injector);
-        // commands
-        this.commandsBukkit = CommandsBukkit.of(this).resultHandler(new BukkitCommandsResultHandler());
-        this.commands = CommandsManager.create(CommandsInjector.of(this.commandsBukkit, this.injector)).register(new CommandsBukkitTypes());
-        this.injector.registerInjectable("commands", this.commands);
+        // commands TODO: commands
+//        this.commandsBukkit = CommandsBukkit.of(this).resultHandler(new BukkitCommandsResultHandler());
+//        this.commands = CommandsManager.create(CommandsInjector.of(this.commandsBukkit, this.injector)).register(new CommandsBukkitTypes());
+//        this.injector.registerInjectable("commands", this.commands);
         // manifest
         this.creator = new BukkitComponentCreator(this, this.commands, this.injector);
         BeanManifest i18CommandsMessages = BeanManifest.of(I18nCommandsMessages.class, this.creator, false).name("i18n-platform-commands");
@@ -150,42 +135,9 @@ public class OkaeriBukkitPlugin extends JavaPlugin {
                 continue;
             }
 
-            if (this.isUnsafeAsync(depend.getType())) {
-                continue;
-            }
-
             depend.setObject(this.creator.makeObject(depend, this.injector));
             this.injector.registerInjectable(depend.getName(), depend.getObject());
         }
-    }
-
-    private boolean isUnsafeAsync(@NonNull Class<?> configType) {
-
-        Boolean cachedResult = IS_UNSAFE_ASYNC_CACHE.get(configType);
-        if (cachedResult != null) {
-            return cachedResult;
-        }
-
-        ConfigDeclaration declaration = ConfigDeclaration.of(configType);
-        for (FieldDeclaration field : declaration.getFields()) {
-
-            Class<?> fieldRealType = field.getType().getType();
-            if (field.getType().isConfig()) {
-                // subconfig - deep check
-                if (!this.isUnsafeAsync(fieldRealType)) {
-                    IS_UNSAFE_ASYNC_CACHE.put(configType, true);
-                    return true;
-                }
-            }
-
-            if (ASYNC_BANNED_TYPES.contains(fieldRealType.getCanonicalName())) {
-                IS_UNSAFE_ASYNC_CACHE.put(configType, true);
-                return true;
-            }
-        }
-
-        IS_UNSAFE_ASYNC_CACHE.put(configType, false);
-        return false;
     }
 
     @SneakyThrows
@@ -228,25 +180,25 @@ public class OkaeriBukkitPlugin extends JavaPlugin {
             else preloader.run();
         }
 
-        // apply i18n text resolver for commands framework
-        Set<BI18n> i18nCommandsProviders = new HashSet<>();
-        AtomicReference<I18nPrefixProvider> prefixProvider = new AtomicReference<>();
-        this.injector.getInjectable("i18n", BI18n.class)
-                .ifPresent(i18n -> {
-                    BI18n bi18n = i18n.getObject();
-                    prefixProvider.set(bi18n.getPrefixProvider());
-                    i18nCommandsProviders.add(bi18n);
-                });
-        this.injector.getInjectable("i18n-platform-commands", BI18n.class)
-                .ifPresent(i18n -> {
-                    BI18n bi18n = i18n.getObject();
-                    I18nPrefixProvider i18nPrefixProvider = prefixProvider.get();
-                    if (i18nPrefixProvider != null) {
-                        bi18n.setPrefixProvider(i18nPrefixProvider);
-                    }
-                    i18nCommandsProviders.add(bi18n);
-                });
-        this.commandsBukkit.textHandler(new I18nCommandsTextHandler(i18nCommandsProviders));
+        // apply i18n text resolver for commands framework TODO: commands
+//        Set<BI18n> i18nCommandsProviders = new HashSet<>();
+//        AtomicReference<I18nPrefixProvider> prefixProvider = new AtomicReference<>();
+//        this.injector.getInjectable("i18n", BI18n.class)
+//                .ifPresent(i18n -> {
+//                    BI18n bi18n = i18n.getObject();
+//                    prefixProvider.set(bi18n.getPrefixProvider());
+//                    i18nCommandsProviders.add(bi18n);
+//                });
+//        this.injector.getInjectable("i18n-platform-commands", BI18n.class)
+//                .ifPresent(i18n -> {
+//                    BI18n bi18n = i18n.getObject();
+//                    I18nPrefixProvider i18nPrefixProvider = prefixProvider.get();
+//                    if (i18nPrefixProvider != null) {
+//                        bi18n.setPrefixProvider(i18nPrefixProvider);
+//                    }
+//                    i18nCommandsProviders.add(bi18n);
+//                });
+//        this.commandsBukkit.textHandler(new I18nCommandsTextHandler(i18nCommandsProviders));
 
         // dispatch async logs
         // to show that these were loaded
@@ -255,13 +207,12 @@ public class OkaeriBukkitPlugin extends JavaPlugin {
 
         // register injectables
         this.injector
-                .registerInjectable("server", this.getServer())
+                .registerInjectable("proxy", this.getProxy())
                 .registerInjectable("dataFolder", this.getDataFolder())
                 .registerInjectable("logger", this.getLogger())
                 .registerInjectable("plugin", this)
-                .registerInjectable("scheduler", this.getServer().getScheduler())
-                .registerInjectable("scoreboardManager", this.getServer().getScoreboardManager())
-                .registerInjectable("pluginManager", this.getServer().getPluginManager());
+                .registerInjectable("scheduler", this.getProxy().getScheduler())
+                .registerInjectable("pluginManager", this.getProxy().getPluginManager());
 
         // load commands/other beans
         try {
