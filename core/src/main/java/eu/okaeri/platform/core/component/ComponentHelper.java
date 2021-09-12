@@ -3,6 +3,7 @@ package eu.okaeri.platform.core.component;
 import eu.okaeri.injector.Injectable;
 import eu.okaeri.injector.Injector;
 import eu.okaeri.injector.annotation.Inject;
+import eu.okaeri.injector.annotation.PostConstruct;
 import eu.okaeri.platform.core.component.manifest.BeanManifest;
 import eu.okaeri.platform.core.exception.BreakException;
 import lombok.NonNull;
@@ -13,6 +14,8 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
 import java.util.Arrays;
+import java.util.Comparator;
+import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -91,5 +94,27 @@ public final class ComponentHelper {
                 + "(" + Arrays.stream(method.getParameters())
                 .map(parameter -> parameter.getType().getSimpleName())
                 .collect(Collectors.joining(", ")) + ")";
+    }
+
+    public static void invokePostConstruct(Object object, @NonNull Injector injector) {
+
+        if (object == null) {
+            return;
+        }
+
+        List<Method> postConstructs = Arrays.stream(object.getClass().getDeclaredMethods())
+                .filter(method -> method.getAnnotation(PostConstruct.class) != null)
+                .sorted(Comparator.comparingInt(method -> method.getAnnotation(PostConstruct.class).order()))
+                .collect(Collectors.toList());
+
+        for (Method postConstruct : postConstructs) {
+
+            Object result = ComponentHelper.invokeMethod(object, postConstruct, injector);
+            if (result == null) {
+                continue;
+            }
+
+            injector.registerInjectable(postConstruct.getName(), result);
+        }
     }
 }
