@@ -275,6 +275,8 @@ public class OkaeriBukkitPlugin extends JavaPlugin {
             ComponentHelper.injectComponentFields(this, this.injector);
             // call PostConstruct
             this.invokePostConstruct();
+            // schedule onServerLoad
+            this.getServer().getScheduler().runTaskLater(this, this::onServerLoad, 1);
             // call custom enable method
             this.onPlatformEnabled();
         }
@@ -321,5 +323,8 @@ public class OkaeriBukkitPlugin extends JavaPlugin {
     }
 
     public void onPlatformDisabled() {
+    }
+
+    public void onServerLoad() {
     }
 }
