@@ -1,4 +1,4 @@
-package eu.okaeri.platform.bungee.i18n;
+package eu.okaeri.platform.minecraft.i18n;
 
 import eu.okaeri.configs.annotation.NameModifier;
 import eu.okaeri.configs.annotation.NameStrategy;

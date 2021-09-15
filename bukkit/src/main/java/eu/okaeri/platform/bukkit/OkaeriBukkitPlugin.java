@@ -5,40 +5,37 @@ import eu.okaeri.commands.CommandsManager;
 import eu.okaeri.commands.bukkit.CommandsBukkit;
 import eu.okaeri.commands.bukkit.type.CommandsBukkitTypes;
 import eu.okaeri.commands.injector.CommandsInjector;
-import eu.okaeri.commons.cache.CacheMap;
-import eu.okaeri.configs.OkaeriConfig;
-import eu.okaeri.configs.schema.ConfigDeclaration;
-import eu.okaeri.configs.schema.FieldDeclaration;
-import eu.okaeri.i18n.configs.LocaleConfig;
 import eu.okaeri.injector.Injectable;
 import eu.okaeri.injector.Injector;
 import eu.okaeri.injector.OkaeriInjector;
 import eu.okaeri.placeholders.bukkit.BukkitPlaceholders;
 import eu.okaeri.platform.bukkit.i18n.BI18n;
-import eu.okaeri.platform.bukkit.i18n.I18nCommandsMessages;
 import eu.okaeri.platform.bukkit.i18n.I18nCommandsTextHandler;
-import eu.okaeri.platform.bukkit.i18n.I18nPrefixProvider;
 import eu.okaeri.platform.core.component.ComponentHelper;
 import eu.okaeri.platform.core.component.ExternalResourceProvider;
 import eu.okaeri.platform.core.component.manifest.BeanManifest;
 import eu.okaeri.platform.core.exception.BreakException;
-import lombok.*;
+import eu.okaeri.platform.core.loader.PlatformPreloader;
+import eu.okaeri.platform.minecraft.i18n.I18nCommandsMessages;
+import eu.okaeri.platform.minecraft.i18n.I18nPrefixProvider;
+import lombok.Getter;
+import lombok.SneakyThrows;
 import org.bukkit.plugin.PluginDescriptionFile;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.plugin.java.JavaPluginLoader;
 
 import java.io.File;
-import java.util.*;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Optional;
+import java.util.Set;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.logging.Level;
-import java.util.stream.Collectors;
 
 
 public class OkaeriBukkitPlugin extends JavaPlugin {
 
-    private static boolean useParallelism = Boolean.parseBoolean(System.getProperty("okaeri.platform.parallelism", "true"));
-
-    private static final Map<Class<?>, Boolean> IS_UNSAFE_ASYNC_CACHE = new CacheMap<>();
+    private static final boolean useParallelism = Boolean.parseBoolean(System.getProperty("okaeri.platform.parallelism", "true"));
     private static final Set<String> ASYNC_BANNED_TYPES = new HashSet<>(Arrays.asList(
             "org.bukkit.block.Block",
             "org.bukkit.Location",
@@ -70,56 +67,26 @@ public class OkaeriBukkitPlugin extends JavaPlugin {
 
     private BeanManifest beanManifest;
     private BukkitComponentCreator creator;
-    private List<AsyncLoader> preloaders = Collections.synchronizedList(new ArrayList<>());
+    private final PlatformPreloader preloader = new PlatformPreloader(this.getLogger(), this.getName(), useParallelism, ASYNC_BANNED_TYPES);
 
+    @SuppressWarnings("unused")
     public OkaeriBukkitPlugin() {
         this.postBukkitConstruct();
     }
 
+    @SuppressWarnings("unused")
     public OkaeriBukkitPlugin(JavaPluginLoader loader, PluginDescriptionFile description, File dataFolder, File file) {
         super(loader, description, dataFolder, file);
         this.postBukkitConstruct();
     }
 
-    @Data
-    @RequiredArgsConstructor
-    class AsyncLoader {
-        private final String name;
-        private final Runnable runnable;
-        private Thread thread;
-        private boolean done;
-    }
-
     // let's see who is faster
     private void postBukkitConstruct() {
         this.getLogger().info("Preloading " + this.getName() + " " + this.getDescription().getVersion());
-        this.preloadData("Placeholders", () -> BukkitComponentCreator.defaultPlaceholders = BukkitPlaceholders.create(true));
-        this.preloadData("BeanManifest", this::preloadManifest);
-        this.preloadData("Config", this::preloadConfig);
-        this.preloadData("LocaleConfig", this::preloadLocaleConfig);
-    }
-
-    private Thread createPreloadThread(@NonNull String name, @NonNull Runnable runnable) {
-        Thread preloader = new Thread(runnable);
-        preloader.setName("Okaeri Platform Preloader (" + this.getName() + ") - " + name);
-        return preloader;
-    }
-
-    private void preloadData(@NonNull String name, @NonNull Runnable runnable) {
-
-        AsyncLoader asyncLoader = new AsyncLoader(name, runnable);
-        Thread preloader = this.createPreloadThread(name, () -> {
-            try {
-                runnable.run();
-                asyncLoader.setDone(true);
-            } catch (Throwable exception) {
-                this.getLogger().warning(name + ": " + exception.getMessage());
-            }
-        });
-
-        asyncLoader.setThread(preloader);
-        this.preloaders.add(asyncLoader);
-        if (useParallelism) preloader.start();
+        this.preloader.preloadData("Placeholders", () -> BukkitComponentCreator.defaultPlaceholders = BukkitPlaceholders.create(true));
+        this.preloader.preloadData("BeanManifest", this::preloadManifest);
+        this.preloader.preloadData("Config", this::preloadConfig);
+        this.preloader.preloadData("LocaleConfig", this::preloadLocaleConfig);
     }
 
     private void preloadManifest() {
@@ -137,71 +104,17 @@ public class OkaeriBukkitPlugin extends JavaPlugin {
     }
 
     @SneakyThrows
+    @SuppressWarnings("BusyWait")
     private void preloadConfig() {
-
         while (this.beanManifest == null) Thread.sleep(1);
-        List<BeanManifest> depends = this.beanManifest.getDepends();
-
-        for (BeanManifest depend : depends) {
-
-            if (!OkaeriConfig.class.isAssignableFrom(depend.getType()) // is not okaeri config
-                    || LocaleConfig.class.isAssignableFrom(depend.getType()) // or is locale config
-                    || !depend.ready(this.injector)) { // or is not ready (somehow has dependencies)
-                continue;
-            }
-
-            if (this.isUnsafeAsync(depend.getType())) {
-                continue;
-            }
-
-            depend.setObject(this.creator.makeObject(depend, this.injector));
-            this.injector.registerInjectable(depend.getName(), depend.getObject());
-        }
-    }
-
-    private boolean isUnsafeAsync(@NonNull Class<?> configType) {
-
-        Boolean cachedResult = IS_UNSAFE_ASYNC_CACHE.get(configType);
-        if (cachedResult != null) {
-            return cachedResult;
-        }
-
-        ConfigDeclaration declaration = ConfigDeclaration.of(configType);
-        for (FieldDeclaration field : declaration.getFields()) {
-
-            Class<?> fieldRealType = field.getType().getType();
-            if (field.getType().isConfig()) {
-                // subconfig - deep check
-                if (!this.isUnsafeAsync(fieldRealType)) {
-                    IS_UNSAFE_ASYNC_CACHE.put(configType, true);
-                    return true;
-                }
-            }
-
-            if (ASYNC_BANNED_TYPES.contains(fieldRealType.getCanonicalName())) {
-                IS_UNSAFE_ASYNC_CACHE.put(configType, true);
-                return true;
-            }
-        }
-
-        IS_UNSAFE_ASYNC_CACHE.put(configType, false);
-        return false;
+        this.preloader.preloadConfig(this.beanManifest, this.injector, this.creator);
     }
 
     @SneakyThrows
+    @SuppressWarnings("BusyWait")
     private void preloadLocaleConfig() {
-
         while ((this.beanManifest == null) || (BukkitComponentCreator.defaultPlaceholders == null)) Thread.sleep(1);
-        List<BeanManifest> depends = this.beanManifest.getDepends();
-
-        for (BeanManifest depend : depends) {
-            if (!LocaleConfig.class.isAssignableFrom(depend.getType())  // is not locale config
-                    || !depend.ready(this.injector)) { // or is not ready (somehow has dependencies)
-                continue;
-            }
-            depend.setObject(this.creator.makeObject(depend, this.injector));
-            this.injector.registerInjectable(depend.getName(), depend.getObject());
-        }
+        this.preloader.preloadLocaleConfig(this.beanManifest, this.injector, this.creator);
     }
 
     @Override
@@ -212,21 +125,8 @@ public class OkaeriBukkitPlugin extends JavaPlugin {
         long start = System.currentTimeMillis();
         this.getLogger().info("Initializing " + this.getClass());
 
-        // fallback load
-        this.preloaders.stream()
-                .filter(loader -> !loader.getThread().isAlive())
-                .filter(loader -> !loader.isDone())
-                .map(loader -> {
-                    this.getLogger().warning("- Fallback loading (async fail): " + loader.getName());
-                    return loader.getRunnable();
-                })
-                .forEach(Runnable::run);
-
-        // wait if not initialized yet
-        for (Thread preloader : this.preloaders.stream().map(AsyncLoader::getThread).collect(Collectors.toList())) {
-            if (useParallelism) preloader.join();
-            else preloader.run();
-        }
+        // fallback load & await all
+        this.preloader.fallbackLoadAndAwait();
 
         // apply i18n text resolver for commands framework
         Set<BI18n> i18nCommandsProviders = new HashSet<>();
@@ -283,13 +183,7 @@ public class OkaeriBukkitPlugin extends JavaPlugin {
 
         // woah
         long took = System.currentTimeMillis() - start;
-        this.getLogger().info("= (" +
-                "configs: " + this.creator.getLoadedConfigs().size() + ", " +
-                "commands: " + this.creator.getLoadedCommands().size() + ", " +
-                "listeners: " + this.creator.getLoadedListeners().size() + ", " +
-                "timers: " + this.creator.getLoadedTimers().size() + ", " +
-                "localeConfigs: " + this.creator.getLoadedLocaleConfigs().size() +
-                ") [blocking: " + took + " ms]");
+        this.getLogger().info(this.creator.getSummaryText(took));
     }
 
     @Override

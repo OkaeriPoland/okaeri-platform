@@ -15,7 +15,7 @@
         <!-- core -->
         <dependency>
             <groupId>eu.okaeri</groupId>
-            <artifactId>okaeri-platform-core</artifactId>
+            <artifactId>okaeri-platform-minecraft</artifactId>
             <version>0.3.21</version>
         </dependency>
 
@@ -24,13 +24,6 @@
             <groupId>eu.okaeri</groupId>
             <artifactId>okaeri-commons-bukkit</artifactId>
             <version>0.1.3</version>
-        </dependency>
-
-        <!-- persistence -->
-        <dependency>
-            <groupId>eu.okaeri</groupId>
-            <artifactId>okaeri-persistence-flat</artifactId>
-            <version>1.5.1</version>
         </dependency>
 
         <!-- configs -->
@@ -42,16 +35,6 @@
         <dependency>
             <groupId>eu.okaeri</groupId>
             <artifactId>okaeri-configs-serdes-bukkit</artifactId>
-            <version>3.3.4</version>
-        </dependency>
-        <dependency>
-            <groupId>eu.okaeri</groupId>
-            <artifactId>okaeri-configs-serdes-commons</artifactId>
-            <version>3.3.4</version>
-        </dependency>
-        <dependency>
-            <groupId>eu.okaeri</groupId>
-            <artifactId>okaeri-configs-validator-okaeri</artifactId>
             <version>3.3.4</version>
         </dependency>
 

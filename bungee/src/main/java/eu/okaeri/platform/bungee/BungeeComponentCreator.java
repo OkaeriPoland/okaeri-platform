@@ -19,11 +19,9 @@ import eu.okaeri.persistence.document.DocumentPersistence;
 import eu.okaeri.persistence.repository.DocumentRepository;
 import eu.okaeri.persistence.repository.RepositoryDeclaration;
 import eu.okaeri.persistence.repository.annotation.DocumentCollection;
-import eu.okaeri.placeholders.Placeholders;
 import eu.okaeri.platform.bungee.annotation.Timer;
 import eu.okaeri.platform.bungee.i18n.BI18n;
 import eu.okaeri.platform.bungee.i18n.I18nColorsConfig;
-import eu.okaeri.platform.bungee.i18n.I18nCommandsMessages;
 import eu.okaeri.platform.bungee.i18n.PlayerLocaleProvider;
 import eu.okaeri.platform.core.DependsOn;
 import eu.okaeri.platform.core.annotation.Bean;
@@ -34,6 +32,7 @@ import eu.okaeri.platform.core.component.ComponentCreator;
 import eu.okaeri.platform.core.component.ComponentHelper;
 import eu.okaeri.platform.core.component.manifest.BeanManifest;
 import eu.okaeri.platform.core.component.manifest.BeanSource;
+import eu.okaeri.platform.minecraft.i18n.I18nCommandsMessages;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
@@ -54,22 +53,22 @@ import java.util.stream.Stream;
 import static eu.okaeri.platform.core.component.ComponentHelper.invokeMethod;
 
 @RequiredArgsConstructor
-public class BukkitComponentCreator implements ComponentCreator {
+public class BungeeComponentCreator implements ComponentCreator {
 
     private static final boolean DEBUG = Boolean.parseBoolean(System.getProperty("okaeri.platform.debug", "false"));
-    public static Placeholders defaultPlaceholders;
+//    public static Placeholders defaultPlaceholders;
 
     private final OkaeriBungeePlugin plugin;
     private final Commands commands;
     private final Injector injector;
 
-    @Getter private List<CommandService> loadedCommands = new ArrayList<>();
-    @Getter private List<Listener> loadedListeners = new ArrayList<>();
+    @Getter private final List<CommandService> loadedCommands = new ArrayList<>();
+    @Getter private final List<Listener> loadedListeners = new ArrayList<>();
 //    @Getter private List<Task> loadedTimers = new ArrayList<>(); TODO: bungee timers
 
-    @Getter private List<OkaeriConfig> loadedConfigs = Collections.synchronizedList(new ArrayList<>());
-    @Getter private List<LocaleConfig> loadedLocaleConfigs = Collections.synchronizedList(new ArrayList<>());
-    @Getter private List<String> asyncLogs = Collections.synchronizedList(new ArrayList<>());
+    @Getter private final List<OkaeriConfig> loadedConfigs = Collections.synchronizedList(new ArrayList<>());
+    @Getter private final List<LocaleConfig> loadedLocaleConfigs = Collections.synchronizedList(new ArrayList<>());
+    @Getter private final List<String> asyncLogs = Collections.synchronizedList(new ArrayList<>());
 
     public void dispatchLogs() {
         this.asyncLogs.stream()
@@ -282,7 +281,7 @@ public class BukkitComponentCreator implements ComponentCreator {
                 BI18n i18n = new BI18n(colorsConfig, messages.prefix().field(), messages.prefix().marker());
                 i18n.setDefaultLocale(defaultLocale);
                 i18n.registerLocaleProvider(new PlayerLocaleProvider());
-                i18n.setPlaceholders(defaultPlaceholders.copy());
+//                i18n.setPlaceholders(defaultPlaceholders.copy());
 
                 List<Locale> loadedLocales = new ArrayList<>();
                 this.injector.registerInjectable(path, template);
@@ -458,5 +457,15 @@ public class BukkitComponentCreator implements ComponentCreator {
 //        String resultingTimerName = ((nameOverride == null) ? runnable.getClass().getSimpleName() : nameOverride);
 //        String timerMeta = "delay = " + delay + ", rate = " + timer.rate() + ", async = " + timer.async();
 //        this.log("Added timer: " + resultingTimerName + " { " + timerMeta + " }");
+    }
+
+    public String getSummaryText(long took) {
+        return "= (" +
+                "configs: " + this.getLoadedConfigs().size() + ", " +
+                "commands: " + this.getLoadedCommands().size() + ", " +
+                "listeners: " + this.getLoadedListeners().size() + ", " +
+//                "timers: " + this.getLoadedTimers().size() + ", " +
+                "localeConfigs: " + this.getLoadedLocaleConfigs().size() +
+                ") [blocking: " + took + " ms]";
     }
 }
