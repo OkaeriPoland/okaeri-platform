@@ -22,7 +22,7 @@ public class TestLocaleConfig extends LocaleConfig {
     // keys ending with: fail, failed result in &c colored message
     // keys ending with: success, succeeded result in &a colored message
     // any other keys with uncolored messages result in &e colored message
-    // for details and defining custom patterns see bukkit/I18N_COLORS.md
+    // for details and defining custom patterns see minecraft/I18N_COLORS.md
     // you can define such file same way as locales in the plugin's resources
     // e.g. {path}/es.yml, {path}/colors.yml, or use default values (recommended)
     private String commandsReloadSuccess = "The configuration has been reloaded!"; // same as: &aThe configuration has been reloaded!

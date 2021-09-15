@@ -10,6 +10,7 @@
     <version>0.3.21</version>
     <modules>
         <module>core</module>
+        <module>minecraft</module>
         <module>bukkit</module>
         <module>bungee</module>
     </modules>

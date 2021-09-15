@@ -25,7 +25,6 @@ import eu.okaeri.placeholders.bukkit.BukkitPlaceholders;
 import eu.okaeri.platform.bukkit.annotation.Timer;
 import eu.okaeri.platform.bukkit.i18n.BI18n;
 import eu.okaeri.platform.bukkit.i18n.I18nColorsConfig;
-import eu.okaeri.platform.bukkit.i18n.I18nCommandsMessages;
 import eu.okaeri.platform.bukkit.i18n.PlayerLocaleProvider;
 import eu.okaeri.platform.core.DependsOn;
 import eu.okaeri.platform.core.annotation.Bean;
@@ -36,6 +35,7 @@ import eu.okaeri.platform.core.component.ComponentCreator;
 import eu.okaeri.platform.core.component.ComponentHelper;
 import eu.okaeri.platform.core.component.manifest.BeanManifest;
 import eu.okaeri.platform.core.component.manifest.BeanSource;
+import eu.okaeri.platform.minecraft.i18n.I18nCommandsMessages;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
@@ -70,13 +70,13 @@ public class BukkitComponentCreator implements ComponentCreator {
     private final Commands commands;
     private final Injector injector;
 
-    @Getter private List<CommandService> loadedCommands = new ArrayList<>();
-    @Getter private List<Listener> loadedListeners = new ArrayList<>();
-    @Getter private List<BukkitTask> loadedTimers = new ArrayList<>();
+    @Getter private final List<CommandService> loadedCommands = new ArrayList<>();
+    @Getter private final List<Listener> loadedListeners = new ArrayList<>();
+    @Getter private final List<BukkitTask> loadedTimers = new ArrayList<>();
 
-    @Getter private List<OkaeriConfig> loadedConfigs = Collections.synchronizedList(new ArrayList<>());
-    @Getter private List<LocaleConfig> loadedLocaleConfigs = Collections.synchronizedList(new ArrayList<>());
-    @Getter private List<String> asyncLogs = Collections.synchronizedList(new ArrayList<>());
+    @Getter private final List<OkaeriConfig> loadedConfigs = Collections.synchronizedList(new ArrayList<>());
+    @Getter private final List<LocaleConfig> loadedLocaleConfigs = Collections.synchronizedList(new ArrayList<>());
+    @Getter private final List<String> asyncLogs = Collections.synchronizedList(new ArrayList<>());
 
     public void dispatchLogs() {
         this.asyncLogs.stream()
@@ -145,8 +145,8 @@ public class BukkitComponentCreator implements ComponentCreator {
             PersistenceCollection collection = PersistenceCollection.of(manifestType);
             persistence.registerCollection(collection);
 
-            Class<? extends DocumentRepository> repositoryType = (Class<? extends DocumentRepository>) manifestType;
-            RepositoryDeclaration<? extends DocumentRepository> repositoryDeclaration = RepositoryDeclaration.of(repositoryType);
+            Class<? extends DocumentRepository<?, ?>> repositoryType = (Class<? extends DocumentRepository<?, ?>>) manifestType;
+            RepositoryDeclaration<? extends DocumentRepository<?, ?>> repositoryDeclaration = RepositoryDeclaration.of(repositoryType);
             manifest.setName(BeanManifest.nameClass(manifestType));
 
             return repositoryDeclaration.newProxy(persistence, collection, manifestType.getClassLoader());
@@ -469,5 +469,15 @@ public class BukkitComponentCreator implements ComponentCreator {
         String resultingTimerName = ((nameOverride == null) ? runnable.getClass().getSimpleName() : nameOverride);
         String timerMeta = "delay = " + delay + ", rate = " + timer.rate() + ", async = " + timer.async();
         this.log("Added timer: " + resultingTimerName + " { " + timerMeta + " }");
+    }
+
+    public String getSummaryText(long took) {
+        return "= (" +
+                "configs: " + this.getLoadedConfigs().size() + ", " +
+                "commands: " + this.getLoadedCommands().size() + ", " +
+                "listeners: " + this.getLoadedListeners().size() + ", " +
+                "timers: " + this.getLoadedTimers().size() + ", " +
+                "localeConfigs: " + this.getLoadedLocaleConfigs().size() +
+                ") [blocking: " + took + " ms]";
     }
 }

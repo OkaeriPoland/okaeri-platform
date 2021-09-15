@@ -1,34 +1,31 @@
 package eu.okaeri.platform.bungee;
 
-import eu.okaeri.commands.Commands;
-import eu.okaeri.configs.OkaeriConfig;
-import eu.okaeri.i18n.configs.LocaleConfig;
 import eu.okaeri.injector.Injectable;
 import eu.okaeri.injector.Injector;
 import eu.okaeri.injector.OkaeriInjector;
-import eu.okaeri.platform.bungee.i18n.I18nCommandsMessages;
 import eu.okaeri.platform.core.component.ComponentHelper;
 import eu.okaeri.platform.core.component.ExternalResourceProvider;
 import eu.okaeri.platform.core.component.manifest.BeanManifest;
 import eu.okaeri.platform.core.exception.BreakException;
-import lombok.*;
+import eu.okaeri.platform.core.loader.PlatformPreloader;
+import eu.okaeri.platform.minecraft.i18n.I18nCommandsMessages;
+import lombok.Getter;
+import lombok.SneakyThrows;
 import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.plugin.Plugin;
 import net.md_5.bungee.api.plugin.PluginDescription;
+import net.md_5.bungee.protocol.packet.Commands;
 
-import java.util.ArrayList;
 import java.util.Collections;
-import java.util.List;
 import java.util.Optional;
 import java.util.logging.Level;
-import java.util.stream.Collectors;
 
 
 public class OkaeriBungeePlugin extends Plugin {
 
-    private static boolean useParallelism = Boolean.parseBoolean(System.getProperty("okaeri.platform.parallelism", "true"));
+    private static final boolean useParallelism = Boolean.parseBoolean(System.getProperty("okaeri.platform.parallelism", "true"));
 
-    @SuppressWarnings("unchecked") private static final ExternalResourceProvider EXTERNAL_RESOURCE_PROVIDER = (name, type, source) -> {
+    private static final ExternalResourceProvider EXTERNAL_RESOURCE_PROVIDER = (name, type, source) -> {
 
         Plugin plugin = ProxyServer.getInstance().getPluginManager().getPlugins().stream()
                 .filter(proxyPlugin -> proxyPlugin.getClass() == source)
@@ -54,57 +51,28 @@ public class OkaeriBungeePlugin extends Plugin {
 //    @Getter private CommandsBukkit commandsBukkit; TODO: commands
 
     private BeanManifest beanManifest;
-    private BukkitComponentCreator creator;
-    private List<AsyncLoader> preloaders = Collections.synchronizedList(new ArrayList<>());
+    private BungeeComponentCreator creator;
+    private final PlatformPreloader preloader = new PlatformPreloader(this.getLogger(), this.getDescription().getName(), useParallelism, Collections.emptySet());
 
+    @SuppressWarnings("unused")
     public OkaeriBungeePlugin() {
+        super();
         this.postBungeeConstruct();
     }
 
+    @SuppressWarnings("unused")
     public OkaeriBungeePlugin(ProxyServer proxy, PluginDescription description) {
         super(proxy, description);
         this.postBungeeConstruct();
     }
 
-    @Data
-    @RequiredArgsConstructor
-    class AsyncLoader {
-        private final String name;
-        private final Runnable runnable;
-        private Thread thread;
-        private boolean done;
-    }
-
     // let's see who is faster
     private void postBungeeConstruct() {
         this.getLogger().info("Preloading " + this.getDescription().getName() + " " + this.getDescription().getVersion());
-//        this.preloadData("Placeholders", () -> BukkitComponentCreator.defaultPlaceholders = BukkitPlaceholders.create(true)); TODO: placeholders
-        this.preloadData("BeanManifest", this::preloadManifest);
-        this.preloadData("Config", this::preloadConfig);
-        this.preloadData("LocaleConfig", this::preloadLocaleConfig);
-    }
-
-    private Thread createPreloadThread(@NonNull String name, @NonNull Runnable runnable) {
-        Thread preloader = new Thread(runnable);
-        preloader.setName("Okaeri Platform Preloader (" + this.getDescription().getName() + ") - " + name);
-        return preloader;
-    }
-
-    private void preloadData(@NonNull String name, @NonNull Runnable runnable) {
-
-        AsyncLoader asyncLoader = new AsyncLoader(name, runnable);
-        Thread preloader = this.createPreloadThread(name, () -> {
-            try {
-                runnable.run();
-                asyncLoader.setDone(true);
-            } catch (Throwable exception) {
-                this.getLogger().warning(name + ": " + exception.getMessage());
-            }
-        });
-
-        asyncLoader.setThread(preloader);
-        this.preloaders.add(asyncLoader);
-        if (useParallelism) preloader.start();
+//        this.preloader.preloadData("Placeholders", () -> BungeeComponentCreator.defaultPlaceholders = BukkitPlaceholders.create(true)); TODO: placeholders
+        this.preloader.preloadData("BeanManifest", this::preloadManifest);
+        this.preloader.preloadData("Config", this::preloadConfig);
+        this.preloader.preloadData("LocaleConfig", this::preloadLocaleConfig);
     }
 
     private void preloadManifest() {
@@ -116,44 +84,23 @@ public class OkaeriBungeePlugin extends Plugin {
 //        this.commands = CommandsManager.create(CommandsInjector.of(this.commandsBukkit, this.injector)).register(new CommandsBukkitTypes());
 //        this.injector.registerInjectable("commands", this.commands);
         // manifest
-        this.creator = new BukkitComponentCreator(this, this.commands, this.injector);
+        this.creator = new BungeeComponentCreator(this, null, this.injector);
         BeanManifest i18CommandsMessages = BeanManifest.of(I18nCommandsMessages.class, this.creator, false).name("i18n-platform-commands");
         this.beanManifest = BeanManifest.of(this.getClass(), this.creator, true).withDepend(i18CommandsMessages);
     }
 
     @SneakyThrows
+    @SuppressWarnings("BusyWait")
     private void preloadConfig() {
-
         while (this.beanManifest == null) Thread.sleep(1);
-        List<BeanManifest> depends = this.beanManifest.getDepends();
-
-        for (BeanManifest depend : depends) {
-
-            if (!OkaeriConfig.class.isAssignableFrom(depend.getType()) // is not okaeri config
-                    || LocaleConfig.class.isAssignableFrom(depend.getType()) // or is locale config
-                    || !depend.ready(this.injector)) { // or is not ready (somehow has dependencies)
-                continue;
-            }
-
-            depend.setObject(this.creator.makeObject(depend, this.injector));
-            this.injector.registerInjectable(depend.getName(), depend.getObject());
-        }
+        this.preloader.preloadConfig(this.beanManifest, this.injector, this.creator);
     }
 
     @SneakyThrows
+    @SuppressWarnings("BusyWait")
     private void preloadLocaleConfig() {
-
-        while ((this.beanManifest == null) || (BukkitComponentCreator.defaultPlaceholders == null)) Thread.sleep(1);
-        List<BeanManifest> depends = this.beanManifest.getDepends();
-
-        for (BeanManifest depend : depends) {
-            if (!LocaleConfig.class.isAssignableFrom(depend.getType())  // is not locale config
-                    || !depend.ready(this.injector)) { // or is not ready (somehow has dependencies)
-                continue;
-            }
-            depend.setObject(this.creator.makeObject(depend, this.injector));
-            this.injector.registerInjectable(depend.getName(), depend.getObject());
-        }
+        while (this.beanManifest == null) Thread.sleep(1);
+        this.preloader.preloadLocaleConfig(this.beanManifest, this.injector, this.creator);
     }
 
     @Override
@@ -164,21 +111,8 @@ public class OkaeriBungeePlugin extends Plugin {
         long start = System.currentTimeMillis();
         this.getLogger().info("Initializing " + this.getClass());
 
-        // fallback load
-        this.preloaders.stream()
-                .filter(loader -> !loader.getThread().isAlive())
-                .filter(loader -> !loader.isDone())
-                .map(loader -> {
-                    this.getLogger().warning("- Fallback loading (async fail): " + loader.getName());
-                    return loader.getRunnable();
-                })
-                .forEach(Runnable::run);
-
-        // wait if not initialized yet
-        for (Thread preloader : this.preloaders.stream().map(AsyncLoader::getThread).collect(Collectors.toList())) {
-            if (useParallelism) preloader.join();
-            else preloader.run();
-        }
+        // fallback load & await all
+        this.preloader.fallbackLoadAndAwait();
 
         // apply i18n text resolver for commands framework TODO: commands
 //        Set<BI18n> i18nCommandsProviders = new HashSet<>();
@@ -234,13 +168,7 @@ public class OkaeriBungeePlugin extends Plugin {
 
         // woah
         long took = System.currentTimeMillis() - start;
-        this.getLogger().info("= (" +
-                "configs: " + this.creator.getLoadedConfigs().size() + ", " +
-                "commands: " + this.creator.getLoadedCommands().size() + ", " +
-                "listeners: " + this.creator.getLoadedListeners().size() + ", " +
-                "timers: " + this.creator.getLoadedTimers().size() + ", " +
-                "localeConfigs: " + this.creator.getLoadedLocaleConfigs().size() +
-                ") [blocking: " + took + " ms]");
+        this.getLogger().info(this.creator.getSummaryText(took));
     }
 
     @Override

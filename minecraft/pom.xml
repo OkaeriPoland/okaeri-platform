@@ -9,14 +9,14 @@
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>okaeri-platform-core</artifactId>
+    <artifactId>okaeri-platform-minecraft</artifactId>
 
     <dependencies>
-        <!-- commands -->
+        <!-- core -->
         <dependency>
             <groupId>eu.okaeri</groupId>
-            <artifactId>okaeri-commands-core</artifactId>
-            <version>0.5.2</version>
+            <artifactId>okaeri-platform-core</artifactId>
+            <version>0.3.21</version>
         </dependency>
 
         <!-- commons -->
@@ -26,25 +26,23 @@
             <version>0.1.3</version>
         </dependency>
 
+        <!-- persistence -->
+        <dependency>
+            <groupId>eu.okaeri</groupId>
+            <artifactId>okaeri-persistence-flat</artifactId>
+            <version>1.5.1</version>
+        </dependency>
+
         <!-- configs -->
         <dependency>
             <groupId>eu.okaeri</groupId>
-            <artifactId>okaeri-configs-core</artifactId>
+            <artifactId>okaeri-configs-serdes-commons</artifactId>
             <version>3.3.4</version>
         </dependency>
-
-        <!-- i18n -->
         <dependency>
             <groupId>eu.okaeri</groupId>
-            <artifactId>okaeri-i18n-configs</artifactId>
-            <version>1.3.1</version>
-        </dependency>
-
-        <!-- injector -->
-        <dependency>
-            <groupId>eu.okaeri</groupId>
-            <artifactId>okaeri-injector</artifactId>
-            <version>1.5.1</version>
+            <artifactId>okaeri-configs-validator-okaeri</artifactId>
+            <version>3.3.4</version>
         </dependency>
     </dependencies>
 
