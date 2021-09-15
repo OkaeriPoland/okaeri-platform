@@ -1,8 +1,0 @@
-commands-system-usage-template: |-
-  ~&eUso correto do /{label}:
-  {entries}
-commands-system-permissions-error: '~Você não tem permissão {permission}!'
-commands-system-command-error: '~Erro: {message}'
-commands-system-unknown-error: '~Erro desconhecido! ID de referência: {id}'
-commands-system-console-only-error: '~Este comando é solamente para console.'
-commands-system-player-only-error: '~Este comando é solamente para jogadores.'
