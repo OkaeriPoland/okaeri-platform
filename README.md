@@ -68,12 +68,12 @@ public class ExamplePlugin extends OkaeriBukkitPlugin {
   private String subbeanStr;
 
   @Override // do not use onEnable (especially without calling super)
-  public void onPlatformEnabled() {
+  public void onPlatformEnable() {
     this.getLogger().info("Enabled!");
   }
 
   @Override // do not use onDisable (especially without calling super)
-  public void onPlatformDisabled() {
+  public void onPlatformDisable() {
     this.getLogger().info("Disabled!");
   }
 

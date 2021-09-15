@@ -174,7 +174,7 @@ public class OkaeriBukkitPlugin extends JavaPlugin {
             // call PostConstruct
             ComponentHelper.invokePostConstruct(this, this.injector);
             // call custom enable method
-            this.onPlatformEnabled();
+            this.onPlatformEnable();
         }
         // handle break signal
         catch (BreakException exception) {
@@ -188,12 +188,12 @@ public class OkaeriBukkitPlugin extends JavaPlugin {
 
     @Override
     public void onDisable() {
-        this.onPlatformDisabled();
+        this.onPlatformDisable();
     }
 
-    public void onPlatformEnabled() {
+    public void onPlatformEnable() {
     }
 
-    public void onPlatformDisabled() {
+    public void onPlatformDisable() {
     }
 }

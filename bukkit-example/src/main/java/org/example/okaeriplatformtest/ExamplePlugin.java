@@ -15,6 +15,7 @@ import eu.okaeri.persistence.jdbc.H2Persistence;
 import eu.okaeri.persistence.jdbc.MariaDbPersistence;
 import eu.okaeri.persistence.redis.RedisPersistence;
 import eu.okaeri.platform.bukkit.OkaeriBukkitPlugin;
+import eu.okaeri.platform.bukkit.annotation.Delayed;
 import eu.okaeri.platform.bukkit.annotation.Timer;
 import eu.okaeri.platform.bukkit.persistence.YamlBukkitPersistence;
 import eu.okaeri.platform.core.annotation.Bean;
@@ -54,12 +55,12 @@ import java.util.concurrent.atomic.AtomicInteger;
 public class ExamplePlugin extends OkaeriBukkitPlugin {
 
     @Override // do not use onEnable (especially without calling super)
-    public void onPlatformEnabled() {
+    public void onPlatformEnable() {
         this.getLogger().info("Enabled!");
     }
 
     @Override // do not use onDisable (especially without calling super)
-    public void onPlatformDisabled() {
+    public void onPlatformDisable() {
         this.getLogger().info("Disabled!");
     }
 
@@ -194,5 +195,12 @@ public class ExamplePlugin extends OkaeriBukkitPlugin {
         // getting value is done using #get(), it is possible to force update using #update()
         // remember however that if supplier is blocking it would affect your current thread
         return Cached.of(Duration.ofMinutes(1), () -> config.getGreeting() + " [" + Instant.now() + "]");
+    }
+
+    // run methods scheduled delayed after full server startup
+    // useful for update notifications and other similar tasks
+    @Delayed(time = MinecraftTimeEquivalent.SECOND, async = true)
+    public void runAfterServerIsFullyLoaded() {
+        this.getLogger().info("Looks like server is now fully loaded!");
     }
 }
