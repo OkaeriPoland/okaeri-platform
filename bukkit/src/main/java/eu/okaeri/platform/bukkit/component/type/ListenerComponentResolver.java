@@ -1,0 +1,51 @@
+package eu.okaeri.platform.bukkit.component.type;
+
+import eu.okaeri.injector.Injector;
+import eu.okaeri.injector.annotation.Inject;
+import eu.okaeri.platform.core.component.ComponentCreator;
+import eu.okaeri.platform.core.component.creator.ComponentResolver;
+import eu.okaeri.platform.core.component.manifest.BeanManifest;
+import lombok.NonNull;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.Listener;
+import org.bukkit.plugin.java.JavaPlugin;
+
+import java.lang.reflect.Method;
+import java.util.Arrays;
+import java.util.stream.Collectors;
+
+public class ListenerComponentResolver implements ComponentResolver {
+
+    @Override
+    public boolean supports(Class<?> type) {
+        return Listener.class.isAssignableFrom(type);
+    }
+
+    @Override
+    public boolean supports(Method method) {
+        return false;
+    }
+
+    @Inject
+    private JavaPlugin plugin;
+
+    @Override
+    public Object make(@NonNull ComponentCreator creator, @NonNull BeanManifest manifest, @NonNull Injector injector) {
+
+        Class<?> manifestType = manifest.getType();
+        Object instance = injector.createInstance(manifestType);
+
+        Listener listener = (Listener) instance;
+        this.plugin.getServer().getPluginManager().registerEvents(listener, this.plugin);
+
+        String listenerMethods = Arrays.stream(listener.getClass().getDeclaredMethods())
+                .filter(method -> method.getAnnotation(EventHandler.class) != null)
+                .map(Method::getName)
+                .collect(Collectors.joining(", "));
+
+        creator.log("Added listener: " + listener.getClass().getSimpleName() + " { " + listenerMethods + " }");
+        creator.increaseStatistics("listeners", 1);
+
+        return listener;
+    }
+}

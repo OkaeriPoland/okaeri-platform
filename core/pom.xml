@@ -5,13 +5,20 @@
     <parent>
         <artifactId>okaeri-platform</artifactId>
         <groupId>eu.okaeri</groupId>
-        <version>0.3.22</version>
+        <version>0.3.24</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
     <artifactId>okaeri-platform-core</artifactId>
 
     <dependencies>
+        <!-- persistence -->
+        <dependency>
+            <groupId>eu.okaeri</groupId>
+            <artifactId>okaeri-persistence-core</artifactId>
+            <version>1.5.3</version>
+        </dependency>
+
         <!-- commands -->
         <dependency>
             <groupId>eu.okaeri</groupId>
@@ -30,6 +37,16 @@
         <dependency>
             <groupId>eu.okaeri</groupId>
             <artifactId>okaeri-configs-core</artifactId>
+            <version>3.3.4</version>
+        </dependency>
+        <dependency>
+            <groupId>eu.okaeri</groupId>
+            <artifactId>okaeri-configs-serdes-commons</artifactId>
+            <version>3.3.4</version>
+        </dependency>
+        <dependency>
+            <groupId>eu.okaeri</groupId>
+            <artifactId>okaeri-configs-validator-okaeri</artifactId>
             <version>3.3.4</version>
         </dependency>
 
