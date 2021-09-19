@@ -7,7 +7,7 @@ import java.lang.annotation.Target;
 
 @Target({ElementType.METHOD, ElementType.TYPE})
 @Retention(RetentionPolicy.RUNTIME)
-public @interface Timer {
+public @interface Scheduled {
     String name() default "";
     int delay() default -1;
     int rate();

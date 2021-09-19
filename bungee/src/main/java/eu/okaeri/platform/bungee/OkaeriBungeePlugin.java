@@ -1,8 +1,15 @@
 package eu.okaeri.platform.bungee;
 
+import eu.okaeri.commands.Commands;
+import eu.okaeri.configs.serdes.commons.SerdesCommons;
+import eu.okaeri.configs.yaml.snakeyaml.YamlSnakeYamlConfigurer;
 import eu.okaeri.injector.Injectable;
 import eu.okaeri.injector.Injector;
 import eu.okaeri.injector.OkaeriInjector;
+import eu.okaeri.persistence.document.ConfigurerProvider;
+import eu.okaeri.placeholders.Placeholders;
+import eu.okaeri.platform.bungee.component.BungeeComponentCreator;
+import eu.okaeri.platform.bungee.component.BungeeCreatorRegistry;
 import eu.okaeri.platform.core.component.ComponentHelper;
 import eu.okaeri.platform.core.component.ExternalResourceProvider;
 import eu.okaeri.platform.core.component.manifest.BeanManifest;
@@ -14,7 +21,6 @@ import lombok.SneakyThrows;
 import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.plugin.Plugin;
 import net.md_5.bungee.api.plugin.PluginDescription;
-import net.md_5.bungee.protocol.packet.Commands;
 
 import java.util.Collections;
 import java.util.Optional;
@@ -33,14 +39,14 @@ public class OkaeriBungeePlugin extends Plugin {
                 .orElse(null);
 
         if (plugin == null) {
-            throw new BreakException("cannot provide external resource: " + name + ", " + type + " from " + source + ": cannot find source");
+            throw new BreakException("Cannot provide external resource: " + name + ", " + type + " from " + source + ": cannot find source");
         }
 
         Injector externalInjector = ((OkaeriBungeePlugin) plugin).getInjector();
         Optional<? extends Injectable<?>> injectable = externalInjector.getInjectable(name, type);
 
         if (!injectable.isPresent()) {
-            throw new BreakException("cannot provide external resource: " + name + ", " + type + " from " + source + ": cannot find injectable");
+            throw new BreakException("Cannot provide external resource: " + name + ", " + type + " from " + source + ": cannot find injectable");
         }
 
         return injectable.get().getObject();
@@ -48,7 +54,6 @@ public class OkaeriBungeePlugin extends Plugin {
 
     @Getter private Injector injector;
     @Getter private Commands commands;
-//    @Getter private CommandsBukkit commandsBukkit; TODO: commands
 
     private BeanManifest beanManifest;
     private BungeeComponentCreator creator;
@@ -68,25 +73,40 @@ public class OkaeriBungeePlugin extends Plugin {
 
     // let's see who is faster
     private void postBungeeConstruct() {
+
+        // setup injector
+        this.injector = OkaeriInjector.create(true);
+        this.injector.registerInjectable("injector", this.injector);
+
+        // register injectables
+        this.injector
+                .registerInjectable("proxy", this.getProxy())
+                .registerInjectable("dataFolder", this.getDataFolder())
+                .registerInjectable("logger", this.getLogger())
+                .registerInjectable("plugin", this)
+                .registerInjectable("scheduler", this.getProxy().getScheduler())
+                .registerInjectable("pluginManager", this.getProxy().getPluginManager())
+                .registerInjectable("defaultConfigurerProvider", (ConfigurerProvider) YamlSnakeYamlConfigurer::new)
+                .registerInjectable("defaultConfigurerSerdes", new Class[]{SerdesCommons.class});
+
+        // preload
         this.getLogger().info("Preloading " + this.getDescription().getName() + " " + this.getDescription().getVersion());
-//        this.preloader.preloadData("Placeholders", () -> BungeeComponentCreator.defaultPlaceholders = BukkitPlaceholders.create(true)); TODO: placeholders
+//        this.preloader.preloadData("Placeholders", () -> this.injector.registerInjectable("placeholders", BukkitPlaceholders.create(true))); TODO: placeholders
         this.preloader.preloadData("BeanManifest", this::preloadManifest);
         this.preloader.preloadData("Config", this::preloadConfig);
         this.preloader.preloadData("LocaleConfig", this::preloadLocaleConfig);
     }
 
     private void preloadManifest() {
-        // injector
-        this.injector = OkaeriInjector.create(true);
-        this.injector.registerInjectable("injector", this.injector);
         // commands TODO: commands
 //        this.commandsBukkit = CommandsBukkit.of(this).resultHandler(new BukkitCommandsResultHandler());
 //        this.commands = CommandsManager.create(CommandsInjector.of(this.commandsBukkit, this.injector)).register(new CommandsBukkitTypes());
 //        this.injector.registerInjectable("commands", this.commands);
         // manifest
-        this.creator = new BungeeComponentCreator(this, null, this.injector);
+        this.creator = new BungeeComponentCreator(this, new BungeeCreatorRegistry(this.injector));
         BeanManifest i18CommandsMessages = BeanManifest.of(I18nCommandsMessages.class, this.creator, false).name("i18n-platform-commands");
         this.beanManifest = BeanManifest.of(this.getClass(), this.creator, true).withDepend(i18CommandsMessages);
+        this.beanManifest.setObject(this);
     }
 
     @SneakyThrows
@@ -99,7 +119,7 @@ public class OkaeriBungeePlugin extends Plugin {
     @SneakyThrows
     @SuppressWarnings("BusyWait")
     private void preloadLocaleConfig() {
-        while (this.beanManifest == null) Thread.sleep(1);
+        while ((this.beanManifest == null) || (!this.injector.getInjectable("placeholders", Placeholders.class).isPresent())) Thread.sleep(1);
         this.preloader.preloadLocaleConfig(this.beanManifest, this.injector, this.creator);
     }
 
@@ -137,16 +157,7 @@ public class OkaeriBungeePlugin extends Plugin {
         // dispatch async logs
         // to show that these were loaded
         // before other components here
-        if (this.creator != null) this.creator.dispatchLogs();
-
-        // register injectables
-        this.injector
-                .registerInjectable("proxy", this.getProxy())
-                .registerInjectable("dataFolder", this.getDataFolder())
-                .registerInjectable("logger", this.getLogger())
-                .registerInjectable("plugin", this)
-                .registerInjectable("scheduler", this.getProxy().getScheduler())
-                .registerInjectable("pluginManager", this.getProxy().getPluginManager());
+        this.creator.dispatchLogs();
 
         // load commands/other beans
         try {

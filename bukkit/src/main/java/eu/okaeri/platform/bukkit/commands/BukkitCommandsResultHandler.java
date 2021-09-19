@@ -1,4 +1,4 @@
-package eu.okaeri.platform.bukkit;
+package eu.okaeri.platform.bukkit.commands;
 
 import eu.okaeri.commands.bukkit.handler.DefaultResultHandler;
 import eu.okaeri.commands.handler.ResultHandler;
@@ -17,7 +17,7 @@ public class BukkitCommandsResultHandler implements ResultHandler {
 
         CommandSender sender = commandContext.get("sender", CommandSender.class);
         if (sender == null) {
-            throw new RuntimeException("cannot return result, no sender found");
+            throw new RuntimeException("Cannot return result, no sender found");
         }
 
         if (object instanceof Message) {

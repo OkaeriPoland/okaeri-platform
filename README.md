@@ -54,7 +54,7 @@ Note the code below does not represent full source code of the example. Project 
 // - okaeri-commands' CommandService
 // - bukkit's Listener (@Component required)
 // - okaeri-configs configs' (@Configuration required)
-// - Runnables (@Timer required)
+// - Runnables (@Scheduled required)
 // - any beans located in class with @Component
 // skip registration using register=false
 @Register(TestConfig.class)
@@ -106,13 +106,13 @@ public class ExamplePlugin extends OkaeriBukkitPlugin {
     return new AtomicInteger();
   }
 
-  // timer with injected properties
+  // scheduled with injected properties
   // can also be registered as class using @Register
   // supports all bukkit scheduler features:
   // delay: time before first call (defaults to same as rate)
   // rate: time between executions (in ticks)
   // async: should runTaskTimerAsynchronously be used
-  @Timer(rate = MinecraftTimeEquivalent.MINUTE, async = true)
+  @Scheduled(rate = MinecraftTimeEquivalent.MINUTE, async = true)
   public void exampleTimer(TestConfig config, @Inject("exampleCounter") AtomicInteger counter) {
     Bukkit.broadcastMessage(config.getGreeting() + " [" + counter.getAndIncrement() + "]");
   }
@@ -127,10 +127,10 @@ public class ExamplePlugin extends OkaeriBukkitPlugin {
   }
 
   // QueuedTeleports requires a task to be registered manually for fine control
-  // this also demonstrates using @Timer with classes implementing Runnable
+  // this also demonstrates using @Scheduled with classes implementing Runnable
   // SECONDS_1/5 = 20/4 = 4 ticks = tries to teleport 1 player (3rd argument) every 4 ticks
   // it is always recommended to decrease rate before increasing teleportsPerRun
-  @Timer(rate = MinecraftTimeEquivalent.SECOND / 5)
+  @Scheduled(rate = MinecraftTimeEquivalent.SECOND / 5)
   public QueuedTeleportsTask configureTeleportsTask(QueuedTeleports teleports) {
     return new QueuedTeleportsTask(teleports, this, 1);
   }
@@ -242,9 +242,9 @@ public class TestListener implements Listener {
 ```
 
 ```java
-// example of timer component class
+// example of scheduled component class
 // async=true - simulating blocking fetching scenario
-@Timer(rate = MinecraftTimeEquivalent.MINUTES * 5, async = true)
+@Scheduled(rate = MinecraftTimeEquivalent.MINUTES * 5, async = true)
 public class TestTask implements Runnable {
 
   @Inject private TestConfig config;
@@ -380,10 +380,10 @@ the time server is loading worlds or other plugins. Blocking time is the real ti
 [..] ~ Loaded configuration: TestConfig { path = config.yml, provider = DEFAULT } [17 ms]
 [..] ~ Loaded messages: TestLocaleConfig { path = i18n, suffix = .yml, provider = DEFAULT } [31 ms]
 [..]   > es, en
-[..] - Added timer: exampleTimer { delay = 1200, rate = 1200, async = true }
-[..] - Added timer: QueuedTeleportsTask { delay = 4, rate = 4, async = false }
+[..] - Added scheduled: exampleTimer { delay = 1200, rate = 1200, async = true }
+[..] - Added scheduled: QueuedTeleportsTask { delay = 4, rate = 4, async = false }
 [..] - Added command: TestCommand { label = testcmd, aliases = [testing] }
-[..] - Added timer: TestTask { delay = 6000, rate = 6000, async = true }
+[..] - Added scheduled: TestTask { delay = 6000, rate = 6000, async = true }
 [..] - Added listener: TestListener { onCommandsUnknownError, onJoin, onAsyncChat }
 [..] = (configs: 1, commands: 1, listeners: 1, timers: 3, localeConfigs: 11) [blocking: 40 ms]
 ```
@@ -406,8 +406,8 @@ BenchmarkCommands.command_simple   thrpt    5  1253307.288 ± 31533.820  ops/s  
 - Reading/saving is mostly the same as using bukkit's config directly (I/O is the biggest concern here) and in most cases can be done async.
 
 **Timers (platform's commons)**
-- Any timer created as Runnable (@Bean, @Timer (on class)) is no different from manually registering it.
-- Method @Timer comes at insignificant cost of the method invocation and DI (best used for async tasks).
+- Any timer created as Runnable (@Bean, @Scheduled (on class)) is no different from manually registering it.
+- Method @Scheduled comes at insignificant cost of the method invocation and DI (best used for async tasks).
 
 **Listeners (platform's commons)**
 - Any Listener registered with @Component is no different from manually registering it.

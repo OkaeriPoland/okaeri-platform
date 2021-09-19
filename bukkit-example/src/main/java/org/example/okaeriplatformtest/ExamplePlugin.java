@@ -16,7 +16,7 @@ import eu.okaeri.persistence.jdbc.MariaDbPersistence;
 import eu.okaeri.persistence.redis.RedisPersistence;
 import eu.okaeri.platform.bukkit.OkaeriBukkitPlugin;
 import eu.okaeri.platform.bukkit.annotation.Delayed;
-import eu.okaeri.platform.bukkit.annotation.Timer;
+import eu.okaeri.platform.bukkit.annotation.Scheduled;
 import eu.okaeri.platform.bukkit.persistence.YamlBukkitPersistence;
 import eu.okaeri.platform.core.annotation.Bean;
 import eu.okaeri.platform.core.annotation.Register;
@@ -43,7 +43,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 // - okaeri-commands' CommandService
 // - bukkit's Listener (@Component required)
 // - okaeri-configs configs' (@Configuration required)
-// - Runnables (@Timer required)
+// - Runnables (@Scheduled required)
 // - any beans located in class with @Component
 // skip registration using register=false
 @Register(TestConfig.class)
@@ -141,12 +141,12 @@ public class ExamplePlugin extends OkaeriBukkitPlugin {
         return new AtomicInteger();
     }
 
-    // timer with injected properties
+    // scheduled with injected properties
     // supports all bukkit scheduler features:
     // delay: time before first call (defaults to same as rate)
     // rate: time between executions (in ticks)
     // async: should runTaskTimerAsynchronously be used
-    @Timer(rate = MinecraftTimeEquivalent.MINUTE, async = true)
+    @Scheduled(rate = MinecraftTimeEquivalent.MINUTE, async = true)
     public void exampleTimer(TestConfig config, @Inject("exampleCounter") AtomicInteger counter) {
         Bukkit.broadcastMessage(config.getGreeting() + " [" + counter.getAndIncrement() + "]");
     }
@@ -161,10 +161,10 @@ public class ExamplePlugin extends OkaeriBukkitPlugin {
     }
 
     // QueuedTeleports requires a task to be registered manually for fine control
-    // this also demonstrates using @Timer with classes implementing Runnable
+    // this also demonstrates using @Scheduled with classes implementing Runnable
     // SECONDS_1/5 = 20/4 = 4 ticks = tries to teleport 1 player (3rd argument) every 4 ticks
     // it is always recommended to decrease rate before increasing teleportsPerRun
-    @Timer(rate = MinecraftTimeEquivalent.SECOND / 5)
+    @Scheduled(rate = MinecraftTimeEquivalent.SECOND / 5)
     public QueuedTeleportsTask configureTeleportsTask(QueuedTeleports teleports) {
         return new QueuedTeleportsTask(teleports, this, 1);
     }

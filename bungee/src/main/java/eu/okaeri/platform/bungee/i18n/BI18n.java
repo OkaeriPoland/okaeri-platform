@@ -17,7 +17,6 @@ import java.util.regex.Pattern;
 public class BI18n extends MI18n {
 
     private static final Pattern ALT_COLOR_PATTERN = Pattern.compile("&[0-9A-Fa-fK-Ok-oRXrx]");
-    private static final Pattern MESSAGE_FIELD_PATTERN = Pattern.compile("\\{[^{]+}");
 
     @Getter private final Map<Locale, LocaleConfig> configs = new HashMap<>();
     @Getter private final I18nColorsConfig colorsConfig;

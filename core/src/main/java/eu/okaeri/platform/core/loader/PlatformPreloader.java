@@ -20,9 +20,9 @@ public class PlatformPreloader {
 
     private final Map<Class<?>, Boolean> isUnsafeAsyncCache = new CacheMap<>();
     @Getter private final List<AsyncLoader> preloaders = Collections.synchronizedList(new ArrayList<>());
-    @Setter private Logger logger = Logger.getLogger(this.originator);
+    @Setter private Logger logger = Logger.getGlobal();
 
-    @NonNull private String originator;
+    private final String originator;
     private final boolean autoStart;
     @NonNull private final Set<String> asyncBannedTypes;
 
@@ -91,7 +91,7 @@ public class PlatformPreloader {
             if (this.isUnsafeAsync(depend.getType())) {
                 continue;
             }
-            depend.setObject(creator.makeObject(depend, injector));
+            depend.setObject(creator.make(depend, injector));
             injector.registerInjectable(depend.getName(), depend.getObject());
         }
     }
@@ -104,7 +104,7 @@ public class PlatformPreloader {
                     || !depend.ready(injector)) { // or is not ready (somehow has dependencies)
                 continue;
             }
-            depend.setObject(creator.makeObject(depend, injector));
+            depend.setObject(creator.make(depend, injector));
             injector.registerInjectable(depend.getName(), depend.getObject());
         }
     }

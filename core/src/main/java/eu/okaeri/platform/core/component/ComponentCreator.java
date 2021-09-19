@@ -7,9 +7,13 @@ import java.lang.reflect.Method;
 
 public interface ComponentCreator {
 
-    Object makeObject(BeanManifest beanManifest, Injector injector);
+    Object make(BeanManifest beanManifest, Injector injector);
 
     boolean isComponent(Class<?> type);
 
     boolean isComponentMethod(Method method);
+
+    void increaseStatistics(String identifier, int count);
+
+    void log(String message);
 }
