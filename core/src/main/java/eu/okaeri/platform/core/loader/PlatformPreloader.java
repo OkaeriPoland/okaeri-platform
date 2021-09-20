@@ -69,7 +69,7 @@ public class PlatformPreloader {
             if (this.autoStart) {
                 preloader.join();
             } else {
-                preloader.run();
+                preloader.start();
             }
         }
     }
@@ -122,7 +122,7 @@ public class PlatformPreloader {
             Class<?> fieldRealType = field.getType().getType();
             if (field.getType().isConfig()) {
                 // subconfig - deep check
-                if (!this.isUnsafeAsync(fieldRealType)) {
+                if (this.isUnsafeAsync(fieldRealType)) {
                     this.isUnsafeAsyncCache.put(configType, true);
                     return true;
                 }

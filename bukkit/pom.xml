@@ -30,19 +30,19 @@
         <dependency>
             <groupId>eu.okaeri</groupId>
             <artifactId>okaeri-configs-yaml-bukkit</artifactId>
-            <version>3.3.4</version>
+            <version>3.3.5</version>
         </dependency>
         <dependency>
             <groupId>eu.okaeri</groupId>
             <artifactId>okaeri-configs-serdes-bukkit</artifactId>
-            <version>3.3.4</version>
+            <version>3.3.5</version>
         </dependency>
 
         <!-- messages -->
         <dependency>
             <groupId>eu.okaeri</groupId>
             <artifactId>okaeri-placeholders-bukkit</artifactId>
-            <version>1.4.4</version>
+            <version>1.4.6</version>
         </dependency>
 
         <!-- commands -->

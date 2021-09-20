@@ -19,18 +19,19 @@ public class BungeeComponentCreator implements ComponentCreator {
     private final OkaeriBungeePlugin plugin;
     private final ComponentCreatorRegistry creatorRegistry;
 
-    private final List<String> asyncLogs = Collections.synchronizedList(new ArrayList<>());
+    private final List<String> logs = Collections.synchronizedList(new ArrayList<>());
     private final Map<String, Integer> statisticsMap = new TreeMap<>();
 
-    public void dispatchLogs() {
-        this.asyncLogs.stream()
+    public void dispatchLogs(String prefix) {
+        this.logs.stream()
                 .flatMap(asyncLog -> Arrays.stream(asyncLog.split("\n")))
-                .forEach(line -> this.plugin.getLogger().info(line));
+                .forEach(line -> this.plugin.getLogger().info(prefix + " " + line));
+        this.logs.clear();
     }
 
     @Override
     public void log(@NonNull String message) {
-        this.asyncLogs.add("~ " + message);
+        this.logs.add(message);
     }
 
     @Override

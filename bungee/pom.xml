@@ -22,16 +22,21 @@
         <!-- configs -->
         <dependency>
             <groupId>eu.okaeri</groupId>
-            <artifactId>okaeri-configs-yaml-snakeyaml</artifactId>
-            <version>3.3.4</version>
+            <artifactId>okaeri-configs-yaml-bungee</artifactId>
+            <version>3.3.5</version>
+        </dependency>
+        <dependency>
+            <groupId>eu.okaeri</groupId>
+            <artifactId>okaeri-configs-serdes-bungee</artifactId>
+            <version>3.3.5</version>
         </dependency>
 
         <!-- messages -->
-<!--        <dependency>-->
-<!--            <groupId>eu.okaeri</groupId>-->
-<!--            <artifactId>okaeri-placeholders-bukkit</artifactId>-->
-<!--            <version>1.4.4</version>-->
-<!--        </dependency>-->
+        <dependency>
+            <groupId>eu.okaeri</groupId>
+            <artifactId>okaeri-placeholders-bungee</artifactId>
+            <version>1.4.6</version>
+        </dependency>
 
         <!-- commands -->
 <!--        <dependency>-->
