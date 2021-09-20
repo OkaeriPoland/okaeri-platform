@@ -2,12 +2,12 @@ package eu.okaeri.platform.bungee.component.type;
 
 import eu.okaeri.configs.ConfigManager;
 import eu.okaeri.configs.configurer.Configurer;
-import eu.okaeri.configs.serdes.commons.SerdesCommons;
-import eu.okaeri.configs.yaml.snakeyaml.YamlSnakeYamlConfigurer;
+import eu.okaeri.configs.serdes.OkaeriSerdesPack;
 import eu.okaeri.i18n.configs.LocaleConfig;
 import eu.okaeri.i18n.configs.LocaleConfigManager;
 import eu.okaeri.injector.Injector;
 import eu.okaeri.injector.annotation.Inject;
+import eu.okaeri.persistence.document.ConfigurerProvider;
 import eu.okaeri.placeholders.Placeholders;
 import eu.okaeri.platform.bungee.i18n.BI18n;
 import eu.okaeri.platform.bungee.i18n.I18nColorsConfig;
@@ -29,6 +29,7 @@ import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 import java.util.logging.Level;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class MessagesComponentResolver implements ComponentResolver {
 
@@ -44,8 +45,9 @@ public class MessagesComponentResolver implements ComponentResolver {
         return false;
     }
 
-    @Inject
-    private Plugin plugin;
+    @Inject private ConfigurerProvider defaultConfigurerProvider;
+    @Inject private Class<? extends OkaeriSerdesPack>[] defaultConfigurerSerdes;
+    @Inject private Plugin plugin;
 
     @Override
     @SuppressWarnings({"unchecked", "ResultOfMethodCallIgnored"})
@@ -122,10 +124,16 @@ public class MessagesComponentResolver implements ComponentResolver {
             exception.printStackTrace();
         }
 
+        // prepare serdes
+        OkaeriSerdesPack[] serdesPacks = Stream.of(this.defaultConfigurerSerdes)
+                .map(injector::createInstance)
+                .distinct()
+                .toArray(OkaeriSerdesPack[]::new);
+
         // gather colors config
         I18nColorsConfig colorsConfig = ConfigManager.create(I18nColorsConfig.class, (it) -> {
-            Configurer configurer = (provider == Messages.DEFAULT.class) ? new YamlSnakeYamlConfigurer() : injector.createInstance(provider);
-            it.withConfigurer(configurer, new SerdesCommons());
+            Configurer configurer = (provider == Messages.DEFAULT.class) ? this.defaultConfigurerProvider.get() : injector.createInstance(provider);
+            it.withConfigurer(configurer, serdesPacks);
             it.withBindFile(new File(directory, "colors" + suffix));
             if (Files.exists(it.getBindFile())) it.load(true);
             if (unpack && !directoryExisted) it.saveDefaults();
@@ -154,7 +162,7 @@ public class MessagesComponentResolver implements ComponentResolver {
                 Locale locale = Locale.forLanguageTag(localeName);
                 // create configurer
                 Configurer configurer = (provider == Messages.DEFAULT.class)
-                        ? new YamlSnakeYamlConfigurer()
+                        ? this.defaultConfigurerProvider.get()
                         : injector.createInstance(provider);
                 // register
                 LocaleConfig localeConfig = LocaleConfigManager.create(beanClazz, configurer, file, !defaultLocale.equals(locale));
@@ -172,7 +180,7 @@ public class MessagesComponentResolver implements ComponentResolver {
                 if (loadedLocales.contains(locale)) continue;
                 // create configurer
                 Configurer configurer = (provider == Messages.DEFAULT.class)
-                        ? new YamlSnakeYamlConfigurer()
+                        ? this.defaultConfigurerProvider.get()
                         : injector.createInstance(provider);
                 // register
                 LocaleConfig localeConfig = ConfigManager.create(beanClazz, (it) -> {
@@ -189,7 +197,7 @@ public class MessagesComponentResolver implements ComponentResolver {
             if (!loadedLocales.contains(defaultLocale)) {
                 // create configurer
                 Configurer configurer = (provider == Messages.DEFAULT.class)
-                        ? new YamlSnakeYamlConfigurer()
+                        ? this.defaultConfigurerProvider.get()
                         : injector.createInstance(provider);
                 // register default locale based on interface values
                 LocaleConfig defaultLocaleConfig = ConfigManager.create(beanClazz, it -> {

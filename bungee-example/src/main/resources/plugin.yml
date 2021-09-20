@@ -1,0 +1,5 @@
+name: OkaeriPlatformBukkitExample
+version: 1.0-SNAPSHOT
+main: org.example.okaeriplatformtest.ExamplePlugin
+description: 'Example Okaeri Platform Plugin'
+author: 'Dawid Sawicki <dawid@okaeri.eu>'

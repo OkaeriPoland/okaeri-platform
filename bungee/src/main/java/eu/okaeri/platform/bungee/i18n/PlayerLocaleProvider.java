@@ -15,11 +15,6 @@ public class PlayerLocaleProvider implements LocaleProvider<ProxiedPlayer> {
 
     @Override
     public Locale getLocale(@NonNull ProxiedPlayer player) {
-
-//        String localeString = UnsafeBukkitCommons.getLocaleString(player);
-//        localeString = localeString.replace("_", "-");
-//
-//        return Locale.forLanguageTag(localeString);
-        return Locale.forLanguageTag("pl-PL"); // TODO: fix locale
+        return player.getLocale();
     }
 }

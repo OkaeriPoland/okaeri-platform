@@ -189,6 +189,9 @@ public class OkaeriBukkitPlugin extends JavaPlugin {
             ComponentHelper.injectComponentFields(this, this.injector);
             // call PostConstruct
             ComponentHelper.invokePostConstruct(this, this.injector);
+            // show platform summary
+            long took = System.currentTimeMillis() - start;
+            this.getLogger().info(this.creator.getSummaryText(took));
             // call custom enable method
             this.onPlatformEnable();
         }
@@ -196,10 +199,6 @@ public class OkaeriBukkitPlugin extends JavaPlugin {
         catch (BreakException exception) {
             this.getLogger().log(Level.SEVERE, "Stopping initialization, received break signal: " + exception.getMessage());
         }
-
-        // woah
-        long took = System.currentTimeMillis() - start;
-        this.getLogger().info(this.creator.getSummaryText(took));
     }
 
     @Override

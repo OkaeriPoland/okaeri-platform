@@ -1,13 +1,14 @@
 package eu.okaeri.platform.bungee;
 
-import eu.okaeri.commands.Commands;
 import eu.okaeri.configs.serdes.commons.SerdesCommons;
-import eu.okaeri.configs.yaml.snakeyaml.YamlSnakeYamlConfigurer;
+import eu.okaeri.configs.yaml.bukkit.serdes.SerdesBungee;
+import eu.okaeri.configs.yaml.bungee.YamlBungeeConfigurer;
 import eu.okaeri.injector.Injectable;
 import eu.okaeri.injector.Injector;
 import eu.okaeri.injector.OkaeriInjector;
 import eu.okaeri.persistence.document.ConfigurerProvider;
 import eu.okaeri.placeholders.Placeholders;
+import eu.okaeri.placeholders.bungee.BungeePlaceholders;
 import eu.okaeri.platform.bungee.component.BungeeComponentCreator;
 import eu.okaeri.platform.bungee.component.BungeeCreatorRegistry;
 import eu.okaeri.platform.core.component.ComponentHelper;
@@ -53,7 +54,7 @@ public class OkaeriBungeePlugin extends Plugin {
     };
 
     @Getter private Injector injector;
-    @Getter private Commands commands;
+//    @Getter private Commands commands; TODO: commands
 
     private BeanManifest beanManifest;
     private BungeeComponentCreator creator;
@@ -86,12 +87,12 @@ public class OkaeriBungeePlugin extends Plugin {
                 .registerInjectable("plugin", this)
                 .registerInjectable("scheduler", this.getProxy().getScheduler())
                 .registerInjectable("pluginManager", this.getProxy().getPluginManager())
-                .registerInjectable("defaultConfigurerProvider", (ConfigurerProvider) YamlSnakeYamlConfigurer::new)
-                .registerInjectable("defaultConfigurerSerdes", new Class[]{SerdesCommons.class});
+                .registerInjectable("defaultConfigurerProvider", (ConfigurerProvider) YamlBungeeConfigurer::new)
+                .registerInjectable("defaultConfigurerSerdes", new Class[]{SerdesBungee.class, SerdesCommons.class});
 
         // preload
         this.getLogger().info("Preloading " + this.getDescription().getName() + " " + this.getDescription().getVersion());
-//        this.preloader.preloadData("Placeholders", () -> this.injector.registerInjectable("placeholders", BukkitPlaceholders.create(true))); TODO: placeholders
+        this.preloader.preloadData("Placeholders", () -> this.injector.registerInjectable("placeholders", BungeePlaceholders.create(true)));
         this.preloader.preloadData("BeanManifest", this::preloadManifest);
         this.preloader.preloadData("Config", this::preloadConfig);
         this.preloader.preloadData("LocaleConfig", this::preloadLocaleConfig);
@@ -157,7 +158,7 @@ public class OkaeriBungeePlugin extends Plugin {
         // dispatch async logs
         // to show that these were loaded
         // before other components here
-        this.creator.dispatchLogs();
+        this.creator.dispatchLogs("~");
 
         // load commands/other beans
         try {
@@ -169,6 +170,11 @@ public class OkaeriBungeePlugin extends Plugin {
             ComponentHelper.injectComponentFields(this, this.injector);
             // call PostConstruct
             ComponentHelper.invokePostConstruct(this, this.injector);
+            // dispatch remaining logs
+            this.creator.dispatchLogs("-");
+            // show platform summary
+            long took = System.currentTimeMillis() - start;
+            this.getLogger().info(this.creator.getSummaryText(took));
             // call custom enable method
             this.onPlatformEnable();
         }
@@ -176,10 +182,6 @@ public class OkaeriBungeePlugin extends Plugin {
         catch (BreakException exception) {
             this.getLogger().log(Level.SEVERE, "Stopping initialization, received break signal: " + exception.getMessage());
         }
-
-        // woah
-        long took = System.currentTimeMillis() - start;
-        this.getLogger().info(this.creator.getSummaryText(took));
     }
 
     @Override

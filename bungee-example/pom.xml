@@ -5,7 +5,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>org.example</groupId>
-    <artifactId>bukkit-test</artifactId>
+    <artifactId>bungee-test</artifactId>
     <version>1.0-SNAPSHOT</version>
 
     <properties>
@@ -18,7 +18,7 @@
         <!-- base platform -->
         <dependency>
             <groupId>eu.okaeri</groupId>
-            <artifactId>okaeri-platform-bukkit</artifactId>
+            <artifactId>okaeri-platform-bungee</artifactId>
             <version>0.3.24</version>
             <scope>compile</scope>
         </dependency>
@@ -61,9 +61,17 @@
 
         <!-- spigot-api/paper-api -->
         <dependency>
-            <groupId>org.spigotmc</groupId>
-            <artifactId>spigot-api</artifactId>
-            <version>1.8.8-R0.1-SNAPSHOT</version>
+            <groupId>net.md-5</groupId>
+            <artifactId>bungeecord-api</artifactId>
+            <version>1.17-R0.1-SNAPSHOT</version>
+            <type>jar</type>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>net.md-5</groupId>
+            <artifactId>bungeecord-api</artifactId>
+            <version>1.17-R0.1-SNAPSHOT</version>
+            <type>javadoc</type>
             <scope>provided</scope>
         </dependency>
 
@@ -77,7 +85,7 @@
     </dependencies>
 
     <build>
-        <finalName>okaeriplatformtest-bukkit-${project.version}</finalName>
+        <finalName>okaeriplatformtest-bungee-${project.version}</finalName>
         <defaultGoal>clean package</defaultGoal>
         <resources>
             <resource>
@@ -167,8 +175,8 @@
             <url>https://storehouse.okaeri.eu/repository/maven-public/</url>
         </repository>
         <repository>
-            <id>spigot-repo</id>
-            <url>https://hub.spigotmc.org/nexus/content/repositories/snapshots/</url>
+            <id>bungeecord-repo</id>
+            <url>https://oss.sonatype.org/content/repositories/snapshots</url>
         </repository>
     </repositories>
 

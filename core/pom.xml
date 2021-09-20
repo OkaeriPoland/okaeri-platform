@@ -37,17 +37,17 @@
         <dependency>
             <groupId>eu.okaeri</groupId>
             <artifactId>okaeri-configs-core</artifactId>
-            <version>3.3.4</version>
+            <version>3.3.5</version>
         </dependency>
         <dependency>
             <groupId>eu.okaeri</groupId>
             <artifactId>okaeri-configs-serdes-commons</artifactId>
-            <version>3.3.4</version>
+            <version>3.3.5</version>
         </dependency>
         <dependency>
             <groupId>eu.okaeri</groupId>
             <artifactId>okaeri-configs-validator-okaeri</artifactId>
-            <version>3.3.4</version>
+            <version>3.3.5</version>
         </dependency>
 
         <!-- i18n -->
