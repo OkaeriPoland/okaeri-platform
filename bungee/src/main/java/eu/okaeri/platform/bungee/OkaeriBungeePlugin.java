@@ -11,6 +11,7 @@ import eu.okaeri.placeholders.Placeholders;
 import eu.okaeri.placeholders.bungee.BungeePlaceholders;
 import eu.okaeri.platform.bungee.component.BungeeComponentCreator;
 import eu.okaeri.platform.bungee.component.BungeeCreatorRegistry;
+import eu.okaeri.platform.bungee.i18n.ProxiedPlayerLocaleProvider;
 import eu.okaeri.platform.core.component.ComponentHelper;
 import eu.okaeri.platform.core.component.ExternalResourceProvider;
 import eu.okaeri.platform.core.component.manifest.BeanManifest;
@@ -88,7 +89,8 @@ public class OkaeriBungeePlugin extends Plugin {
                 .registerInjectable("scheduler", this.getProxy().getScheduler())
                 .registerInjectable("pluginManager", this.getProxy().getPluginManager())
                 .registerInjectable("defaultConfigurerProvider", (ConfigurerProvider) YamlBungeeConfigurer::new)
-                .registerInjectable("defaultConfigurerSerdes", new Class[]{SerdesBungee.class, SerdesCommons.class});
+                .registerInjectable("defaultConfigurerSerdes", new Class[]{SerdesBungee.class, SerdesCommons.class})
+                .registerInjectable("i18nLocaleProvider", new ProxiedPlayerLocaleProvider());
 
         // preload
         this.getLogger().info("Preloading " + this.getDescription().getName() + " " + this.getDescription().getVersion());

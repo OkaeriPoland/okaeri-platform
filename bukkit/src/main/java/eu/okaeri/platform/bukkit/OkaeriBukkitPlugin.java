@@ -19,6 +19,7 @@ import eu.okaeri.platform.bukkit.component.BukkitComponentCreator;
 import eu.okaeri.platform.bukkit.component.BukkitCreatorRegistry;
 import eu.okaeri.platform.bukkit.i18n.BI18n;
 import eu.okaeri.platform.bukkit.i18n.I18nCommandsTextHandler;
+import eu.okaeri.platform.bukkit.i18n.PlayerLocaleProvider;
 import eu.okaeri.platform.core.component.ComponentHelper;
 import eu.okaeri.platform.core.component.ExternalResourceProvider;
 import eu.okaeri.platform.core.component.manifest.BeanManifest;
@@ -104,7 +105,8 @@ public class OkaeriBukkitPlugin extends JavaPlugin {
                 .registerInjectable("scheduler", this.getServer().getScheduler())
                 .registerInjectable("pluginManager", this.getServer().getPluginManager())
                 .registerInjectable("defaultConfigurerProvider", (ConfigurerProvider) YamlBukkitConfigurer::new)
-                .registerInjectable("defaultConfigurerSerdes", new Class[]{SerdesBukkit.class, SerdesCommons.class});
+                .registerInjectable("defaultConfigurerSerdes", new Class[]{SerdesBukkit.class, SerdesCommons.class})
+                .registerInjectable("i18nLocaleProvider", new PlayerLocaleProvider());
 
         // preload
         this.getLogger().info("Preloading " + this.getName() + " " + this.getDescription().getVersion());

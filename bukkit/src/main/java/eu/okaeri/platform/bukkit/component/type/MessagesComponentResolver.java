@@ -5,13 +5,13 @@ import eu.okaeri.configs.configurer.Configurer;
 import eu.okaeri.configs.serdes.OkaeriSerdesPack;
 import eu.okaeri.i18n.configs.LocaleConfig;
 import eu.okaeri.i18n.configs.LocaleConfigManager;
+import eu.okaeri.i18n.provider.LocaleProvider;
 import eu.okaeri.injector.Injector;
 import eu.okaeri.injector.annotation.Inject;
 import eu.okaeri.persistence.document.ConfigurerProvider;
 import eu.okaeri.placeholders.Placeholders;
 import eu.okaeri.platform.bukkit.i18n.BI18n;
 import eu.okaeri.platform.bukkit.i18n.I18nColorsConfig;
-import eu.okaeri.platform.bukkit.i18n.PlayerLocaleProvider;
 import eu.okaeri.platform.core.annotation.Messages;
 import eu.okaeri.platform.core.component.ComponentCreator;
 import eu.okaeri.platform.core.component.creator.ComponentResolver;
@@ -48,6 +48,7 @@ public class MessagesComponentResolver implements ComponentResolver {
 
     @Inject private ConfigurerProvider defaultConfigurerProvider;
     @Inject private Class<? extends OkaeriSerdesPack>[] defaultConfigurerSerdes;
+    @Inject private LocaleProvider<?> i18nLocaleProvider;
     @Inject private JavaPlugin plugin;
 
     @Override
@@ -150,7 +151,7 @@ public class MessagesComponentResolver implements ComponentResolver {
 
             BI18n i18n = new BI18n(colorsConfig, messages.prefix().field(), messages.prefix().marker());
             i18n.setDefaultLocale(defaultLocale);
-            i18n.registerLocaleProvider(new PlayerLocaleProvider());
+            i18n.registerLocaleProvider(this.i18nLocaleProvider);
             i18n.setPlaceholders(defaultPlaceholders.copy());
 
             List<Locale> loadedLocales = new ArrayList<>();

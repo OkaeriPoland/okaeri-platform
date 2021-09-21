@@ -6,7 +6,7 @@ import net.md_5.bungee.api.connection.ProxiedPlayer;
 
 import java.util.Locale;
 
-public class PlayerLocaleProvider implements LocaleProvider<ProxiedPlayer> {
+public class ProxiedPlayerLocaleProvider implements LocaleProvider<ProxiedPlayer> {
 
     @Override
     public boolean supports(@NonNull Class<?> type) {

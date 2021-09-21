@@ -1,32 +1,28 @@
 package eu.okaeri.platform.bungee.component;
 
-import eu.okaeri.injector.Injector;
 import eu.okaeri.platform.bungee.OkaeriBungeePlugin;
 import eu.okaeri.platform.core.component.ComponentCreator;
 import eu.okaeri.platform.core.component.creator.ComponentCreatorRegistry;
-import eu.okaeri.platform.core.component.manifest.BeanManifest;
-import eu.okaeri.platform.core.component.manifest.BeanSource;
 import lombok.NonNull;
-import lombok.RequiredArgsConstructor;
 
-import java.lang.reflect.Method;
-import java.util.*;
-import java.util.stream.Collectors;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 
-@RequiredArgsConstructor
-public class BungeeComponentCreator implements ComponentCreator {
+public class BungeeComponentCreator extends ComponentCreator {
 
     private final OkaeriBungeePlugin plugin;
-    private final ComponentCreatorRegistry creatorRegistry;
-
     private final List<String> logs = Collections.synchronizedList(new ArrayList<>());
-    private final Map<String, Integer> statisticsMap = new TreeMap<>();
 
-    public void dispatchLogs(String prefix) {
-        this.logs.stream()
-                .flatMap(asyncLog -> Arrays.stream(asyncLog.split("\n")))
-                .forEach(line -> this.plugin.getLogger().info(prefix + " " + line));
-        this.logs.clear();
+    public BungeeComponentCreator(@NonNull OkaeriBungeePlugin plugin, @NonNull ComponentCreatorRegistry creatorRegistry) {
+        super(creatorRegistry);
+        this.plugin = plugin;
+    }
+
+    @Override
+    public boolean isComponent(@NonNull Class<?> type) {
+        return OkaeriBungeePlugin.class.isAssignableFrom(type) || super.isComponent(type);
     }
 
     @Override
@@ -34,45 +30,10 @@ public class BungeeComponentCreator implements ComponentCreator {
         this.logs.add(message);
     }
 
-    @Override
-    public void increaseStatistics(String identifier, int count) {
-        this.statisticsMap.put(identifier, this.statisticsMap.getOrDefault(identifier, 0) + 1);
-    }
-
-    @Override
-    public boolean isComponent(@NonNull Class<?> type) {
-        return OkaeriBungeePlugin.class.isAssignableFrom(type) || this.creatorRegistry.supports(type);
-    }
-
-    @Override
-    public boolean isComponentMethod(@NonNull Method method) {
-        return this.creatorRegistry.supports(method);
-    }
-
-    @Override
-    public Object make(@NonNull BeanManifest manifest, @NonNull Injector injector) {
-
-        // validation
-        if (!Arrays.asList(BeanSource.METHOD, BeanSource.COMPONENT).contains(manifest.getSource())) {
-            throw new RuntimeException("Cannot transform from source " + manifest.getSource());
-        }
-
-        // use CreatorRegistry to create components
-        Optional<Object> objectOptional = this.creatorRegistry.make(this, manifest);
-
-        // returned value does not seem right
-        if (!objectOptional.isPresent()) {
-            throw new IllegalArgumentException("Found unresolvable component: " + manifest);
-        }
-
-        // extract ready object
-        return objectOptional.get();
-    }
-
-    public String getSummaryText(long took) {
-        String statistics = this.statisticsMap.entrySet().stream()
-                .map(entry -> entry.getKey() + ": " + entry.getValue())
-                .collect(Collectors.joining(", "));
-        return "= (" + statistics + ") [blocking: " + took + " ms]";
+    public void dispatchLogs(String prefix) {
+        this.logs.stream()
+                .flatMap(asyncLog -> Arrays.stream(asyncLog.split("\n")))
+                .forEach(line -> this.plugin.getLogger().info(prefix + " " + line));
+        this.logs.clear();
     }
 }
