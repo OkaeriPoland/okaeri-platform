@@ -369,7 +369,7 @@ Internals mainly used inside of the platform, but available for manual use. For 
 Overridable defaults used in various components:
 
 ```java
-# example of i18nLocaleProvider override (in plugin's main class)
+// example of i18nLocaleProvider override (in plugin's main class)
 @Override
 public void setup() {
     this.getInjector().registerExclusive("i18nLocaleProvider", new MyLocaleProvider());
