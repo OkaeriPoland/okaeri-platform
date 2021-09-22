@@ -9,6 +9,8 @@ import eu.okaeri.platform.core.exception.BreakException;
 import lombok.NonNull;
 import lombok.SneakyThrows;
 
+import java.io.Closeable;
+import java.io.IOException;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -90,7 +92,7 @@ public final class ComponentHelper {
     }
 
     public static String displayMethod(@NonNull Method method) {
-        return  method.getReturnType().getSimpleName() + "->" + method.getName()
+        return method.getReturnType().getSimpleName() + "->" + method.getName()
                 + "(" + Arrays.stream(method.getParameters())
                 .map(parameter -> parameter.getType().getSimpleName())
                 .collect(Collectors.joining(", ")) + ")";
@@ -116,5 +118,16 @@ public final class ComponentHelper {
 
             injector.registerInjectable(postConstruct.getName(), result);
         }
+    }
+
+    public static void closeAllOfType(@NonNull Class<? extends Closeable> type, @NonNull Injector injector) {
+        injector.allOf(type).stream()
+                .map(Injectable::getObject)
+                .forEach(closeable -> {
+                    try {
+                        closeable.close();
+                    } catch (IOException ignored) {
+                    }
+                });
     }
 }

@@ -6,6 +6,7 @@ import eu.okaeri.configs.yaml.bungee.YamlBungeeConfigurer;
 import eu.okaeri.injector.Injectable;
 import eu.okaeri.injector.Injector;
 import eu.okaeri.injector.OkaeriInjector;
+import eu.okaeri.persistence.Persistence;
 import eu.okaeri.persistence.document.ConfigurerProvider;
 import eu.okaeri.placeholders.Placeholders;
 import eu.okaeri.placeholders.bungee.BungeePlaceholders;
@@ -194,7 +195,12 @@ public class OkaeriBungeePlugin extends Plugin {
 
     @Override
     public void onDisable() {
+
+        // call custom disable method
         this.onPlatformDisable();
+
+        // cleanup connections
+        ComponentHelper.closeAllOfType(Persistence.class, this.injector);
     }
 
     public void setup() {
