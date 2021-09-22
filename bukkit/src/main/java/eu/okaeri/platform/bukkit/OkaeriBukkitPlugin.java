@@ -11,6 +11,7 @@ import eu.okaeri.configs.yaml.bukkit.serdes.SerdesBukkit;
 import eu.okaeri.injector.Injectable;
 import eu.okaeri.injector.Injector;
 import eu.okaeri.injector.OkaeriInjector;
+import eu.okaeri.persistence.Persistence;
 import eu.okaeri.persistence.document.ConfigurerProvider;
 import eu.okaeri.placeholders.Placeholders;
 import eu.okaeri.placeholders.bukkit.BukkitPlaceholders;
@@ -211,7 +212,12 @@ public class OkaeriBukkitPlugin extends JavaPlugin {
 
     @Override
     public void onDisable() {
+
+        // call custom disable method
         this.onPlatformDisable();
+
+        // cleanup connections
+        ComponentHelper.closeAllOfType(Persistence.class, this.injector);
     }
 
     public void setup() {
