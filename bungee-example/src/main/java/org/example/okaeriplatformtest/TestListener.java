@@ -1,12 +1,12 @@
 package org.example.okaeriplatformtest;
 
 import eu.okaeri.injector.annotation.Inject;
+import eu.okaeri.platform.bungee.scheduler.PlatformScheduler;
 import eu.okaeri.platform.core.annotation.Component;
 import net.md_5.bungee.api.chat.BaseComponent;
 import net.md_5.bungee.api.chat.TextComponent;
 import net.md_5.bungee.api.event.ServerConnectEvent;
 import net.md_5.bungee.api.plugin.Listener;
-import net.md_5.bungee.api.scheduler.TaskScheduler;
 import net.md_5.bungee.event.EventHandler;
 import org.example.okaeriplatformtest.config.TestConfig;
 import org.example.okaeriplatformtest.persistence.PlayerProperties;
@@ -22,7 +22,7 @@ public class TestListener implements Listener {
     @Inject private ExamplePlugin plugin;
     @Inject private Logger logger; // plugin's logger (name=logger)
     @Inject private Proxy server;
-    @Inject private TaskScheduler scheduler;
+    @Inject private PlatformScheduler scheduler;
     @Inject private TestConfig config;
 
     @Inject private PlayerRepository playerPersistence;
@@ -40,7 +40,7 @@ public class TestListener implements Listener {
         // this is especially true for loading and saving
         // failing to do this may cause lag spikes which can
         // range from minor for flat storages and major for databases
-        this.scheduler.runAsync(this.plugin, () -> {
+        this.scheduler.runAsync(() -> {
 
             // read example
             PlayerProperties playerProperties = this.playerPersistence.get(event.getPlayer());

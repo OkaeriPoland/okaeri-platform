@@ -3,13 +3,13 @@ package eu.okaeri.platform.bungee.component.type;
 import eu.okaeri.injector.Injector;
 import eu.okaeri.injector.annotation.Inject;
 import eu.okaeri.platform.bungee.annotation.Delayed;
+import eu.okaeri.platform.bungee.scheduler.PlatformScheduler;
 import eu.okaeri.platform.core.component.creator.ComponentCreator;
 import eu.okaeri.platform.core.component.creator.ComponentResolver;
 import eu.okaeri.platform.core.component.manifest.BeanManifest;
 import eu.okaeri.platform.core.component.manifest.BeanSource;
 import lombok.NonNull;
 import net.md_5.bungee.api.plugin.Plugin;
-import net.md_5.bungee.api.scheduler.TaskScheduler;
 
 import java.lang.reflect.Method;
 import java.util.concurrent.TimeUnit;
@@ -29,7 +29,7 @@ public class DelayedComponentResolver implements ComponentResolver {
     }
 
     @Inject private Plugin plugin;
-    @Inject private TaskScheduler scheduler;
+    @Inject private PlatformScheduler scheduler;
 
     @Override
     public Object make(@NonNull ComponentCreator creator, @NonNull BeanManifest manifest, @NonNull Injector injector) {
@@ -57,7 +57,7 @@ public class DelayedComponentResolver implements ComponentResolver {
         int delay = delayed.time();
         TimeUnit timeUnit = delayed.timeUnit();
 
-        this.scheduler.schedule(this.plugin, runnable, delay, timeUnit);
+        this.scheduler.schedule(runnable, delay, timeUnit);
 
         String delayedMeta = "time = " + delayed.time() + ", timeUnit = " + timeUnit;
         if (manifest.getSource() == BeanSource.METHOD) {

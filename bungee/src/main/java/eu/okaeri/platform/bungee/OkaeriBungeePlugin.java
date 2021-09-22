@@ -12,6 +12,7 @@ import eu.okaeri.placeholders.bungee.BungeePlaceholders;
 import eu.okaeri.platform.bungee.component.BungeeComponentCreator;
 import eu.okaeri.platform.bungee.component.BungeeCreatorRegistry;
 import eu.okaeri.platform.bungee.i18n.ProxiedPlayerLocaleProvider;
+import eu.okaeri.platform.bungee.scheduler.PlatformScheduler;
 import eu.okaeri.platform.core.component.ComponentHelper;
 import eu.okaeri.platform.core.component.ExternalResourceProvider;
 import eu.okaeri.platform.core.component.manifest.BeanManifest;
@@ -80,23 +81,28 @@ public class OkaeriBungeePlugin extends Plugin {
         this.injector = OkaeriInjector.create(true);
         this.injector.registerInjectable("injector", this.injector);
 
-        // setup creator
-        this.creator = new BungeeComponentCreator(this, new BungeeCreatorRegistry(this.injector));
-
-        // allow additional setup
-        this.setup();
-
         // register injectables
         this.injector
                 .registerInjectable("proxy", this.getProxy())
                 .registerInjectable("dataFolder", this.getDataFolder())
                 .registerInjectable("logger", this.getLogger())
                 .registerInjectable("plugin", this)
-                .registerInjectable("scheduler", this.getProxy().getScheduler())
+                .registerInjectable("scheduler", new PlatformScheduler(this, this.getProxy().getScheduler()))
                 .registerInjectable("pluginManager", this.getProxy().getPluginManager())
                 .registerInjectable("defaultConfigurerProvider", (ConfigurerProvider) YamlBungeeConfigurer::new)
                 .registerInjectable("defaultConfigurerSerdes", new Class[]{SerdesBungee.class, SerdesCommons.class})
                 .registerInjectable("i18nLocaleProvider", new ProxiedPlayerLocaleProvider());
+
+        // commands TODO: commands
+//        this.commandsBukkit = CommandsBukkit.of(this).resultHandler(new BukkitCommandsResultHandler());
+//        this.commands = CommandsManager.create(CommandsInjector.of(this.commandsBukkit, this.injector)).register(new CommandsBukkitTypes());
+//        this.injector.registerInjectable("commands", this.commands);
+
+        // setup creator
+        this.creator = new BungeeComponentCreator(this, new BungeeCreatorRegistry(this.injector));
+
+        // allow additional setup
+        this.setup();
 
         // preload
         this.getLogger().info("Preloading " + this.getDescription().getName() + " " + this.getDescription().getVersion());
@@ -107,11 +113,6 @@ public class OkaeriBungeePlugin extends Plugin {
     }
 
     private void preloadManifest() {
-        // commands TODO: commands
-//        this.commandsBukkit = CommandsBukkit.of(this).resultHandler(new BukkitCommandsResultHandler());
-//        this.commands = CommandsManager.create(CommandsInjector.of(this.commandsBukkit, this.injector)).register(new CommandsBukkitTypes());
-//        this.injector.registerInjectable("commands", this.commands);
-        // manifest
         BeanManifest i18CommandsMessages = BeanManifest.of(I18nCommandsMessages.class, this.creator, false).name("i18n-platform-commands");
         this.beanManifest = BeanManifest.of(this.getClass(), this.creator, true).withDepend(i18CommandsMessages);
         this.beanManifest.setObject(this);

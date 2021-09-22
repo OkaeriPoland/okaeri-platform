@@ -20,6 +20,7 @@ import eu.okaeri.platform.bukkit.component.BukkitCreatorRegistry;
 import eu.okaeri.platform.bukkit.i18n.BI18n;
 import eu.okaeri.platform.bukkit.i18n.I18nCommandsTextHandler;
 import eu.okaeri.platform.bukkit.i18n.PlayerLocaleProvider;
+import eu.okaeri.platform.bukkit.scheduler.PlatformScheduler;
 import eu.okaeri.platform.core.component.ComponentHelper;
 import eu.okaeri.platform.core.component.ExternalResourceProvider;
 import eu.okaeri.platform.core.component.manifest.BeanManifest;
@@ -96,23 +97,28 @@ public class OkaeriBukkitPlugin extends JavaPlugin {
         this.injector = OkaeriInjector.create(true);
         this.injector.registerInjectable("injector", this.injector);
 
-        // setup creator
-        this.creator = new BukkitComponentCreator(this, new BukkitCreatorRegistry(this.injector));
-
-        // allow additional setup
-        this.setup();
-
         // register injectables
         this.injector
                 .registerInjectable("server", this.getServer())
                 .registerInjectable("dataFolder", this.getDataFolder())
                 .registerInjectable("logger", this.getLogger())
                 .registerInjectable("plugin", this)
-                .registerInjectable("scheduler", this.getServer().getScheduler())
+                .registerInjectable("scheduler", new PlatformScheduler(this, this.getServer().getScheduler()))
                 .registerInjectable("pluginManager", this.getServer().getPluginManager())
                 .registerInjectable("defaultConfigurerProvider", (ConfigurerProvider) YamlBukkitConfigurer::new)
                 .registerInjectable("defaultConfigurerSerdes", new Class[]{SerdesBukkit.class, SerdesCommons.class})
                 .registerInjectable("i18nLocaleProvider", new PlayerLocaleProvider());
+
+        // commands
+        this.commandsBukkit = CommandsBukkit.of(this).resultHandler(new BukkitCommandsResultHandler());
+        this.commands = CommandsManager.create(CommandsInjector.of(this.commandsBukkit, this.injector)).register(new CommandsBukkitTypes());
+        this.injector.registerInjectable("commands", this.commands);
+
+        // setup creator
+        this.creator = new BukkitComponentCreator(this, new BukkitCreatorRegistry(this.injector));
+
+        // allow additional setup
+        this.setup();
 
         // preload
         this.getLogger().info("Preloading " + this.getName() + " " + this.getDescription().getVersion());
@@ -123,11 +129,6 @@ public class OkaeriBukkitPlugin extends JavaPlugin {
     }
 
     private void preloadManifest() {
-        // commands
-        this.commandsBukkit = CommandsBukkit.of(this).resultHandler(new BukkitCommandsResultHandler());
-        this.commands = CommandsManager.create(CommandsInjector.of(this.commandsBukkit, this.injector)).register(new CommandsBukkitTypes());
-        this.injector.registerInjectable("commands", this.commands);
-        // manifest
         BeanManifest i18CommandsMessages = BeanManifest.of(I18nCommandsMessages.class, this.creator, false).name("i18n-platform-commands");
         this.beanManifest = BeanManifest.of(this.getClass(), this.creator, true).withDepend(i18CommandsMessages);
         this.beanManifest.setObject(this);

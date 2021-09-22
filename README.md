@@ -355,7 +355,7 @@ Generally available common instances, useful in almost every component (e.g. Log
 | `dataFolder` | java.io.`File` | injectable version of `JavaPlugin#getDataFolder()` |
 | `logger` | java.util.logging.`Logger` | injectable version of `JavaPlugin#getLogger()` |
 | `plugin` | org.bukkit.plugin.`Plugin` | injectable instance of platform plugin |
-| `scheduler` | org.bukkit.scheduler.`BukkitScheduler` | injectable version of `Server#getScheduler()` |
+| `scheduler` | eu.okaeri.platform.bukkit.scheduler.`PlatformScheduler` | custom, simplified BukkitScheduler alternative |
 | `pluginManager` | org.bukkit.plugin.`PluginManager` | injectable version of `Server#getPluginManager()` |
 | `scoreboardManager` | org.bukkit.scoreboard.`ScoreboardManager` | injectable version of `Server#getScoreboardManager()` |
 
@@ -365,6 +365,22 @@ Internals mainly used inside of the platform, but available for manual use. For 
 |-|-|-|
 | `commands` | eu.okaeri.commands.`Commands` | instance of `okaeri-commands` used for registering commands internally |
 | `injector` | eu.okaeri.injector.`Injector` | instance of `okaeri-injector` used internally |
+
+Overridable defaults used in various components:
+
+```java
+# example of i18nLocaleProvider override (in plugin's main class)
+@Override
+public void setup() {
+    this.getInjector().registerExclusive("i18nLocaleProvider", new MyLocaleProvider());
+}
+```
+
+| Inject Name | Type | Description |
+|-|-|-|
+| `defaultConfigurerProvider` | eu.okaeri.persistence.document.`ConfigurerProvider` | default configuration provider for @Configuration, @Messages and others |
+| `defaultConfigurerSerdes` | Class[] | list of default OkaeriSerdesPack(s) classes to be used with `defaultConfigurerProvider` |
+| `i18nLocaleProvider` | eu.okaeri.i18n.provider.`LocaleProvider` | platform's locale provider for i18n components e.g. commands |
 
 ### Performance
 
