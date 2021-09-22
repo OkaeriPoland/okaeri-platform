@@ -7,7 +7,7 @@ import eu.okaeri.platform.core.DependsOn;
 import eu.okaeri.platform.core.annotation.Bean;
 import eu.okaeri.platform.core.annotation.External;
 import eu.okaeri.platform.core.annotation.Register;
-import eu.okaeri.platform.core.component.ComponentCreator;
+import eu.okaeri.platform.core.component.creator.ComponentCreator;
 import eu.okaeri.platform.core.component.ExternalResourceProvider;
 import lombok.Data;
 import lombok.NonNull;
@@ -262,7 +262,7 @@ public class BeanManifest {
                                 .sorted(Collections.reverseOrder(Map.Entry.comparingByValue()))
                                 .filter(entry -> entry.getValue() > 10)
                                 .forEach((entry) -> LOGGER.severe(entry.getKey() + " - " + entry.getValue() + " fails"));
-                        throw new RuntimeException("Failed to resolve component/bean " + dependClass + " (" + depend.getName() + "=" + depend.getSource() + "):\n"
+                        throw new RuntimeException("Failed to resolve component/bean " + dependClass + " (" + depend.getName() + "=" + depend.getSource() + ") in " + this.getType() + ":\n"
                                  + injector.all().stream().map(i -> "- '" + i.getName() + "' -> " + i.getType()).collect(Collectors.joining("\n")));
                     }
 

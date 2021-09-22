@@ -6,7 +6,7 @@ import eu.okaeri.commands.meta.ServiceMeta;
 import eu.okaeri.commands.service.CommandService;
 import eu.okaeri.injector.Injector;
 import eu.okaeri.injector.annotation.Inject;
-import eu.okaeri.platform.core.component.ComponentCreator;
+import eu.okaeri.platform.core.component.creator.ComponentCreator;
 import eu.okaeri.platform.core.component.creator.ComponentResolver;
 import eu.okaeri.platform.core.component.manifest.BeanManifest;
 import lombok.NonNull;
@@ -19,12 +19,12 @@ import java.util.stream.Collectors;
 public class ServiceDescriptorComponentResolver implements ComponentResolver {
 
     @Override
-    public boolean supports(Class<?> type) {
+    public boolean supports(@NonNull Class<?> type) {
         return type.getAnnotation(ServiceDescriptor.class) != null;
     }
 
     @Override
-    public boolean supports(Method method) {
+    public boolean supports(@NonNull Method method) {
         return false;
     }
 

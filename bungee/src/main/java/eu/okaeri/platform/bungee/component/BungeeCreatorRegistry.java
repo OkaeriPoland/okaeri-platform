@@ -9,12 +9,13 @@ import eu.okaeri.platform.core.component.creator.ComponentCreatorRegistry;
 import eu.okaeri.platform.core.component.type.BeanComponentResolver;
 import eu.okaeri.platform.core.component.type.ConfigurationComponentResolver;
 import eu.okaeri.platform.core.component.type.DocumentCollectionComponentResolver;
+import eu.okaeri.platform.core.component.type.GenericComponentResolver;
 
 public class BungeeCreatorRegistry extends ComponentCreatorRegistry {
 
     public BungeeCreatorRegistry(Injector injector) {
         super(injector);
-        this.register(BeanComponentResolver.class);
+        // custom first
         this.register(ConfigurationComponentResolver.class);
         this.register(DelayedComponentResolver.class);
         this.register(DocumentCollectionComponentResolver.class);
@@ -22,5 +23,8 @@ public class BungeeCreatorRegistry extends ComponentCreatorRegistry {
         this.register(MessagesComponentResolver.class);
 //        this.register(ServiceDescriptorComponentResolver.class); TODO: commands
         this.register(ScheduledComponentResolver.class);
+        // generic last
+        this.register(BeanComponentResolver.class);
+        this.register(GenericComponentResolver.class);
     }
 }

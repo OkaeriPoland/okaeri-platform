@@ -8,7 +8,7 @@ import eu.okaeri.persistence.repository.DocumentRepository;
 import eu.okaeri.persistence.repository.RepositoryDeclaration;
 import eu.okaeri.persistence.repository.annotation.DocumentCollection;
 import eu.okaeri.platform.core.DependsOn;
-import eu.okaeri.platform.core.component.ComponentCreator;
+import eu.okaeri.platform.core.component.creator.ComponentCreator;
 import eu.okaeri.platform.core.component.creator.ComponentResolver;
 import eu.okaeri.platform.core.component.manifest.BeanManifest;
 import lombok.NonNull;
@@ -19,12 +19,12 @@ import java.util.Arrays;
 public class DocumentCollectionComponentResolver implements ComponentResolver {
 
     @Override
-    public boolean supports(Class<?> type) {
+    public boolean supports(@NonNull Class<?> type) {
         return type.getAnnotation(DocumentCollection.class) != null;
     }
 
     @Override
-    public boolean supports(Method method) {
+    public boolean supports(@NonNull Method method) {
         return false;
     }
 

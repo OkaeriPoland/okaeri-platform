@@ -1,7 +1,6 @@
-package eu.okaeri.platform.core.component;
+package eu.okaeri.platform.core.component.creator;
 
 import eu.okaeri.injector.Injector;
-import eu.okaeri.platform.core.component.creator.ComponentCreatorRegistry;
 import eu.okaeri.platform.core.component.manifest.BeanManifest;
 import eu.okaeri.platform.core.component.manifest.BeanSource;
 import lombok.AccessLevel;
@@ -18,7 +17,7 @@ public abstract class ComponentCreator {
 
     private static final Set<BeanSource> SUPPORTED_BEAN_SOURCES = new HashSet<>(Arrays.asList(BeanSource.METHOD, BeanSource.COMPONENT));
 
-    @Getter(AccessLevel.PROTECTED) @NonNull private final ComponentCreatorRegistry creatorRegistry;
+    @Getter @NonNull private final ComponentCreatorRegistry registry;
     @Getter(AccessLevel.PROTECTED) @NonNull private final Map<String, Integer> statisticsMap = new TreeMap<>();
 
     public void increaseStatistics(String identifier, int count) {
@@ -26,11 +25,11 @@ public abstract class ComponentCreator {
     }
 
     public boolean isComponent(@NonNull Class<?> type) {
-        return this.getCreatorRegistry().supports(type);
+        return this.getRegistry().supports(type);
     }
 
     public boolean isComponentMethod(@NonNull Method method) {
-        return this.getCreatorRegistry().supports(method);
+        return this.getRegistry().supports(method);
     }
 
     public Object make(@NonNull BeanManifest manifest, @NonNull Injector injector) {
@@ -41,7 +40,7 @@ public abstract class ComponentCreator {
         }
 
         // use CreatorRegistry to create components
-        Optional<Object> objectOptional = this.getCreatorRegistry().make(this, manifest);
+        Optional<Object> objectOptional = this.getRegistry().make(this, manifest);
 
         // returned value does not seem right
         if (!objectOptional.isPresent()) {

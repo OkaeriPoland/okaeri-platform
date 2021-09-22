@@ -3,7 +3,7 @@ package eu.okaeri.platform.bukkit.component.type;
 import eu.okaeri.injector.Injector;
 import eu.okaeri.injector.annotation.Inject;
 import eu.okaeri.platform.bukkit.annotation.Scheduled;
-import eu.okaeri.platform.core.component.ComponentCreator;
+import eu.okaeri.platform.core.component.creator.ComponentCreator;
 import eu.okaeri.platform.core.component.creator.ComponentResolver;
 import eu.okaeri.platform.core.component.manifest.BeanManifest;
 import eu.okaeri.platform.core.component.manifest.BeanSource;
@@ -18,12 +18,12 @@ import static eu.okaeri.platform.core.component.ComponentHelper.invokeMethod;
 public class ScheduledComponentResolver implements ComponentResolver {
 
     @Override
-    public boolean supports(Class<?> type) {
+    public boolean supports(@NonNull Class<?> type) {
         return type.getAnnotation(Scheduled.class) != null;
     }
 
     @Override
-    public boolean supports(Method method) {
+    public boolean supports(@NonNull Method method) {
         return method.getAnnotation(Scheduled.class) != null;
     }
 
@@ -63,7 +63,11 @@ public class ScheduledComponentResolver implements ComponentResolver {
         }
 
         String scheduledMeta = "delay = " + delay + ", rate = " + rate + ", async = " + scheduled.async();
-        creator.log("Added scheduled: " + manifest.getName() + " { " + scheduledMeta + " }");
+        if (manifest.getSource() == BeanSource.METHOD) {
+            creator.log("Added scheduled: " + manifest.getName() + " { " + scheduledMeta + " }");
+        } else {
+            creator.log("Added scheduled: " + manifest.getType().getSimpleName() + " { " + scheduledMeta + " }");
+        }
         creator.increaseStatistics("scheduled", 1);
 
         return object;

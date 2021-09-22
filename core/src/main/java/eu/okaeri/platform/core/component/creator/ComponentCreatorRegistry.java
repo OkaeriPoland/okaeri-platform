@@ -1,7 +1,6 @@
 package eu.okaeri.platform.core.component.creator;
 
 import eu.okaeri.injector.Injector;
-import eu.okaeri.platform.core.component.ComponentCreator;
 import eu.okaeri.platform.core.component.manifest.BeanManifest;
 import eu.okaeri.platform.core.component.manifest.BeanSource;
 import lombok.NonNull;

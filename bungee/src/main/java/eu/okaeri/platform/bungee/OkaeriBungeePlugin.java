@@ -56,9 +56,9 @@ public class OkaeriBungeePlugin extends Plugin {
 
     @Getter private Injector injector;
 //    @Getter private Commands commands; TODO: commands
+    @Getter private BungeeComponentCreator creator;
 
     private BeanManifest beanManifest;
-    private BungeeComponentCreator creator;
     private final PlatformPreloader preloader = new PlatformPreloader(this.getLogger(), this.getDescription().getName(), useParallelism, Collections.emptySet());
 
     @SuppressWarnings("unused")
@@ -79,6 +79,12 @@ public class OkaeriBungeePlugin extends Plugin {
         // setup injector
         this.injector = OkaeriInjector.create(true);
         this.injector.registerInjectable("injector", this.injector);
+
+        // setup creator
+        this.creator = new BungeeComponentCreator(this, new BungeeCreatorRegistry(this.injector));
+
+        // allow additional setup
+        this.setup();
 
         // register injectables
         this.injector
@@ -106,7 +112,6 @@ public class OkaeriBungeePlugin extends Plugin {
 //        this.commands = CommandsManager.create(CommandsInjector.of(this.commandsBukkit, this.injector)).register(new CommandsBukkitTypes());
 //        this.injector.registerInjectable("commands", this.commands);
         // manifest
-        this.creator = new BungeeComponentCreator(this, new BungeeCreatorRegistry(this.injector));
         BeanManifest i18CommandsMessages = BeanManifest.of(I18nCommandsMessages.class, this.creator, false).name("i18n-platform-commands");
         this.beanManifest = BeanManifest.of(this.getClass(), this.creator, true).withDepend(i18CommandsMessages);
         this.beanManifest.setObject(this);
@@ -189,6 +194,9 @@ public class OkaeriBungeePlugin extends Plugin {
     @Override
     public void onDisable() {
         this.onPlatformDisable();
+    }
+
+    public void setup() {
     }
 
     public void onPlatformEnable() {
