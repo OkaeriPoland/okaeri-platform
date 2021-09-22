@@ -73,9 +73,9 @@ public class OkaeriBukkitPlugin extends JavaPlugin {
     @Getter private Injector injector;
     @Getter private Commands commands;
     @Getter private CommandsBukkit commandsBukkit;
+    @Getter private BukkitComponentCreator creator;
 
     private BeanManifest beanManifest;
-    private BukkitComponentCreator creator;
     private final PlatformPreloader preloader = new PlatformPreloader(this.getLogger(), this.getName(), useParallelism, ASYNC_BANNED_TYPES);
 
     @SuppressWarnings("unused")
@@ -95,6 +95,12 @@ public class OkaeriBukkitPlugin extends JavaPlugin {
         // setup injector
         this.injector = OkaeriInjector.create(true);
         this.injector.registerInjectable("injector", this.injector);
+
+        // setup creator
+        this.creator = new BukkitComponentCreator(this, new BukkitCreatorRegistry(this.injector));
+
+        // allow additional setup
+        this.setup();
 
         // register injectables
         this.injector
@@ -122,7 +128,6 @@ public class OkaeriBukkitPlugin extends JavaPlugin {
         this.commands = CommandsManager.create(CommandsInjector.of(this.commandsBukkit, this.injector)).register(new CommandsBukkitTypes());
         this.injector.registerInjectable("commands", this.commands);
         // manifest
-        this.creator = new BukkitComponentCreator(this, new BukkitCreatorRegistry(this.injector));
         BeanManifest i18CommandsMessages = BeanManifest.of(I18nCommandsMessages.class, this.creator, false).name("i18n-platform-commands");
         this.beanManifest = BeanManifest.of(this.getClass(), this.creator, true).withDepend(i18CommandsMessages);
         this.beanManifest.setObject(this);
@@ -206,6 +211,9 @@ public class OkaeriBukkitPlugin extends JavaPlugin {
     @Override
     public void onDisable() {
         this.onPlatformDisable();
+    }
+
+    public void setup() {
     }
 
     public void onPlatformEnable() {

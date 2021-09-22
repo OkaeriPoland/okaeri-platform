@@ -1,7 +1,7 @@
 package eu.okaeri.platform.bukkit.component;
 
 import eu.okaeri.platform.bukkit.OkaeriBukkitPlugin;
-import eu.okaeri.platform.core.component.ComponentCreator;
+import eu.okaeri.platform.core.component.creator.ComponentCreator;
 import eu.okaeri.platform.core.component.creator.ComponentCreatorRegistry;
 import lombok.NonNull;
 import org.bukkit.Bukkit;

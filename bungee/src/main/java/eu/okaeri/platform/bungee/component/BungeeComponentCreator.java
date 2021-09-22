@@ -1,7 +1,7 @@
 package eu.okaeri.platform.bungee.component;
 
 import eu.okaeri.platform.bungee.OkaeriBungeePlugin;
-import eu.okaeri.platform.core.component.ComponentCreator;
+import eu.okaeri.platform.core.component.creator.ComponentCreator;
 import eu.okaeri.platform.core.component.creator.ComponentCreatorRegistry;
 import lombok.NonNull;
 

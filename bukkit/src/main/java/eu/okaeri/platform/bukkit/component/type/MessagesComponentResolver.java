@@ -13,7 +13,7 @@ import eu.okaeri.placeholders.Placeholders;
 import eu.okaeri.platform.bukkit.i18n.BI18n;
 import eu.okaeri.platform.bukkit.i18n.I18nColorsConfig;
 import eu.okaeri.platform.core.annotation.Messages;
-import eu.okaeri.platform.core.component.ComponentCreator;
+import eu.okaeri.platform.core.component.creator.ComponentCreator;
 import eu.okaeri.platform.core.component.creator.ComponentResolver;
 import eu.okaeri.platform.core.component.manifest.BeanManifest;
 import eu.okaeri.platform.minecraft.i18n.I18nCommandsMessages;
@@ -37,12 +37,12 @@ public class MessagesComponentResolver implements ComponentResolver {
     private static final boolean DEBUG = Boolean.parseBoolean(System.getProperty("okaeri.platform.debug", "false"));
 
     @Override
-    public boolean supports(Class<?> type) {
+    public boolean supports(@NonNull Class<?> type) {
         return type.getAnnotation(Messages.class) != null;
     }
 
     @Override
-    public boolean supports(Method method) {
+    public boolean supports(@NonNull Method method) {
         return false;
     }
 

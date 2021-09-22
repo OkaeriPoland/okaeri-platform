@@ -10,7 +10,7 @@ import eu.okaeri.injector.annotation.Inject;
 import eu.okaeri.persistence.document.ConfigurerProvider;
 import eu.okaeri.platform.core.annotation.Configuration;
 import eu.okaeri.platform.core.annotation.Messages;
-import eu.okaeri.platform.core.component.ComponentCreator;
+import eu.okaeri.platform.core.component.creator.ComponentCreator;
 import eu.okaeri.platform.core.component.creator.ComponentResolver;
 import eu.okaeri.platform.core.component.manifest.BeanManifest;
 import lombok.AllArgsConstructor;
@@ -27,12 +27,12 @@ import java.util.stream.Stream;
 public class ConfigurationComponentResolver implements ComponentResolver {
 
     @Override
-    public boolean supports(Class<?> type) {
+    public boolean supports(@NonNull Class<?> type) {
         return type.getAnnotation(Configuration.class) != null;
     }
 
     @Override
-    public boolean supports(Method method) {
+    public boolean supports(@NonNull Method method) {
         return false;
     }
 

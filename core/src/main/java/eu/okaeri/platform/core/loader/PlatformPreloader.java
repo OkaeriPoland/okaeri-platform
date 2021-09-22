@@ -6,7 +6,7 @@ import eu.okaeri.configs.schema.ConfigDeclaration;
 import eu.okaeri.configs.schema.FieldDeclaration;
 import eu.okaeri.i18n.configs.LocaleConfig;
 import eu.okaeri.injector.Injector;
-import eu.okaeri.platform.core.component.ComponentCreator;
+import eu.okaeri.platform.core.component.creator.ComponentCreator;
 import eu.okaeri.platform.core.component.manifest.BeanManifest;
 import lombok.*;
 

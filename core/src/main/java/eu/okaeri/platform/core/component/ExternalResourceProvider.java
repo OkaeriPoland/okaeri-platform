@@ -1,5 +1,7 @@
 package eu.okaeri.platform.core.component;
 
+import lombok.NonNull;
+
 public interface ExternalResourceProvider {
-    Object provide(String name, Class<?> type, Class<?> of);
+    Object provide(@NonNull String name, @NonNull Class<?> type, @NonNull Class<?> of);
 }

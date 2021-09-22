@@ -3,7 +3,7 @@ package eu.okaeri.platform.bukkit.component.type;
 import eu.okaeri.injector.Injector;
 import eu.okaeri.injector.annotation.Inject;
 import eu.okaeri.platform.bukkit.annotation.Delayed;
-import eu.okaeri.platform.core.component.ComponentCreator;
+import eu.okaeri.platform.core.component.creator.ComponentCreator;
 import eu.okaeri.platform.core.component.creator.ComponentResolver;
 import eu.okaeri.platform.core.component.manifest.BeanManifest;
 import eu.okaeri.platform.core.component.manifest.BeanSource;
@@ -18,12 +18,12 @@ import static eu.okaeri.platform.core.component.ComponentHelper.invokeMethod;
 public class DelayedComponentResolver implements ComponentResolver {
 
     @Override
-    public boolean supports(Class<?> type) {
+    public boolean supports(@NonNull Class<?> type) {
         return type.getAnnotation(Delayed.class) != null;
     }
 
     @Override
-    public boolean supports(Method method) {
+    public boolean supports(@NonNull Method method) {
         return method.getAnnotation(Delayed.class) != null;
     }
 
@@ -61,8 +61,12 @@ public class DelayedComponentResolver implements ComponentResolver {
             this.scheduler.runTaskLater(this.plugin, runnable, delay);
         }
 
-        String scheduledMeta = "time = " + delayed.time() + ", async = " + delayed.async();
-        creator.log("Added delayed: " + manifest.getName() + " { " + scheduledMeta + " }");
+        String delayedMeta = "time = " + delayed.time() + ", async = " + delayed.async();
+        if (manifest.getSource() == BeanSource.METHOD) {
+            creator.log("Added delayed: " + manifest.getName() + " { " + delayedMeta + " }");
+        } else {
+            creator.log("Added delayed: " + manifest.getType().getSimpleName() + " { " + delayedMeta + " }");
+        }
         creator.increaseStatistics("delayed", 1);
 
         return object;
