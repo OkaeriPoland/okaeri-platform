@@ -3,13 +3,13 @@ package eu.okaeri.platform.bukkit.component.type;
 import eu.okaeri.injector.Injector;
 import eu.okaeri.injector.annotation.Inject;
 import eu.okaeri.platform.bukkit.annotation.Delayed;
+import eu.okaeri.platform.bukkit.scheduler.PlatformScheduler;
 import eu.okaeri.platform.core.component.creator.ComponentCreator;
 import eu.okaeri.platform.core.component.creator.ComponentResolver;
 import eu.okaeri.platform.core.component.manifest.BeanManifest;
 import eu.okaeri.platform.core.component.manifest.BeanSource;
 import lombok.NonNull;
 import org.bukkit.plugin.java.JavaPlugin;
-import org.bukkit.scheduler.BukkitScheduler;
 
 import java.lang.reflect.Method;
 
@@ -28,7 +28,7 @@ public class DelayedComponentResolver implements ComponentResolver {
     }
 
     @Inject private JavaPlugin plugin;
-    @Inject private BukkitScheduler scheduler;
+    @Inject private PlatformScheduler scheduler;
 
     @Override
     public Object make(@NonNull ComponentCreator creator, @NonNull BeanManifest manifest, @NonNull Injector injector) {
@@ -54,14 +54,11 @@ public class DelayedComponentResolver implements ComponentResolver {
         }
 
         int delay = delayed.time();
+        boolean async = delayed.async();
 
-        if (delayed.async()) {
-            this.scheduler.runTaskLaterAsynchronously(this.plugin, runnable, delay);
-        } else {
-            this.scheduler.runTaskLater(this.plugin, runnable, delay);
-        }
+        this.scheduler.runLater(runnable, delay, async);
 
-        String delayedMeta = "time = " + delayed.time() + ", async = " + delayed.async();
+        String delayedMeta = "time = " + delayed.time() + ", async = " + async;
         if (manifest.getSource() == BeanSource.METHOD) {
             creator.log("Added delayed: " + manifest.getName() + " { " + delayedMeta + " }");
         } else {
