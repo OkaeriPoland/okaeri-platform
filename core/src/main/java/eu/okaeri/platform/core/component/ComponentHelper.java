@@ -185,7 +185,13 @@ public final class ComponentHelper {
             if (!this.meta.isEmpty()) {
                 metaBuilder.append(" { ");
                 metaBuilder.append(this.meta.entrySet().stream()
-                        .map(entry -> entry.getKey() + " = " + entry.getValue())
+                        .map(entry -> {
+                            Object rendered = entry.getValue();
+                            if (rendered instanceof String) {
+                                rendered = "'" + rendered + "'";
+                            }
+                            return entry.getKey() + " = " + rendered;
+                        })
                         .collect(Collectors.joining(", ")));
                 metaBuilder.append(" }");
             }

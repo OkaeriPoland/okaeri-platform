@@ -49,7 +49,7 @@ public class ListenerComponentResolver implements ComponentResolver {
                 .meta("methods", Arrays.stream(listener.getClass().getDeclaredMethods())
                         .filter(method -> method.getAnnotation(EventHandler.class) != null)
                         .map(Method::getName)
-                        .collect(Collectors.joining(", ")))
+                        .collect(Collectors.toList()))
                 .build());
         creator.increaseStatistics("listeners", 1);
 
