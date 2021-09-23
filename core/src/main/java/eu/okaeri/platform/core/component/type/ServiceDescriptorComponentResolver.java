@@ -6,15 +6,13 @@ import eu.okaeri.commands.meta.ServiceMeta;
 import eu.okaeri.commands.service.CommandService;
 import eu.okaeri.injector.Injector;
 import eu.okaeri.injector.annotation.Inject;
+import eu.okaeri.platform.core.component.ComponentHelper;
 import eu.okaeri.platform.core.component.creator.ComponentCreator;
 import eu.okaeri.platform.core.component.creator.ComponentResolver;
 import eu.okaeri.platform.core.component.manifest.BeanManifest;
 import lombok.NonNull;
 
 import java.lang.reflect.Method;
-import java.util.LinkedHashMap;
-import java.util.Map;
-import java.util.stream.Collectors;
 
 public class ServiceDescriptorComponentResolver implements ComponentResolver {
 
@@ -38,26 +36,20 @@ public class ServiceDescriptorComponentResolver implements ComponentResolver {
             throw new IllegalArgumentException("Component of @ServiceDescriptor on type requires class to be a CommandService: " + manifest);
         }
 
+        long start = System.currentTimeMillis();
         CommandService commandService = (CommandService) injector.createInstance(manifest.getType());
         ServiceMeta serviceMeta = ServiceMeta.of(commandService);
         this.commands.getRegistry().register(commandService);
 
-        Map<String, String> commandMeta = new LinkedHashMap<>();
-        commandMeta.put("label", serviceMeta.getLabel());
-
-        if (!serviceMeta.getAliases().isEmpty()) {
-            commandMeta.put("aliases", "[" + String.join(", ", serviceMeta.getAliases()) + "]");
-        }
-
-        if (!serviceMeta.getDescription().isEmpty()) {
-            commandMeta.put("description", serviceMeta.getDescription());
-        }
-
-        String commandMetaString = commandMeta.entrySet().stream()
-                .map(entry -> entry.getKey() + " = " + entry.getValue())
-                .collect(Collectors.joining(", "));
-
-        creator.log("Added command: " + commandService.getClass().getSimpleName() + " { " + commandMetaString + " }");
+        long took = System.currentTimeMillis() - start;
+        creator.log(ComponentHelper.buildComponentMessage()
+                .type("Added command")
+                .name(commandService.getClass().getSimpleName())
+                .took(took)
+                .meta("label", serviceMeta.getLabel())
+                .meta("aliases", serviceMeta.getAliases())
+                .meta("description", serviceMeta.getDescription())
+                .build());
         creator.increaseStatistics("commands", 1);
 
         return commandService;

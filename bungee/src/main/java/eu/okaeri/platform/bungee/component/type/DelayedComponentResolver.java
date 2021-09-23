@@ -4,6 +4,7 @@ import eu.okaeri.injector.Injector;
 import eu.okaeri.injector.annotation.Inject;
 import eu.okaeri.platform.bungee.annotation.Delayed;
 import eu.okaeri.platform.bungee.scheduler.PlatformScheduler;
+import eu.okaeri.platform.core.component.ComponentHelper;
 import eu.okaeri.platform.core.component.creator.ComponentCreator;
 import eu.okaeri.platform.core.component.creator.ComponentResolver;
 import eu.okaeri.platform.core.component.manifest.BeanManifest;
@@ -34,6 +35,7 @@ public class DelayedComponentResolver implements ComponentResolver {
     @Override
     public Object make(@NonNull ComponentCreator creator, @NonNull BeanManifest manifest, @NonNull Injector injector) {
 
+        long start = System.currentTimeMillis();
         Object object;
         if (manifest.getSource() == BeanSource.METHOD) {
             object = (Runnable) () -> invokeMethod(manifest, injector);
@@ -59,12 +61,14 @@ public class DelayedComponentResolver implements ComponentResolver {
 
         this.scheduler.schedule(runnable, delay, timeUnit);
 
-        String delayedMeta = "time = " + delayed.time() + ", timeUnit = " + timeUnit;
-        if (manifest.getSource() == BeanSource.METHOD) {
-            creator.log("Added delayed: " + manifest.getName() + " { " + delayedMeta + " }");
-        } else {
-            creator.log("Added delayed: " + manifest.getType().getSimpleName() + " { " + delayedMeta + " }");
-        }
+        long took = System.currentTimeMillis() - start;
+        creator.log(ComponentHelper.buildComponentMessage()
+                .type("Added delayed")
+                .name(manifest.getSource() == BeanSource.METHOD ? manifest.getName() : manifest.getType().getSimpleName())
+                .took(took)
+                .meta("time", delay)
+                .meta("timeUnit", timeUnit)
+                .build());
         creator.increaseStatistics("delayed", 1);
 
         return object;

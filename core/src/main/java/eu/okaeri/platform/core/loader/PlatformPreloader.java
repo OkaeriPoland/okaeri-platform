@@ -8,6 +8,7 @@ import eu.okaeri.i18n.configs.LocaleConfig;
 import eu.okaeri.injector.Injector;
 import eu.okaeri.platform.core.component.creator.ComponentCreator;
 import eu.okaeri.platform.core.component.manifest.BeanManifest;
+import eu.okaeri.platform.core.component.manifest.BeanSource;
 import lombok.*;
 
 import java.util.*;
@@ -83,14 +84,22 @@ public class PlatformPreloader {
     public void preloadConfig(@NonNull BeanManifest beanManifest, @NonNull Injector injector, @NonNull ComponentCreator creator) {
         List<BeanManifest> depends = beanManifest.getDepends();
         for (BeanManifest depend : depends) {
+            // component only, method beans would not work
+            // due to missing parent etc
+            if (depend.getSource() != BeanSource.COMPONENT) {
+                continue;
+            }
+            // basic type blacklist
             if (!OkaeriConfig.class.isAssignableFrom(depend.getType()) // is not okaeri config
                     || LocaleConfig.class.isAssignableFrom(depend.getType()) // or is locale config
                     || !depend.ready(injector)) { // or is not ready (somehow has dependencies)
                 continue;
             }
+            // async safety check
             if (this.isUnsafeAsync(depend.getType())) {
                 continue;
             }
+            // everything ok, preload
             depend.setObject(creator.make(depend, injector));
             injector.registerInjectable(depend.getName(), depend.getObject());
         }
@@ -100,10 +109,17 @@ public class PlatformPreloader {
     public void preloadLocaleConfig(@NonNull BeanManifest beanManifest, @NonNull Injector injector, @NonNull ComponentCreator creator) {
         List<BeanManifest> depends = beanManifest.getDepends();
         for (BeanManifest depend : depends) {
+            // component only, method beans would not work
+            // due to missing parent etc
+            if (depend.getSource() != BeanSource.COMPONENT) {
+                continue;
+            }
+            // basic type blacklist
             if (!LocaleConfig.class.isAssignableFrom(depend.getType())  // is not locale config
                     || !depend.ready(injector)) { // or is not ready (somehow has dependencies)
                 continue;
             }
+            // everything ok, preload
             depend.setObject(creator.make(depend, injector));
             injector.registerInjectable(depend.getName(), depend.getObject());
         }
