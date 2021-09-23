@@ -8,6 +8,7 @@ import eu.okaeri.platform.core.component.manifest.BeanManifest;
 import eu.okaeri.platform.core.exception.BreakException;
 import lombok.NonNull;
 import lombok.SneakyThrows;
+import lombok.ToString;
 
 import java.io.Closeable;
 import java.io.IOException;
@@ -15,15 +16,15 @@ import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
-import java.util.Arrays;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public final class ComponentHelper {
 
     public static Object invokeMethod(@NonNull BeanManifest manifest, @NonNull Injector injector) {
+        if (manifest.getParent() == null) {
+            throw new IllegalArgumentException("manifest.parent cannot be null to invoke method: " + manifest);
+        }
         return invokeMethod(manifest.getParent(), manifest.getMethod(), injector);
     }
 
@@ -129,5 +130,85 @@ public final class ComponentHelper {
                     } catch (IOException ignored) {
                     }
                 });
+    }
+
+    public static ComponentMessageBuilder buildComponentMessage() {
+        return new ComponentMessageBuilder();
+    }
+
+    @ToString
+    public static class ComponentMessageBuilder {
+
+        private String type;
+        private String name;
+        private Long took;
+
+        private final Map<String, Object> meta = new TreeMap<>();
+        private final List<String> footer = new ArrayList<>();
+
+        public ComponentMessageBuilder type(String type) {
+            this.type = type;
+            return this;
+        }
+
+        public ComponentMessageBuilder name(String name) {
+            this.name = name;
+            return this;
+        }
+
+        public ComponentMessageBuilder meta(String name, Object value) {
+            this.meta.put(name, value);
+            return this;
+        }
+
+        public ComponentMessageBuilder took(long took) {
+            this.took = took;
+            return this;
+        }
+
+        public String build() {
+
+            if (this.type == null) {
+                throw new IllegalArgumentException("type cannot be null");
+            }
+
+            StringBuilder metaBuilder = new StringBuilder();
+            metaBuilder.append(this.type);
+
+            if (this.name == null) {
+                throw new IllegalArgumentException("name cannot be null");
+            }
+
+            metaBuilder.append(": ");
+            metaBuilder.append(this.name);
+
+            if (!this.meta.isEmpty()) {
+                metaBuilder.append(" { ");
+                metaBuilder.append(this.meta.entrySet().stream()
+                        .map(entry -> entry.getKey() + " = " + entry.getValue())
+                        .collect(Collectors.joining(", ")));
+                metaBuilder.append(" }");
+            }
+
+            if (this.took != null) {
+                metaBuilder.append(" [");
+                metaBuilder.append(this.took);
+                metaBuilder.append(" ms]");
+            }
+
+            if (!this.footer.isEmpty()) {
+                for (String line : this.footer) {
+                    metaBuilder.append("\n");
+                    metaBuilder.append(line);
+                }
+            }
+
+            return metaBuilder.toString();
+        }
+
+        public ComponentMessageBuilder footer(String line) {
+            this.footer.add(line);
+            return this;
+        }
     }
 }

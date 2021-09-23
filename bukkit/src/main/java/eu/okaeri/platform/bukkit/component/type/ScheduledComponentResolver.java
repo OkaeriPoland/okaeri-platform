@@ -4,6 +4,7 @@ import eu.okaeri.injector.Injector;
 import eu.okaeri.injector.annotation.Inject;
 import eu.okaeri.platform.bukkit.annotation.Scheduled;
 import eu.okaeri.platform.bukkit.scheduler.PlatformScheduler;
+import eu.okaeri.platform.core.component.ComponentHelper;
 import eu.okaeri.platform.core.component.creator.ComponentCreator;
 import eu.okaeri.platform.core.component.creator.ComponentResolver;
 import eu.okaeri.platform.core.component.manifest.BeanManifest;
@@ -33,6 +34,7 @@ public class ScheduledComponentResolver implements ComponentResolver {
     @Override
     public Object make(@NonNull ComponentCreator creator, @NonNull BeanManifest manifest, @NonNull Injector injector) {
 
+        long start = System.currentTimeMillis();
         Object object;
         if (manifest.getSource() == BeanSource.METHOD) {
             object = (Runnable) () -> invokeMethod(manifest, injector);
@@ -59,12 +61,15 @@ public class ScheduledComponentResolver implements ComponentResolver {
 
         this.scheduler.runTimer(runnable, delay, rate, async);
 
-        String scheduledMeta = "delay = " + delay + ", rate = " + rate + ", async = " + async;
-        if (manifest.getSource() == BeanSource.METHOD) {
-            creator.log("Added scheduled: " + manifest.getName() + " { " + scheduledMeta + " }");
-        } else {
-            creator.log("Added scheduled: " + manifest.getType().getSimpleName() + " { " + scheduledMeta + " }");
-        }
+        long took = System.currentTimeMillis() - start;
+        creator.log(ComponentHelper.buildComponentMessage()
+                .type("Added scheduled")
+                .name(manifest.getSource() == BeanSource.METHOD ? manifest.getName() : manifest.getType().getSimpleName())
+                .took(took)
+                .meta("delay", delay)
+                .meta("rate", rate)
+                .meta("async", async)
+                .build());
         creator.increaseStatistics("scheduled", 1);
 
         return object;

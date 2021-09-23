@@ -10,6 +10,7 @@ import eu.okaeri.injector.annotation.Inject;
 import eu.okaeri.persistence.document.ConfigurerProvider;
 import eu.okaeri.platform.core.annotation.Configuration;
 import eu.okaeri.platform.core.annotation.Messages;
+import eu.okaeri.platform.core.component.ComponentHelper;
 import eu.okaeri.platform.core.component.creator.ComponentCreator;
 import eu.okaeri.platform.core.component.creator.ComponentResolver;
 import eu.okaeri.platform.core.component.manifest.BeanManifest;
@@ -79,7 +80,13 @@ public class ConfigurationComponentResolver implements ComponentResolver {
             });
 
             long took = System.currentTimeMillis() - start;
-            creator.log("Loaded configuration: " + configType.getSimpleName() + " { path = " + path + ", provider = " + provider.getSimpleName() + " } [" + took + " ms]");
+            creator.log(ComponentHelper.buildComponentMessage()
+                    .type("Loaded configuration")
+                    .name(configType.getSimpleName())
+                    .took(took)
+                    .meta("path", path)
+                    .meta("provider", provider.getSimpleName())
+                    .build());
             creator.increaseStatistics("configs", 1);
 
             return config;

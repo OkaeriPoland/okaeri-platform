@@ -5,7 +5,7 @@ import eu.okaeri.persistence.repository.DocumentRepository;
 import eu.okaeri.persistence.repository.annotation.DocumentCollection;
 import eu.okaeri.persistence.repository.annotation.DocumentIndex;
 import eu.okaeri.persistence.repository.annotation.DocumentPath;
-import eu.okaeri.platform.core.DependsOn;
+import eu.okaeri.platform.core.annotation.DependsOn;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 
 import java.util.Optional;

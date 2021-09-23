@@ -3,7 +3,7 @@ package eu.okaeri.platform.core.component.manifest;
 import eu.okaeri.injector.Injectable;
 import eu.okaeri.injector.Injector;
 import eu.okaeri.injector.annotation.Inject;
-import eu.okaeri.platform.core.DependsOn;
+import eu.okaeri.platform.core.annotation.DependsOn;
 import eu.okaeri.platform.core.annotation.Bean;
 import eu.okaeri.platform.core.annotation.External;
 import eu.okaeri.platform.core.annotation.Register;

@@ -7,7 +7,8 @@ import eu.okaeri.persistence.document.DocumentPersistence;
 import eu.okaeri.persistence.repository.DocumentRepository;
 import eu.okaeri.persistence.repository.RepositoryDeclaration;
 import eu.okaeri.persistence.repository.annotation.DocumentCollection;
-import eu.okaeri.platform.core.DependsOn;
+import eu.okaeri.platform.core.annotation.DependsOn;
+import eu.okaeri.platform.core.component.ComponentHelper;
 import eu.okaeri.platform.core.component.creator.ComponentCreator;
 import eu.okaeri.platform.core.component.creator.ComponentResolver;
 import eu.okaeri.platform.core.component.manifest.BeanManifest;
@@ -37,6 +38,7 @@ public class DocumentCollectionComponentResolver implements ComponentResolver {
             throw new IllegalArgumentException("Component of @DocumentCollection on type requires class to be a DocumentRepository: " + manifest);
         }
 
+        long start = System.currentTimeMillis();
         DependsOn dependsOnPersistence = Arrays.stream(manifestType.getAnnotationsByType(DependsOn.class))
                 .filter(on -> on.type().isAssignableFrom(DocumentPersistence.class))
                 .findAny()
@@ -52,8 +54,17 @@ public class DocumentCollectionComponentResolver implements ComponentResolver {
         Class<? extends DocumentRepository<?, ?>> repositoryType = (Class<? extends DocumentRepository<?, ?>>) manifestType;
         RepositoryDeclaration<? extends DocumentRepository<?, ?>> repositoryDeclaration = RepositoryDeclaration.of(repositoryType);
         manifest.setName(BeanManifest.nameClass(manifestType));
+        DocumentRepository<?, ?> proxy = repositoryDeclaration.newProxy(persistence, collection, manifestType.getClassLoader());
+
+        long took = System.currentTimeMillis() - start;
+        creator.log(ComponentHelper.buildComponentMessage()
+                .type("Added persistence repository")
+                .name(manifestType.getSimpleName())
+                .took(took)
+                .meta("dependsOn", dependsOnPersistence.name() + "->" + dependsOnPersistence.type().getSimpleName())
+                .build());
         creator.increaseStatistics("persistenceRepositories", 1);
 
-        return repositoryDeclaration.newProxy(persistence, collection, manifestType.getClassLoader());
+        return proxy;
     }
 }

@@ -2,6 +2,7 @@ package eu.okaeri.platform.core.component.type;
 
 import eu.okaeri.injector.Injector;
 import eu.okaeri.platform.core.annotation.Component;
+import eu.okaeri.platform.core.component.ComponentHelper;
 import eu.okaeri.platform.core.component.creator.ComponentCreator;
 import eu.okaeri.platform.core.component.creator.ComponentResolver;
 import eu.okaeri.platform.core.component.manifest.BeanManifest;
@@ -30,6 +31,20 @@ public class GenericComponentResolver implements ComponentResolver {
 
     @Override
     public Object make(@NonNull ComponentCreator creator, @NonNull BeanManifest manifest, @NonNull Injector injector) {
-        return injector.createInstance(manifest.getType());
+
+        long start = System.currentTimeMillis();
+        Object result = injector.createInstance(manifest.getType());
+
+        long took = System.currentTimeMillis() - start;
+        if (took > 1) {
+            creator.log(ComponentHelper.buildComponentMessage()
+                    .type("Added generic component")
+                    .name(manifest.getType().getSimpleName())
+                    .took(took)
+                    .build());
+        }
+        creator.increaseStatistics("components", 1);
+
+        return result;
     }
 }

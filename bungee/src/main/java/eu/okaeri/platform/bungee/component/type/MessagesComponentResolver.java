@@ -13,6 +13,7 @@ import eu.okaeri.placeholders.Placeholders;
 import eu.okaeri.platform.bungee.i18n.BI18n;
 import eu.okaeri.platform.bungee.i18n.I18nColorsConfig;
 import eu.okaeri.platform.core.annotation.Messages;
+import eu.okaeri.platform.core.component.ComponentHelper;
 import eu.okaeri.platform.core.component.creator.ComponentCreator;
 import eu.okaeri.platform.core.component.creator.ComponentResolver;
 import eu.okaeri.platform.core.component.manifest.BeanManifest;
@@ -213,8 +214,15 @@ public class MessagesComponentResolver implements ComponentResolver {
 
             long took = System.currentTimeMillis() - start;
             if ((beanClazz != I18nCommandsMessages.class) || DEBUG) {
-                creator.log("Loaded messages: " + beanClazz.getSimpleName() + " { path = " + path + ", suffix = " + suffix + ", provider = " + provider.getSimpleName() + " } [" + took + " ms]\n" +
-                        "  > " + loadedLocales.stream().map(Locale::toString).collect(Collectors.joining(", ")));
+                creator.log(ComponentHelper.buildComponentMessage()
+                        .type("Loaded messages")
+                        .name(beanClazz.getSimpleName())
+                        .took(took)
+                        .meta("path", path)
+                        .meta("suffix", suffix)
+                        .meta("provider", provider.getSimpleName())
+                        .footer("  > " + loadedLocales.stream().map(Locale::toString).collect(Collectors.joining(", ")))
+                        .build());
             }
 
             manifest.setName(path);
