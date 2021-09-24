@@ -390,10 +390,10 @@ technology (up to 10x faster loading time). We use highly parallelized startup r
 the time server is loading worlds or other plugins. Blocking time is the real time server spent waiting for the platform.
 
 #### Startup Speed
-| Type                                  | Single Thread Speed | Okaeri Preloader Speed | Average relative gain |
-|---------------------------------------|---------------------|------------------------|-----------------------|
-| Example plugin with FLAT persistence  | ~200 ms             | ~20 ms                 | 10x                   |
-| Example plugin with REDIS persistence | ~1200 ms            | ~20 ms                 | 60x                   |
+| Type                           | Single Thread Speed | Okaeri Preloader Speed | Average relative gain |
+|--------------------------------|---------------------|------------------------|-----------------------|
+| Example with FLAT persistence  | ~200 ms             | ~20 ms                 | 10x                   |
+| Example with REDIS persistence | ~1200 ms            | ~20 ms                 | 60x                   |
 
 ### Startup logs
 ```console
