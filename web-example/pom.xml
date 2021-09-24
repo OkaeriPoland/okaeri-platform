@@ -33,7 +33,7 @@
     </dependencies>
 
     <build>
-        <finalName>okaeriplatformtest-cli-${project.version}</finalName>
+        <finalName>okaeriplatformtest-web-${project.version}</finalName>
         <defaultGoal>clean package</defaultGoal>
         <resources>
             <resource>
