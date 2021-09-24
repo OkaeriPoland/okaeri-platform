@@ -384,16 +384,16 @@ public void setup() {
 
 ### Performance
 
-The example plugin loads in under 30ms on the AMD Ryzen 3600 system. Runtime overhead for most of the components is negligible
+The example plugin loads in about 50 ms on the AMD Ryzen 3600 system. Runtime overhead for most of the components is negligible
 as most of the work is done at the startup, which is relatively fast, and even less noticeable thanks to special async preloading
-technology (up to 10x faster loading time). We use highly parallelized startup routine that can load most of the data at
+technology (up to 5x faster loading time). We use highly parallelized startup routine that can load most of the data at
 the time server is loading worlds or other plugins. Blocking time is the real time server spent waiting for the platform.
 
 #### Startup Speed
 | Type                           | Single Thread Speed | Okaeri Preloader Speed | Average relative gain |
 |--------------------------------|---------------------|------------------------|-----------------------|
-| Example with FLAT persistence  | ~200 ms             | ~20 ms                 | 10x                   |
-| Example with REDIS persistence | ~1200 ms            | ~20 ms                 | 60x                   |
+| Example with FLAT persistence  | ~250 ms             | ~50 ms                 | 5x                   |
+| Example with REDIS persistence | ~1250 ms            | ~50 ms                 | 25x                   |
 
 ### Startup logs
 ```console
