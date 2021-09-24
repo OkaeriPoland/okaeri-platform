@@ -1,15 +1,18 @@
 package eu.okaeri.platform.web;
 
+import com.fasterxml.jackson.databind.json.JsonMapper;
 import eu.okaeri.commands.Commands;
 import eu.okaeri.commands.CommandsManager;
 import eu.okaeri.commands.cli.CommandsCli;
 import eu.okaeri.commands.injector.CommandsInjector;
+import eu.okaeri.configs.OkaeriConfig;
 import eu.okaeri.configs.serdes.commons.SerdesCommons;
 import eu.okaeri.configs.yaml.snakeyaml.YamlSnakeYamlConfigurer;
 import eu.okaeri.injector.Injector;
 import eu.okaeri.injector.OkaeriInjector;
 import eu.okaeri.persistence.Persistence;
 import eu.okaeri.persistence.document.ConfigurerProvider;
+import eu.okaeri.persistence.document.Document;
 import eu.okaeri.placeholders.Placeholders;
 import eu.okaeri.platform.core.component.ComponentHelper;
 import eu.okaeri.platform.core.component.ExternalResourceProvider;
@@ -18,7 +21,10 @@ import eu.okaeri.platform.core.exception.BreakException;
 import eu.okaeri.platform.web.component.ApplicationComponentCreator;
 import eu.okaeri.platform.web.component.ApplicationCreatorRegistry;
 import eu.okaeri.platform.web.i18n.SystemLocaleProvider;
+import eu.okaeri.platform.web.persistence.DocumentMixIn;
+import eu.okaeri.platform.web.persistence.OkaeriConfigMixIn;
 import io.javalin.Javalin;
+import io.javalin.plugin.json.JavalinJackson;
 import lombok.Getter;
 import lombok.SneakyThrows;
 import org.slf4j.Logger;
@@ -32,9 +38,9 @@ public class OkaeriWebApplication {
     private static final ExternalResourceProvider EXTERNAL_RESOURCE_PROVIDER = (name, type, source) -> null;
 
     @Getter private final Logger logger = LoggerFactory.getLogger(this.getClass());
-    @Getter private final File dataFolder = ComponentHelper.getJarFile(OkaeriWebApplication.class).getParentFile();
+    @Getter private final File dataFolder = new File(".");
     @Getter private final File jarFile = ComponentHelper.getJarFile(OkaeriWebApplication.class);
-    @Getter private final Javalin javalin = Javalin.create();
+    @Getter private final Javalin javalin = this.setupJavalin();
 
     @Getter private Injector injector;
     @Getter private Commands commands;
@@ -114,6 +120,15 @@ public class OkaeriWebApplication {
     }
 
     public void setup() {
+    }
+
+    public Javalin setupJavalin() {
+        return Javalin.create(config -> {
+            JsonMapper jsonMapper = new JsonMapper();
+            jsonMapper.addMixIn(Document.class, DocumentMixIn.class);
+            jsonMapper.addMixIn(OkaeriConfig.class, OkaeriConfigMixIn.class);
+            config.jsonMapper(new JavalinJackson(jsonMapper));
+        });
     }
 
     public void run(String... args) {

@@ -19,8 +19,51 @@
         <dependency>
             <groupId>eu.okaeri</groupId>
             <artifactId>okaeri-platform-web</artifactId>
-            <version>0.4.0-preview5</version>
+            <version>0.4.0-preview6</version>
             <scope>compile</scope>
+        </dependency>
+
+        <!-- json configurer for redis/jdbc backends -->
+        <dependency>
+            <groupId>eu.okaeri</groupId>
+            <artifactId>okaeri-configs-json-simple</artifactId>
+            <version>3.3.5</version>
+            <scope>compile</scope>
+        </dependency>
+
+        <!-- additional redis backend -->
+        <dependency>
+            <groupId>eu.okaeri</groupId>
+            <artifactId>okaeri-persistence-redis</artifactId>
+            <version>1.5.5</version>
+            <scope>compile</scope>
+        </dependency>
+
+        <!-- additional jdbc backend with the clients of choice (mariadb/mysql here) -->
+        <dependency>
+            <groupId>eu.okaeri</groupId>
+            <artifactId>okaeri-persistence-jdbc</artifactId>
+            <version>1.5.5</version>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.mariadb.jdbc</groupId>
+            <artifactId>mariadb-java-client</artifactId>
+            <version>2.7.2</version>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.h2database</groupId>
+            <artifactId>h2</artifactId>
+            <version>1.4.200</version>
+            <scope>compile</scope>
+        </dependency>
+
+        <!-- jackson for javalin json support -->
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-databind</artifactId>
+            <version>2.12.4</version>
         </dependency>
 
         <!-- lombok for cleaner examples -->
