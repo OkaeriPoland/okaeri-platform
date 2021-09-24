@@ -8,7 +8,6 @@ import eu.okaeri.injector.Injector;
 import eu.okaeri.injector.OkaeriInjector;
 import eu.okaeri.persistence.Persistence;
 import eu.okaeri.persistence.document.ConfigurerProvider;
-import eu.okaeri.placeholders.Placeholders;
 import eu.okaeri.placeholders.bungee.BungeePlaceholders;
 import eu.okaeri.platform.bungee.component.BungeeComponentCreator;
 import eu.okaeri.platform.bungee.component.BungeeCreatorRegistry;
@@ -105,12 +104,18 @@ public class OkaeriBungeePlugin extends Plugin {
         // allow additional setup
         this.setup();
 
-        // preload
+        // (pre)load tasks
         this.getLogger().info("Preloading " + this.getDescription().getName() + " " + this.getDescription().getVersion());
         this.preloader.preloadData("Placeholders", () -> this.injector.registerInjectable("placeholders", BungeePlaceholders.create(true)));
         this.preloader.preloadData("BeanManifest", this::preloadManifest);
-        this.preloader.preloadData("Config", this::preloadConfig);
-        this.preloader.preloadData("LocaleConfig", this::preloadLocaleConfig);
+
+        // optional tasks
+        if (useParallelism) {
+            this.preloader.preloadData("Beans", this::preloadBeans);
+            this.preloader.preloadData("Config", this::preloadConfig);
+            this.preloader.preloadData("LocaleConfig", this::preloadLocaleConfig);
+//            this.preloader.preloadData("Commands", this::preloadCommands); TODO: commands
+        }
     }
 
     private void preloadManifest() {
@@ -119,17 +124,18 @@ public class OkaeriBungeePlugin extends Plugin {
         this.beanManifest.setObject(this);
     }
 
-    @SneakyThrows
-    @SuppressWarnings("BusyWait")
+    private void preloadBeans() {
+        this.preloader.await("BeanManifest");
+        this.preloader.preloadBeans(this.beanManifest, this.injector, this.creator);
+    }
+
     private void preloadConfig() {
-        while (this.beanManifest == null) Thread.sleep(1);
+        this.preloader.await("BeanManifest");
         this.preloader.preloadConfig(this.beanManifest, this.injector, this.creator);
     }
 
-    @SneakyThrows
-    @SuppressWarnings("BusyWait")
     private void preloadLocaleConfig() {
-        while ((this.beanManifest == null) || (!this.injector.getInjectable("placeholders", Placeholders.class).isPresent())) Thread.sleep(1);
+        this.preloader.await("BeanManifest", "Placeholders");
         this.preloader.preloadLocaleConfig(this.beanManifest, this.injector, this.creator);
     }
 

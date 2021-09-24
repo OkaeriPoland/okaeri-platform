@@ -384,24 +384,35 @@ public void setup() {
 
 ### Performance
 
-The example plugin loads in under 50ms on the AMD Ryzen 3600 system. Runtime overhead for most of the components is negligible
+The example plugin loads in under 30ms on the AMD Ryzen 3600 system. Runtime overhead for most of the components is negligible
 as most of the work is done at the startup, which is relatively fast, and even less noticeable thanks to special async preloading
-technology (up to 5x faster loading time). We use highly parallelized startup routine that can load most of the data at
+technology (up to 10x faster loading time). We use highly parallelized startup routine that can load most of the data at
 the time server is loading worlds or other plugins. Blocking time is the real time server spent waiting for the platform.
 
+#### Startup Speed
+| Type                                  | Single Thread Speed | Okaeri Preloader Speed | Average relative gain |
+|---------------------------------------|---------------------|------------------------|-----------------------|
+| Example plugin with FLAT persistence  | ~200 ms             | ~20 ms                 | 10x                   |
+| Example plugin with REDIS persistence | ~1200 ms            | ~20 ms                 | 60x                   |
+
+### Startup logs
 ```console
 # platform startup speed
 [..] Enabling OkaeriPlatformBukkitExample v1.0-SNAPSHOT
 [..] Initializing class org.example.okaeriplatformtest.ExamplePlugin
-[..] ~ Loaded configuration: TestConfig { path = config.yml, provider = DEFAULT } [17 ms]
-[..] ~ Loaded messages: TestLocaleConfig { path = i18n, suffix = .yml, provider = DEFAULT } [31 ms]
+[..] ~ Loaded messages: TestLocaleConfig { path = 'i18n', provider = 'DEFAULT', suffix = '.yml' } [42 ms]
 [..]   > es, en
-[..] - Added scheduled: exampleTimer { delay = 1200, rate = 1200, async = true }
-[..] - Added scheduled: QueuedTeleportsTask { delay = 4, rate = 4, async = false }
-[..] - Added command: TestCommand { label = testcmd, aliases = [testing] }
-[..] - Added scheduled: TestTask { delay = 6000, rate = 6000, async = true }
-[..] - Added listener: TestListener { onCommandsUnknownError, onJoin, onAsyncChat }
-[..] = (configs: 1, commands: 1, listeners: 1, timers: 3, localeConfigs: 11) [blocking: 40 ms]
+[..] ~ Loaded configuration: TestConfig { path = 'config.yml', provider = 'DEFAULT' } [133 ms]
+[..] ~ Added command: TestPreloadedCommand { aliases = [testing], description = '', label = 'testpcmd' } [10 ms]
+[..] ~ Added generic bean: persistence [11 ms]
+[..] - Added delayed: runAfterServerIsFullyLoaded { async = true, time = 20 } [0 ms]
+[..] - Added scheduled: configureTeleportsTask { async = false, delay = 4, rate = 4 } [0 ms]
+[..] - Added scheduled: exampleTimer { async = true, delay = 1200, rate = 1200 } [0 ms]
+[..] - Added persistence repository: PlayerRepository { dependsOn = 'persistence->DocumentPersistence' } [11 ms]
+[..] - Added command: TestCommand { aliases = [testing], description = '', label = 'testcmd' } [3 ms]
+[..] - Added listener: TestListener { methods = [onJoin, onCommandsUnknownError, onAsyncChat] } [2 ms]
+[..] - Added scheduled: TestTask { async = true, delay = 6000, rate = 6000 } [0 ms]
+[..] = (beans: 8, commands: 2, configs: 1, delayed: 1, listeners: 1, localeConfigs: 11, persistenceRepositories: 1, scheduled: 3) [blocking: 22 ms]
 ```
 
 **Commands (okaeri-commands)**

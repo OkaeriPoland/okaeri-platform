@@ -1,5 +1,6 @@
 package eu.okaeri.platform.core.loader;
 
+import eu.okaeri.commands.service.CommandService;
 import eu.okaeri.commons.cache.CacheMap;
 import eu.okaeri.configs.OkaeriConfig;
 import eu.okaeri.configs.schema.ConfigDeclaration;
@@ -26,6 +27,22 @@ public class PlatformPreloader {
     private final String originator;
     private final boolean autoStart;
     @NonNull private final Set<String> asyncBannedTypes;
+
+    public boolean hasLoaded(String... preloaders) {
+        Set<String> names = new HashSet<>(Arrays.asList(preloaders));
+        return this.preloaders.stream()
+                .filter(preloader -> names.contains(preloader.getName()))
+                .filter(AsyncLoader::isDone)
+                .count() == names.size();
+    }
+
+    @SneakyThrows
+    @SuppressWarnings("BusyWait")
+    public void await(String... preloaders) {
+        while (!this.hasLoaded(preloaders)) {
+            Thread.sleep(1);
+        }
+    }
 
     public Thread createPreloadThread(@NonNull String name, @NonNull Runnable runnable) {
         Thread preloader = new Thread(runnable);
@@ -80,7 +97,53 @@ public class PlatformPreloader {
         this.await();
     }
 
+    public void preloadBeans(@NonNull BeanManifest beanManifest, @NonNull Injector injector, @NonNull ComponentCreator creator) {
+        List<BeanManifest> depends = beanManifest.getDepends();
+        for (BeanManifest depend : depends) {
+            // only targeting @Bean
+            if (depend.getSource() != BeanSource.METHOD) {
+                continue;
+            }
+            // must be marked as preload
+            if (!depend.isPreload()) {
+                continue;
+            }
+            // start preload thread
+            this.preloadData("Bean - " + depend.getName(), () -> this.awaitDepend(depend, injector, creator));
+        }
+    }
+
     @SneakyThrows
+    @SuppressWarnings("BusyWait")
+    public void awaitDepend(BeanManifest depend, Injector injector, ComponentCreator creator) {
+        // await when ready
+        while (!depend.ready(injector, false)) {
+            Thread.sleep(1);
+        }
+        // update dependencies
+        depend.update(creator, injector);
+        // everything ok, make
+        depend.setObject(creator.make(depend, injector));
+        injector.registerInjectable(depend.getName(), depend.getObject());
+    }
+
+    public void preloadCommands(@NonNull BeanManifest beanManifest, @NonNull Injector injector, @NonNull ComponentCreator creator) {
+        List<BeanManifest> depends = beanManifest.getDepends();
+        for (BeanManifest depend : depends) {
+            // only targeting @Register
+            if (depend.getSource() != BeanSource.COMPONENT) {
+                continue;
+            }
+            // must be a CommandService and ready
+            if (!CommandService.class.isAssignableFrom(depend.getType()) || !depend.ready(injector)) {
+                continue;
+            }
+            // everything ok, preload
+            depend.setObject(creator.make(depend, injector));
+            injector.registerInjectable(depend.getName(), depend.getObject());
+        }
+    }
+
     public void preloadConfig(@NonNull BeanManifest beanManifest, @NonNull Injector injector, @NonNull ComponentCreator creator) {
         List<BeanManifest> depends = beanManifest.getDepends();
         for (BeanManifest depend : depends) {
@@ -105,7 +168,6 @@ public class PlatformPreloader {
         }
     }
 
-    @SneakyThrows
     public void preloadLocaleConfig(@NonNull BeanManifest beanManifest, @NonNull Injector injector, @NonNull ComponentCreator creator) {
         List<BeanManifest> depends = beanManifest.getDepends();
         for (BeanManifest depend : depends) {
