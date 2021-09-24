@@ -1,4 +1,4 @@
-package org.example.okaeriplatformtest;
+package org.example.okaeriplatformtest.command;
 
 import eu.okaeri.commands.annotation.*;
 import eu.okaeri.commands.bukkit.annotation.Sender;
@@ -18,6 +18,7 @@ import org.apache.commons.lang.RandomStringUtils;
 import org.bukkit.*;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+import org.example.okaeriplatformtest.ExamplePlugin;
 import org.example.okaeriplatformtest.config.TestConfig;
 import org.example.okaeriplatformtest.config.TestLocaleConfig;
 import org.example.okaeriplatformtest.persistence.PlayerProperties;

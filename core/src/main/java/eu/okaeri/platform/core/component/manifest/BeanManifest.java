@@ -90,7 +90,7 @@ public class BeanManifest {
 
         depends.addAll(Arrays.stream(clazz.getDeclaredMethods())
                 .filter(creator::isComponentMethod)
-                .map(method -> BeanManifest.of(method, creator))
+                .map(method -> BeanManifest.of(manifest, method, creator))
                 .collect(Collectors.toList()));
 
         return manifest;
@@ -108,7 +108,7 @@ public class BeanManifest {
         return manifest;
     }
 
-    public static BeanManifest of(@NonNull Method method, @NonNull ComponentCreator creator) {
+    public static BeanManifest of(@NonNull BeanManifest parent, @NonNull Method method, @NonNull ComponentCreator creator) {
 
         Bean annotation = method.getAnnotation(Bean.class);
         if ((annotation == null) && !creator.isComponentMethod(method)) {
@@ -118,6 +118,7 @@ public class BeanManifest {
         BeanManifest manifest = new BeanManifest();
         manifest.setType(method.getReturnType());
         manifest.setName((annotation == null) ? "" : annotation.value());
+        manifest.setPreload(annotation != null && annotation.preload());
 
         manifest.setDepends(Arrays.stream(method.getParameters())
                 .map(BeanManifest::of)
@@ -126,6 +127,7 @@ public class BeanManifest {
 
         manifest.setSource(BeanSource.METHOD);
         manifest.setMethod(method);
+        manifest.setParent(parent);
 
         return manifest;
     }
@@ -138,8 +140,9 @@ public class BeanManifest {
     private Object object;
     private Class<?> type;
     private BeanSource source;
-    private Object parent;
+    private BeanManifest parent;
     private Method method;
+    private boolean preload = false;
     private boolean fullLoad = false;
     private List<BeanManifest> depends;
     private List<External> externals;
@@ -191,7 +194,7 @@ public class BeanManifest {
                 continue;
             }
 
-            depend.setParent(this.object);
+            // create object using creator
             Object createdObject = creator.make(depend, injector);
 
             // a little hack to fool stO0opid BeanManifest - void bean can be executable method eg. @Scheduled
@@ -243,6 +246,10 @@ public class BeanManifest {
     }
 
     public boolean ready(@NonNull Injector injector) {
+        return this.ready(injector, true);
+    }
+
+    public boolean ready(@NonNull Injector injector, boolean registerFail) {
 
         for (BeanManifest depend : this.depends) {
 
@@ -251,6 +258,10 @@ public class BeanManifest {
                 Optional<? extends Injectable<?>> injectable = injector.getExact(depend.getName(), depend.getType());
 
                 if (!injectable.isPresent()) {
+
+                    if (!registerFail) {
+                        return false;
+                    }
 
                     Class<?> dependClass = depend.getType();
                     DependencyPair dependencyPair = new DependencyPair(depend.getName(), dependClass);

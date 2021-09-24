@@ -22,10 +22,10 @@ import java.util.stream.Collectors;
 public final class ComponentHelper {
 
     public static Object invokeMethod(@NonNull BeanManifest manifest, @NonNull Injector injector) {
-        if (manifest.getParent() == null) {
-            throw new IllegalArgumentException("manifest.parent cannot be null to invoke method: " + manifest);
+        if (manifest.getParent().getObject() == null) {
+            throw new IllegalArgumentException("manifest.parent.object cannot be null to invoke method: " + manifest);
         }
-        return invokeMethod(manifest.getParent(), manifest.getMethod(), injector);
+        return invokeMethod(manifest.getParent().getObject(), manifest.getMethod(), injector);
     }
 
     public static Object invokeMethod(@NonNull Object object, @NonNull Method method, @NonNull Injector injector) {
