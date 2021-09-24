@@ -6,9 +6,9 @@ import org.example.okaeriplatformtest.route.IndexController;
 
 
 @Register(IndexController.class)
-public class ExampleApplication extends OkaeriWebApplication {
+public class ExampleWebApplication extends OkaeriWebApplication {
 
     public static void main(String[] args) {
-        OkaeriWebApplication.run(ExampleApplication.class, args);
+        OkaeriWebApplication.run(ExampleWebApplication.class, args);
     }
 }
