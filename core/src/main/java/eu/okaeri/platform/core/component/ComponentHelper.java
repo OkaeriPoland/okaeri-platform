@@ -11,11 +11,13 @@ import lombok.SneakyThrows;
 import lombok.ToString;
 
 import java.io.Closeable;
+import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
+import java.net.URISyntaxException;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -134,6 +136,14 @@ public final class ComponentHelper {
 
     public static ComponentMessageBuilder buildComponentMessage() {
         return new ComponentMessageBuilder();
+    }
+
+    public static File getJarFile(Class<?> clazz) {
+        try {
+            return new File(clazz.getProtectionDomain().getCodeSource().getLocation().toURI());
+        } catch (URISyntaxException exception) {
+            throw new RuntimeException("Failed to resolve jar file of " + clazz, exception);
+        }
     }
 
     @ToString

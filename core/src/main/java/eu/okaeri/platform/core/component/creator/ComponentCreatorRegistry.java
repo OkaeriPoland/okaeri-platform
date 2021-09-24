@@ -7,15 +7,14 @@ import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 
 import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 @RequiredArgsConstructor
 public class ComponentCreatorRegistry {
 
     @NonNull private final Injector injector;
     private final List<ComponentResolver> componentResolvers = new ArrayList<>();
+    private final Set<Class<?>> dynamicTypes = new HashSet<>();
 
     public ComponentCreatorRegistry register(Class<? extends ComponentResolver> componentResolverType) {
         return this.register(this.injector.createInstance(componentResolverType));
@@ -24,6 +23,15 @@ public class ComponentCreatorRegistry {
     public ComponentCreatorRegistry register(ComponentResolver componentResolver) {
         this.componentResolvers.add(componentResolver);
         return this;
+    }
+
+    public ComponentCreatorRegistry registerDynamicType(Class<?> type) {
+        this.dynamicTypes.add(type);
+        return this;
+    }
+
+    public boolean isDynamicType(Class<?> dynamicType) {
+        return this.dynamicTypes.contains(dynamicType);
     }
 
     public boolean supports(Class<?> type) {

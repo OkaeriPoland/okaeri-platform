@@ -399,7 +399,7 @@ the time server is loading worlds or other plugins. Blocking time is the real ti
 ```console
 # platform startup speed
 [..] Enabling OkaeriPlatformBukkitExample v1.0-SNAPSHOT
-[..] Initializing class org.example.okaeriplatformtest.ExamplePlugin
+[..] Initializing class org.example.okaeriplatformtest.ExampleApplication
 [..] ~ Loaded messages: TestLocaleConfig { path = 'i18n', provider = 'DEFAULT', suffix = '.yml' } [42 ms]
 [..]   > es, en
 [..] ~ Loaded configuration: TestConfig { path = 'config.yml', provider = 'DEFAULT' } [133 ms]

@@ -117,7 +117,7 @@ public class PlatformPreloader {
     @SuppressWarnings("BusyWait")
     public void awaitDepend(BeanManifest depend, Injector injector, ComponentCreator creator) {
         // await when ready
-        while (!depend.ready(injector, false)) {
+        while (!depend.ready(creator, injector, false)) {
             Thread.sleep(1);
         }
         // update dependencies
@@ -135,7 +135,7 @@ public class PlatformPreloader {
                 continue;
             }
             // must be a CommandService and ready
-            if (!CommandService.class.isAssignableFrom(depend.getType()) || !depend.ready(injector)) {
+            if (!CommandService.class.isAssignableFrom(depend.getType()) || !depend.ready(creator, injector)) {
                 continue;
             }
             // everything ok, preload
@@ -155,7 +155,7 @@ public class PlatformPreloader {
             // basic type blacklist
             if (!OkaeriConfig.class.isAssignableFrom(depend.getType()) // is not okaeri config
                     || LocaleConfig.class.isAssignableFrom(depend.getType()) // or is locale config
-                    || !depend.ready(injector)) { // or is not ready (somehow has dependencies)
+                    || !depend.ready(creator, injector)) { // or is not ready (somehow has dependencies)
                 continue;
             }
             // async safety check
@@ -178,7 +178,7 @@ public class PlatformPreloader {
             }
             // basic type blacklist
             if (!LocaleConfig.class.isAssignableFrom(depend.getType())  // is not locale config
-                    || !depend.ready(injector)) { // or is not ready (somehow has dependencies)
+                    || !depend.ready(creator, injector)) { // or is not ready (somehow has dependencies)
                 continue;
             }
             // everything ok, preload

@@ -3,12 +3,12 @@ package eu.okaeri.platform.core.component.manifest;
 import eu.okaeri.injector.Injectable;
 import eu.okaeri.injector.Injector;
 import eu.okaeri.injector.annotation.Inject;
-import eu.okaeri.platform.core.annotation.DependsOn;
 import eu.okaeri.platform.core.annotation.Bean;
+import eu.okaeri.platform.core.annotation.DependsOn;
 import eu.okaeri.platform.core.annotation.External;
 import eu.okaeri.platform.core.annotation.Register;
-import eu.okaeri.platform.core.component.creator.ComponentCreator;
 import eu.okaeri.platform.core.component.ExternalResourceProvider;
+import eu.okaeri.platform.core.component.creator.ComponentCreator;
 import lombok.Data;
 import lombok.NonNull;
 
@@ -121,6 +121,7 @@ public class BeanManifest {
         manifest.setPreload(annotation != null && annotation.preload());
 
         manifest.setDepends(Arrays.stream(method.getParameters())
+                .filter(parameter -> !creator.getRegistry().isDynamicType(parameter.getType()))
                 .map(BeanManifest::of)
                 .collect(Collectors.toList()));
         manifest.setExternals(Collections.emptyList());
@@ -148,7 +149,7 @@ public class BeanManifest {
     private List<External> externals;
     private Map<DependencyPair, Integer> failCounter = new HashMap<>();
 
-    public BeanManifest withDepend(@NonNull int pos, BeanManifest beanManifest) {
+    public BeanManifest withDepend(int pos, @NonNull BeanManifest beanManifest) {
         this.depends.add(pos, beanManifest);
         return this;
     }
@@ -169,7 +170,7 @@ public class BeanManifest {
             Optional<? extends Injectable<?>> injectable = injector.getExact(this.name, this.type);
             if (injectable.isPresent()) {
                 this.object = injectable.get().getObject();
-            } else if (this.ready(injector) && creator.isComponent(this.type) && (this.source != BeanSource.INJECT)) {
+            } else if (this.ready(creator, injector) && creator.isComponent(this.type) && (this.source != BeanSource.INJECT)) {
                 this.object = creator.make(this, injector);
                 injector.registerInjectable(this.name, this.object);
             }
@@ -190,7 +191,7 @@ public class BeanManifest {
     private void invokeMethodDependencies(@NonNull ComponentCreator creator, @NonNull Injector injector) {
         for (BeanManifest depend : this.depends) {
 
-            if ((this.object == null) || !depend.ready(injector) || (depend.getSource() != BeanSource.METHOD) || (depend.getObject() != null)) {
+            if ((this.object == null) || !depend.ready(creator, injector) || (depend.getSource() != BeanSource.METHOD) || (depend.getObject() != null)) {
                 continue;
             }
 
@@ -245,11 +246,11 @@ public class BeanManifest {
         }
     }
 
-    public boolean ready(@NonNull Injector injector) {
-        return this.ready(injector, true);
+    public boolean ready(@NonNull ComponentCreator creator, @NonNull Injector injector) {
+        return this.ready(creator, injector, true);
     }
 
-    public boolean ready(@NonNull Injector injector, boolean registerFail) {
+    public boolean ready(@NonNull ComponentCreator creator, @NonNull Injector injector, boolean registerFail) {
 
         for (BeanManifest depend : this.depends) {
 
@@ -274,7 +275,7 @@ public class BeanManifest {
                                 .filter(entry -> entry.getValue() > 10)
                                 .forEach((entry) -> LOGGER.severe(entry.getKey() + " - " + entry.getValue() + " fails"));
                         throw new RuntimeException("Failed to resolve component/bean " + dependClass + " (" + depend.getName() + "=" + depend.getSource() + ") in " + this.getType() + ":\n"
-                                 + injector.all().stream().map(i -> "- '" + i.getName() + "' -> " + i.getType()).collect(Collectors.joining("\n")));
+                                + injector.all().stream().map(i -> "- '" + i.getName() + "' -> " + i.getType()).collect(Collectors.joining("\n")));
                     }
 
                     return false;
@@ -297,7 +298,7 @@ public class BeanManifest {
         long start = System.currentTimeMillis();
         this.injectExternals(injector, resourceProvider);
 
-        while (!this.ready(injector) || (this.fullLoad && !this.fullLoadReady(injector))) {
+        while (!this.ready(creator, injector) || (this.fullLoad && !this.fullLoadReady(injector))) {
 
             // emergency break
             if ((System.currentTimeMillis() - start) > TimeUnit.SECONDS.toMillis(60)) {

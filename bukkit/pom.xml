@@ -55,6 +55,12 @@
             <groupId>eu.okaeri</groupId>
             <artifactId>okaeri-commands-injector</artifactId>
             <version>0.5.3</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>eu.okaeri</groupId>
+                    <artifactId>okaeri-injector</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
 
         <!-- spigot -->

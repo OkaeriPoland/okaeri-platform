@@ -1,0 +1,2 @@
+example-message: '&eHola {Mundo,mundos#who|desconocido}!'
+player-message: '&eHola &f{sender.name}&e!'
