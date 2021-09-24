@@ -78,6 +78,7 @@ public class OkaeriBukkitPlugin extends JavaPlugin {
 
     private BeanManifest beanManifest;
     private final PlatformPreloader preloader = new PlatformPreloader(this.getLogger(), this.getName(), useParallelism, ASYNC_BANNED_TYPES);
+    private long setupTook;
 
     @SuppressWarnings("unused")
     public OkaeriBukkitPlugin() {
@@ -92,6 +93,9 @@ public class OkaeriBukkitPlugin extends JavaPlugin {
 
     // let's see who is faster
     private void postBukkitConstruct() {
+
+        // start timing
+        long start = System.currentTimeMillis();
 
         // setup injector
         this.injector = OkaeriInjector.create(true);
@@ -132,6 +136,9 @@ public class OkaeriBukkitPlugin extends JavaPlugin {
             this.preloader.preloadData("LocaleConfig", this::preloadLocaleConfig);
             this.preloader.preloadData("Commands", this::preloadCommands);
         }
+
+        this.setupTook = System.currentTimeMillis() - start;
+        this.getLogger().info("- Basic setup completed in " + this.setupTook + " ms");
     }
 
     private void preloadManifest() {
@@ -211,7 +218,7 @@ public class OkaeriBukkitPlugin extends JavaPlugin {
             ComponentHelper.invokePostConstruct(this, this.injector);
             // show platform summary
             long took = System.currentTimeMillis() - start;
-            this.getLogger().info(this.creator.getSummaryText(took));
+            this.getLogger().info(this.creator.getSummaryText(took + this.setupTook));
             // call custom enable method
             this.onPlatformEnable();
         }

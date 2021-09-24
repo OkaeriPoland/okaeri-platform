@@ -61,6 +61,7 @@ public class OkaeriBungeePlugin extends Plugin {
 
     private BeanManifest beanManifest;
     private final PlatformPreloader preloader = new PlatformPreloader(this.getLogger(), this.getDescription().getName(), useParallelism, Collections.emptySet());
+    private long setupTook;
 
     @SuppressWarnings("unused")
     public OkaeriBungeePlugin() {
@@ -76,6 +77,9 @@ public class OkaeriBungeePlugin extends Plugin {
 
     // let's see who is faster
     private void postBungeeConstruct() {
+
+        // start timing
+        long start = System.currentTimeMillis();
 
         // setup injector
         this.injector = OkaeriInjector.create(true);
@@ -116,6 +120,9 @@ public class OkaeriBungeePlugin extends Plugin {
             this.preloader.preloadData("LocaleConfig", this::preloadLocaleConfig);
 //            this.preloader.preloadData("Commands", this::preloadCommands); TODO: commands
         }
+
+        this.setupTook = System.currentTimeMillis() - start;
+        this.getLogger().info("- Basic setup completed in " + this.setupTook + " ms");
     }
 
     private void preloadManifest() {
@@ -189,7 +196,7 @@ public class OkaeriBungeePlugin extends Plugin {
             this.creator.dispatchLogs("-");
             // show platform summary
             long took = System.currentTimeMillis() - start;
-            this.getLogger().info(this.creator.getSummaryText(took));
+            this.getLogger().info(this.creator.getSummaryText(took + this.setupTook));
             // call custom enable method
             this.onPlatformEnable();
         }
