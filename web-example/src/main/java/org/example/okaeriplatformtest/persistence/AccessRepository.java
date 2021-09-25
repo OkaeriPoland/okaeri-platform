@@ -17,20 +17,20 @@ import java.util.UUID;
         name = "persistence"
 )
 // example flat/database persistence with custom object
-// note that saving can be done using User#save()
+// note that saving can be done using PlayerPersistence#save()
 // and DocumentRepository#save is not required
 // DocumentRepository provides multiple default methods
 // to create, read, update and delete entities
-@DocumentCollection(path = "user", keyLength = 36, indexes = {
-        @DocumentIndex(path = "name", maxLength = 32)
+@DocumentCollection(path = "access", keyLength = 36, indexes = {
+        @DocumentIndex(path = "token", maxLength = 64)
 })
-public interface UserRepository extends DocumentRepository<UUID, User> {
+public interface AccessRepository extends DocumentRepository<UUID, Access> {
 
     // find by property allows to run an easy search
     // optimized for use with indexed properties
     // superior to filtering result of findAll by hand
     // can scan non-indexed fields using stream
     // filters or platform specific implementation
-    @DocumentPath("name")
-    Optional<User> findByName(String name);
+    @DocumentPath("token")
+    Optional<Access> findByToken(String token);
 }

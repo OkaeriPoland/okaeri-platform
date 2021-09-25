@@ -20,7 +20,7 @@ public class UserController {
     @Inject
     private UserRepository userRepository;
 
-    @Handler(path = "/user/{id}", type = HandlerType.GET)
+    @Handler(path = "/user/{id}", type = HandlerType.GET, permittedRoles = {"USER_READ"})
     public void userGet(Context context) {
 
         UUID id = UUID.fromString(context.pathParam("id")); // FIXME: invalid uuid error handling
@@ -34,23 +34,23 @@ public class UserController {
         context.json(dataOptional.get());
     }
 
-    @Handler(path = "/user/{id}", type = HandlerType.DELETE)
+    @Handler(path = "/user/{id}", type = HandlerType.DELETE, permittedRoles = {"USER_WRITE"})
     public void userDelete(Context context) {
         UUID id = UUID.fromString(context.pathParam("id")); // FIXME: invalid uuid error handling
         context.json(Map.of("status", this.userRepository.deleteByPath(id)));
     }
 
-    @Handler(path = "/user", type = HandlerType.GET)
+    @Handler(path = "/user", type = HandlerType.GET, permittedRoles = {"USER_READ"})
     public void userList(Context context) {
         context.json(this.userRepository.findAll());
     }
 
-    @Handler(path = "/user", type = HandlerType.PUT)
+    @Handler(path = "/user", type = HandlerType.PUT, permittedRoles = {"USER_WRITE"})
     public void userPut(Context context) {
         context.json(this.userRepository.save(context.bodyAsClass(User.class)));
     }
 
-    @Handler(path = "/user/createRandom", type = HandlerType.GET)
+    @Handler(path = "/user/createRandom", type = HandlerType.GET, permittedRoles = {"USER_WRITE"})
     public void createRandom(Context context) {
         User randomUser = this.userRepository.findOrCreateByPath(UUID.randomUUID());
         randomUser.setName("Random User " + ThreadLocalRandom.current().nextInt(10_000));

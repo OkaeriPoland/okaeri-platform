@@ -12,4 +12,5 @@ import java.lang.annotation.Target;
 public @interface Handler {
     String path() default "";
     HandlerType type() default HandlerType.GET;
+    String[] permittedRoles() default {"ANYONE"};
 }
