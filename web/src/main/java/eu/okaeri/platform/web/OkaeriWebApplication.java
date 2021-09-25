@@ -24,6 +24,7 @@ import eu.okaeri.platform.web.i18n.SystemLocaleProvider;
 import eu.okaeri.platform.web.persistence.DocumentMixIn;
 import eu.okaeri.platform.web.persistence.OkaeriConfigMixIn;
 import io.javalin.Javalin;
+import io.javalin.core.JavalinConfig;
 import io.javalin.plugin.json.JavalinJackson;
 import lombok.Getter;
 import lombok.SneakyThrows;
@@ -31,6 +32,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
+import java.util.function.Consumer;
 
 
 public class OkaeriWebApplication {
@@ -40,7 +42,18 @@ public class OkaeriWebApplication {
     @Getter private final Logger logger = LoggerFactory.getLogger(this.getClass());
     @Getter private final File dataFolder = new File(".");
     @Getter private final File jarFile = ComponentHelper.getJarFile(OkaeriWebApplication.class);
-    @Getter private final Javalin javalin = this.setupJavalin();
+
+    @Getter private final Javalin javalin = Javalin.create(config -> {
+        // basic config
+        config.showJavalinBanner = false;
+        // json mapper
+        JsonMapper jsonMapper = new JsonMapper();
+        jsonMapper.addMixIn(Document.class, DocumentMixIn.class);
+        jsonMapper.addMixIn(OkaeriConfig.class, OkaeriConfigMixIn.class);
+        config.jsonMapper(new JavalinJackson(jsonMapper));
+        // allow customization
+        this.setupJavalin().accept(config);
+    });
 
     @Getter private Injector injector;
     @Getter private Commands commands;
@@ -98,6 +111,13 @@ public class OkaeriWebApplication {
             // show platform summary
             long took = System.currentTimeMillis() - start;
             this.getLogger().info(this.creator.getSummaryText(took));
+            // ascii art
+            this.getLogger().info("\n   ____  __                   _    ____  __      __  ____                   \n" +
+                    "  / __ \\/ /______ ____  _____(_)  / __ \\/ /___ _/ /_/ __/___  _________ ___ \n" +
+                    " / / / / //_/ __ `/ _ \\/ ___/ /  / /_/ / / __ `/ __/ /_/ __ \\/ ___/ __ `__ \\\n" +
+                    "/ /_/ / ,< / /_/ /  __/ /  / /  / ____/ / /_/ / /_/ __/ /_/ / /  / / / / / /\n" +
+                    "\\____/_/|_|\\__,_/\\___/_/  /_/  /_/   /_/\\__,_/\\__/_/  \\____/_/  /_/ /_/ /_/ \n" +
+                    "\n            https://github.com/OkaeriPoland/okaeri-platform\n");
             // call custom enable method
             this.run(args);
         }
@@ -122,13 +142,8 @@ public class OkaeriWebApplication {
     public void setup() {
     }
 
-    public Javalin setupJavalin() {
-        return Javalin.create(config -> {
-            JsonMapper jsonMapper = new JsonMapper();
-            jsonMapper.addMixIn(Document.class, DocumentMixIn.class);
-            jsonMapper.addMixIn(OkaeriConfig.class, OkaeriConfigMixIn.class);
-            config.jsonMapper(new JavalinJackson(jsonMapper));
-        });
+    public Consumer<JavalinConfig> setupJavalin() {
+        return config -> {};
     }
 
     public void run(String... args) {
