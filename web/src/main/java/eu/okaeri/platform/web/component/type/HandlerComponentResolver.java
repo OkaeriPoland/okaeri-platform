@@ -8,7 +8,9 @@ import eu.okaeri.platform.core.component.creator.ComponentCreator;
 import eu.okaeri.platform.core.component.creator.ComponentResolver;
 import eu.okaeri.platform.core.component.manifest.BeanManifest;
 import eu.okaeri.platform.web.annotation.Handler;
+import eu.okaeri.platform.web.role.SimpleRouteRole;
 import io.javalin.Javalin;
+import io.javalin.core.security.RouteRole;
 import io.javalin.http.Context;
 import io.javalin.http.HandlerType;
 import lombok.NonNull;
@@ -17,9 +19,7 @@ import org.slf4j.Logger;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class HandlerComponentResolver implements ComponentResolver {
 
@@ -51,17 +51,23 @@ public class HandlerComponentResolver implements ComponentResolver {
         int[] contextIndexes = this.readContextIndexes(parameters);
 
         io.javalin.http.Handler javalinHandler = context -> {
+            Object[] call = null;
             try {
-                Object[] call = this.getCall(contextIndexes, parameters, context, injector);
+                call = this.getCall(contextIndexes, parameters, context, injector);
                 method.invoke(parent.getObject(), call);
                 this.flushCall(call, contextIndexes);
             }
             catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException exception) {
-                this.logger.error("Handler failure", exception);
+                this.logger.error("Handler (" + method + ") failure [" + Arrays.toString(call) + "]", exception);
             }
         };
 
-        this.javalin.addHandler(type, path, javalinHandler);
+        Set<RouteRole> roles = new HashSet<>();
+        for (String roleName : handler.permittedRoles()) {
+            roles.add(new SimpleRouteRole(roleName));
+        }
+
+        this.javalin.addHandler(type, path, javalinHandler, roles.toArray(new RouteRole[0]));
         creator.increaseStatistics("handlers", 1);
 
         return javalinHandler;

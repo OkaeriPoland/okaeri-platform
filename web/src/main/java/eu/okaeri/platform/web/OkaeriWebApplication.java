@@ -23,8 +23,10 @@ import eu.okaeri.platform.web.component.ApplicationCreatorRegistry;
 import eu.okaeri.platform.web.i18n.SystemLocaleProvider;
 import eu.okaeri.platform.web.persistence.DocumentMixIn;
 import eu.okaeri.platform.web.persistence.OkaeriConfigMixIn;
+import eu.okaeri.platform.web.serdes.SerdesWeb;
 import io.javalin.Javalin;
 import io.javalin.core.JavalinConfig;
+import io.javalin.core.security.AccessManager;
 import io.javalin.plugin.json.JavalinJackson;
 import lombok.Getter;
 import lombok.SneakyThrows;
@@ -51,8 +53,6 @@ public class OkaeriWebApplication {
         jsonMapper.addMixIn(Document.class, DocumentMixIn.class);
         jsonMapper.addMixIn(OkaeriConfig.class, OkaeriConfigMixIn.class);
         config.jsonMapper(new JavalinJackson(jsonMapper));
-        // allow customization
-        this.setupJavalin().accept(config);
     });
 
     @Getter private Injector injector;
@@ -79,7 +79,7 @@ public class OkaeriWebApplication {
                 .registerInjectable("javalin", this.getJavalin())
                 .registerInjectable("placeholders", Placeholders.create(true))
                 .registerInjectable("defaultConfigurerProvider", (ConfigurerProvider) YamlSnakeYamlConfigurer::new)
-                .registerInjectable("defaultConfigurerSerdes", new Class[]{SerdesCommons.class})
+                .registerInjectable("defaultConfigurerSerdes", new Class[]{SerdesCommons.class, SerdesWeb.class})
                 .registerInjectable("i18nLocaleProvider", new SystemLocaleProvider());
 
         // commands
@@ -108,6 +108,8 @@ public class OkaeriWebApplication {
             ComponentHelper.injectComponentFields(this, this.injector);
             // call PostConstruct
             ComponentHelper.invokePostConstruct(this, this.injector);
+            // apply javalin customization
+            this.applyJavalinComponents();
             // show platform summary
             long took = System.currentTimeMillis() - start;
             this.getLogger().info(this.creator.getSummaryText(took));
@@ -127,6 +129,20 @@ public class OkaeriWebApplication {
         }
     }
 
+    @SuppressWarnings("unchecked")
+    private void applyJavalinComponents() {
+        // setup access manager
+        this.injector.getExact("accessManager", AccessManager.class).ifPresent(accessManagerInject -> {
+            AccessManager accessManager = accessManagerInject.getObject();
+            this.javalin._conf.accessManager(accessManager);
+        });
+        // custom setup routine
+        this.injector.getExact("javalinConfigurer", Consumer.class).ifPresent(configurerInject -> {
+            Consumer<JavalinConfig> configurer = configurerInject.getObject();
+            JavalinConfig.applyUserConfig(this.javalin, this.javalin._conf, configurer);
+        });
+    }
+
     public void callShutdown() {
 
         // shutdown javalin
@@ -140,10 +156,6 @@ public class OkaeriWebApplication {
     }
 
     public void setup() {
-    }
-
-    public Consumer<JavalinConfig> setupJavalin() {
-        return config -> {};
     }
 
     public void run(String... args) {
