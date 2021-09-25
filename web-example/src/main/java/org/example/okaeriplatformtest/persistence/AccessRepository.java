@@ -17,7 +17,7 @@ import java.util.UUID;
         name = "persistence"
 )
 // example flat/database persistence with custom object
-// note that saving can be done using PlayerPersistence#save()
+// note that saving can be done using Access#save()
 // and DocumentRepository#save is not required
 // DocumentRepository provides multiple default methods
 // to create, read, update and delete entities
