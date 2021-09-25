@@ -16,15 +16,6 @@ import lombok.Getter;
 @Names(strategy = NameStrategy.HYPHEN_CASE, modifier = NameModifier.TO_LOWER_CASE)
 public class TestLocaleConfig extends LocaleConfig {
     // it is HIGHLY recommended that defaultLocale is implemented as default values here
-    private String exampleMessage = "Hello {world,worlds#who|unknown}!"; // pluralization and default values: for details see okaeri-i18n
-    private String playerMessage = "Hello {sender.name}!"; // accessing subfields of placeholders: for details see okaeri-i18n
-    // it is advised to leave messages uncolored and use key based coloring
-    // keys ending with: fail, failed result in &c colored message
-    // keys ending with: success, succeeded result in &a colored message
-    // any other keys with uncolored messages result in &e colored message
-    // for details and defining custom patterns see minecraft/I18N_COLORS.md
-    // you can define such file same way as locales in the plugin's resources
-    // e.g. {path}/es.yml, {path}/colors.yml, or use default values (recommended)
-    private String commandsReloadSuccess = "The configuration has been reloaded!"; // same as: &aThe configuration has been reloaded!
-    private String commandsReloadFail = "Reload fail! See the console for details."; // same as: &cReload fail! See the console for details.
+    private String pageTitle = "Hello {world,worlds#who|unknown}!"; // pluralization and default values: for details see okaeri-i18n
+    private String pageMessage = "Hello {user.name}!"; // accessing subfields of placeholders: for details see okaeri-i18n
 }

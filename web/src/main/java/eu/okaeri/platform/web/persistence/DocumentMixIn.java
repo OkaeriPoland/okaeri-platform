@@ -15,7 +15,7 @@ public abstract class DocumentMixIn {
     @JsonIgnore private DocumentPersistence persistence;
     @JsonIgnore private PersistenceCollection collection;
 
-    @JsonProperty("id")
+    @JsonProperty(value = "id", index = 0)
     @JsonSerialize(using = PersistencePathSerializer.class)
     @JsonDeserialize(using = PersistencePathDeserializer.class)
     private PersistencePath path;
