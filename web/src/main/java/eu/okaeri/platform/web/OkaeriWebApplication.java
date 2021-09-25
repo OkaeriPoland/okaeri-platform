@@ -8,6 +8,7 @@ import eu.okaeri.commands.injector.CommandsInjector;
 import eu.okaeri.configs.OkaeriConfig;
 import eu.okaeri.configs.serdes.commons.SerdesCommons;
 import eu.okaeri.configs.yaml.snakeyaml.YamlSnakeYamlConfigurer;
+import eu.okaeri.injector.Injectable;
 import eu.okaeri.injector.Injector;
 import eu.okaeri.injector.OkaeriInjector;
 import eu.okaeri.persistence.Persistence;
@@ -23,6 +24,7 @@ import eu.okaeri.platform.web.component.ApplicationCreatorRegistry;
 import eu.okaeri.platform.web.i18n.SystemLocaleProvider;
 import eu.okaeri.platform.web.persistence.DocumentMixIn;
 import eu.okaeri.platform.web.persistence.OkaeriConfigMixIn;
+import eu.okaeri.platform.web.role.FallbackAccessManager;
 import eu.okaeri.platform.web.serdes.SerdesWeb;
 import io.javalin.Javalin;
 import io.javalin.core.JavalinConfig;
@@ -131,11 +133,13 @@ public class OkaeriWebApplication {
 
     @SuppressWarnings("unchecked")
     private void applyJavalinComponents() {
+
         // setup access manager
-        this.injector.getExact("accessManager", AccessManager.class).ifPresent(accessManagerInject -> {
-            AccessManager accessManager = accessManagerInject.getObject();
-            this.javalin._conf.accessManager(accessManager);
-        });
+        AccessManager accessManager = this.injector.getExact("accessManager", AccessManager.class)
+                .map(Injectable::getObject)
+                .orElse(new FallbackAccessManager());
+        this.javalin._conf.accessManager(accessManager);
+
         // custom setup routine
         this.injector.getExact("javalinConfigurer", Consumer.class).ifPresent(configurerInject -> {
             Consumer<JavalinConfig> configurer = configurerInject.getObject();
