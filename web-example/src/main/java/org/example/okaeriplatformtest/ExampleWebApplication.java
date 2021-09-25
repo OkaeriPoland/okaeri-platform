@@ -113,7 +113,8 @@ public class ExampleWebApplication extends OkaeriWebApplication {
         switch (config.getStorage().getBackend()) {
             case FLAT:
                 // specify custom child dir in dataFolder or other custom location
-                return new DocumentPersistence(new FlatPersistence(new File(dataFolder, "storage"), ".yml"), YamlSnakeYamlConfigurer::new, new SerdesWeb());
+                File storagePath = new File(config.getStorage().getUri());
+                return new DocumentPersistence(new FlatPersistence(storagePath, ".yml"), YamlSnakeYamlConfigurer::new, new SerdesWeb());
             case REDIS:
                 // construct redis client based on your needs, e.g. using config
                 RedisURI redisUri = RedisURI.create(config.getStorage().getUri());
