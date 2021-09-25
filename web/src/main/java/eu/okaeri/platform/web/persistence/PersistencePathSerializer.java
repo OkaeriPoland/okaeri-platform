@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.SerializerProvider;
 import com.fasterxml.jackson.databind.ser.std.StdSerializer;
+import eu.okaeri.commons.Numbers;
 import eu.okaeri.persistence.PersistencePath;
 
 import java.io.IOException;
@@ -32,6 +33,11 @@ public class PersistencePathSerializer extends StdSerializer<PersistencePath> {
 
     @Override
     public void serialize(PersistencePath persistencePath, JsonGenerator jsonGenerator, SerializerProvider serializerProvider) throws IOException {
-        jsonGenerator.writeString(persistencePath.getValue());
+        String value = persistencePath.getValue();
+        if (Numbers.isInteger(value)) {
+            jsonGenerator.writeNumber(Integer.parseInt(value));
+        } else {
+            jsonGenerator.writeString(value);
+        }
     }
 }
