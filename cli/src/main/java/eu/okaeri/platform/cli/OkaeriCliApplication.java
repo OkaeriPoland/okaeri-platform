@@ -32,7 +32,7 @@ public class OkaeriCliApplication {
     private static final ExternalResourceProvider EXTERNAL_RESOURCE_PROVIDER = (name, type, source) -> null;
 
     @Getter private final Logger logger = Logger.getLogger(this.getClass().getName());
-    @Getter private final File dataFolder = ComponentHelper.getJarFile(OkaeriCliApplication.class).getParentFile();
+    @Getter private final File dataFolder = new File(".");
     @Getter private final File jarFile = ComponentHelper.getJarFile(OkaeriCliApplication.class);
 
     @Getter private Injector injector;
