@@ -6,6 +6,7 @@ import eu.okaeri.platform.core.component.type.*;
 import eu.okaeri.platform.standalone.component.type.MessagesComponentResolver;
 import eu.okaeri.platform.web.annotation.PathParam;
 import eu.okaeri.platform.web.component.type.RequestHandlerComponentResolver;
+import eu.okaeri.platform.web.meta.context.RequestContext;
 import io.javalin.http.Context;
 
 public class ApplicationCreatorRegistry extends ComponentCreatorRegistry {
@@ -20,6 +21,7 @@ public class ApplicationCreatorRegistry extends ComponentCreatorRegistry {
         // web
         this.register(RequestHandlerComponentResolver.class);
         this.registerDynamicType(Context.class);
+        this.registerDynamicType(RequestContext.class);
         this.registerDynamicAnnotation(PathParam.class);
         // generic last
         this.register(BeanComponentResolver.class);

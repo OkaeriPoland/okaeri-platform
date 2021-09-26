@@ -1,4 +1,4 @@
-package eu.okaeri.platform.web.role;
+package eu.okaeri.platform.web.meta.role;
 
 import io.javalin.core.security.RouteRole;
 import lombok.Data;
