@@ -1,7 +1,7 @@
 package org.example.okaeriplatformtest.persistence;
 
 import eu.okaeri.persistence.document.Document;
-import eu.okaeri.platform.web.role.SimpleRouteRole;
+import eu.okaeri.platform.web.meta.role.SimpleRouteRole;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 

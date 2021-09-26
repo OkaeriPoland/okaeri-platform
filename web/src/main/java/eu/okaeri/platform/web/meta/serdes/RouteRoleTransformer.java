@@ -1,9 +1,9 @@
-package eu.okaeri.platform.web.serdes;
+package eu.okaeri.platform.web.meta.serdes;
 
 import eu.okaeri.configs.schema.GenericsPair;
 import eu.okaeri.configs.serdes.SerdesContext;
 import eu.okaeri.configs.serdes.TwoSideObjectTransformer;
-import eu.okaeri.platform.web.role.SimpleRouteRole;
+import eu.okaeri.platform.web.meta.role.SimpleRouteRole;
 
 public class RouteRoleTransformer extends TwoSideObjectTransformer<String, SimpleRouteRole> {
 

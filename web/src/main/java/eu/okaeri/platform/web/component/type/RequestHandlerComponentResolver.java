@@ -4,15 +4,19 @@ import eu.okaeri.commons.cache.CacheMap;
 import eu.okaeri.injector.Injector;
 import eu.okaeri.injector.OkaeriInjector;
 import eu.okaeri.injector.annotation.Inject;
+import eu.okaeri.platform.core.component.ComponentHelper;
 import eu.okaeri.platform.core.component.creator.ComponentCreator;
 import eu.okaeri.platform.core.component.creator.ComponentResolver;
 import eu.okaeri.platform.core.component.manifest.BeanManifest;
 import eu.okaeri.platform.web.meta.PathParamMeta;
 import eu.okaeri.platform.web.meta.RequestHandlerHelper;
 import eu.okaeri.platform.web.meta.RequestHandlerMeta;
+import eu.okaeri.platform.web.meta.context.RequestContext;
+import eu.okaeri.platform.web.meta.role.SimpleRouteRole;
 import io.javalin.Javalin;
 import io.javalin.http.Context;
 import io.javalin.http.Handler;
+import io.javalin.http.HandlerType;
 import lombok.NonNull;
 import org.slf4j.Logger;
 
@@ -21,6 +25,7 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
 import java.util.Arrays;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 public class RequestHandlerComponentResolver implements ComponentResolver {
 
@@ -42,6 +47,7 @@ public class RequestHandlerComponentResolver implements ComponentResolver {
     @Override
     public Object make(@NonNull ComponentCreator creator, @NonNull BeanManifest manifest, @NonNull Injector injector) {
 
+        long start = System.currentTimeMillis();
         BeanManifest parent = manifest.getParent();
         Class<?> parentClass = parent.getType();
         Method method = manifest.getMethod();
@@ -52,7 +58,7 @@ public class RequestHandlerComponentResolver implements ComponentResolver {
         Handler handler = context -> {
             Object[] call = null;
             try {
-                call = this.getCall(handlerMeta, context, injector);
+                call = this.getCall(handlerMeta, RequestContext.of(context), injector);
                 method.invoke(parent.getObject(), call);
                 this.flushCall(call, contextIndexes);
             }
@@ -61,7 +67,20 @@ public class RequestHandlerComponentResolver implements ComponentResolver {
             }
         };
 
-        this.javalin.addHandler(handlerMeta.getType(), handlerMeta.getPath(), handler, handlerMeta.getPermittedRoles());
+        HandlerType handlerType = handlerMeta.getType();
+        String handlerPath = handlerMeta.getPath();
+        SimpleRouteRole[] handlerPermittedRoles = handlerMeta.getPermittedRoles();
+        this.javalin.addHandler(handlerType, handlerPath, handler, handlerPermittedRoles);
+
+        long took = System.currentTimeMillis() - start;
+        creator.log(ComponentHelper.buildComponentMessage()
+                .type("Added handler")
+                .name(parentClass.getSimpleName() + "#" + method.getName())
+                .took(took)
+                .meta("path", handlerPath)
+                .meta("type", handlerType)
+                .meta("permittedRoles", Arrays.stream(handlerPermittedRoles).map(SimpleRouteRole::getName).collect(Collectors.toList()))
+                .build());
         creator.increaseStatistics("handlers", 1);
 
         return handler;

@@ -1,7 +1,7 @@
 package eu.okaeri.platform.web.meta;
 
 import eu.okaeri.platform.web.annotation.Controller;
-import eu.okaeri.platform.web.role.SimpleRouteRole;
+import eu.okaeri.platform.web.meta.role.SimpleRouteRole;
 import io.javalin.http.HandlerType;
 import lombok.Data;
 
