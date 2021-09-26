@@ -11,7 +11,6 @@ import eu.okaeri.platform.core.component.manifest.BeanManifest;
 import eu.okaeri.platform.web.meta.PathParamMeta;
 import eu.okaeri.platform.web.meta.RequestHandlerHelper;
 import eu.okaeri.platform.web.meta.RequestHandlerMeta;
-import eu.okaeri.platform.web.meta.context.RequestContext;
 import eu.okaeri.platform.web.meta.role.SimpleRouteRole;
 import io.javalin.Javalin;
 import io.javalin.http.Context;
@@ -58,7 +57,7 @@ public class RequestHandlerComponentResolver implements ComponentResolver {
         Handler handler = context -> {
             Object[] call = null;
             try {
-                call = this.getCall(handlerMeta, RequestContext.of(context), injector);
+                call = this.getCall(handlerMeta, context, injector);
                 method.invoke(parent.getObject(), call);
                 this.flushCall(call, contextIndexes);
             }
@@ -107,7 +106,17 @@ public class RequestHandlerComponentResolver implements ComponentResolver {
 
         Map<Integer, PathParamMeta> pathParams = handlerMeta.getPathParams();
         for (PathParamMeta pathParam : pathParams.values()) {
-            Object paramValue = context.pathParamAsClass(pathParam.getName(), pathParam.getType()).get();
+
+            Object paramValue;
+            String paramName = pathParam.getName();
+            Class<?> paramType = pathParam.getType();
+
+            try {
+                paramValue = context.pathParamAsClass(paramName, paramType).get();
+            } catch (Exception exception) {
+                throw new RuntimeException("Failed resolving path parameter (" + paramName + ") of type " + paramType, exception);
+            }
+
             prefilledCall[pathParam.getIndex()] = paramValue;
         }
 
