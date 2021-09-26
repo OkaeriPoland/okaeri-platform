@@ -19,6 +19,7 @@ import eu.okaeri.platform.web.role.SimpleAccessManager;
 import eu.okaeri.platform.web.role.SimpleRouteRole;
 import eu.okaeri.platform.web.serdes.SerdesWeb;
 import io.javalin.core.security.AccessManager;
+import io.javalin.core.validation.JavalinValidation;
 import io.javalin.http.Context;
 import io.lettuce.core.RedisClient;
 import io.lettuce.core.RedisURI;
@@ -45,6 +46,13 @@ public class ExampleWebApplication extends OkaeriWebApplication {
     // basic entrypoint inspired by Spring Boot
     public static void main(String[] args) {
         OkaeriWebApplication.run(ExampleWebApplication.class, args);
+    }
+
+    // setup platform
+    @Override
+    public void setup() {
+        // needed for uuid path parameters
+        JavalinValidation.register(UUID.class, UUID::fromString);
     }
 
     // setup access manager for javalin

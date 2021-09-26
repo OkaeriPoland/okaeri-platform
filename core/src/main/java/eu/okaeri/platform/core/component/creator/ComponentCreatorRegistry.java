@@ -6,7 +6,9 @@ import eu.okaeri.platform.core.component.manifest.BeanSource;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 
+import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
+import java.lang.reflect.Parameter;
 import java.util.*;
 
 @RequiredArgsConstructor
@@ -15,6 +17,7 @@ public class ComponentCreatorRegistry {
     @NonNull private final Injector injector;
     private final List<ComponentResolver> componentResolvers = new ArrayList<>();
     private final Set<Class<?>> dynamicTypes = new HashSet<>();
+    private final Set<Class<? extends Annotation>> dynamicAnnotations = new HashSet<>();
 
     public ComponentCreatorRegistry register(Class<? extends ComponentResolver> componentResolverType) {
         return this.register(this.injector.createInstance(componentResolverType));
@@ -30,8 +33,31 @@ public class ComponentCreatorRegistry {
         return this;
     }
 
+    public ComponentCreatorRegistry registerDynamicAnnotation(Class<? extends Annotation> type) {
+        this.dynamicAnnotations.add(type);
+        return this;
+    }
+
     public boolean isDynamicType(Class<?> dynamicType) {
         return this.dynamicTypes.contains(dynamicType);
+    }
+
+    public boolean isDynamicAnnotation(Class<? extends Annotation> annotationType) {
+        return this.dynamicTypes.contains(annotationType);
+    }
+
+    @SuppressWarnings({"Convert2MethodRef"})
+    public boolean isDynamicParameter(Parameter parameter) {
+
+        // check type
+        if (this.isDynamicType(parameter.getType())) {
+            return true;
+        }
+
+        // check if any of annotations is marked as dynamic
+        return this.dynamicAnnotations.stream()
+                .map(type -> parameter.getAnnotation(type))
+                .anyMatch(Objects::nonNull);
     }
 
     public boolean supports(Class<?> type) {

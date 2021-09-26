@@ -121,7 +121,7 @@ public class BeanManifest {
         manifest.setPreload(annotation != null && annotation.preload());
 
         manifest.setDepends(Arrays.stream(method.getParameters())
-                .filter(parameter -> !creator.getRegistry().isDynamicType(parameter.getType()))
+                .filter(parameter -> !creator.getRegistry().isDynamicParameter(parameter))
                 .map(BeanManifest::of)
                 .collect(Collectors.toList()));
         manifest.setExternals(Collections.emptyList());
