@@ -2,9 +2,8 @@ package org.example.okaeriplatformtest.route;
 
 import eu.okaeri.injector.annotation.Inject;
 import eu.okaeri.platform.core.annotation.Component;
-import eu.okaeri.platform.web.annotation.Handler;
+import eu.okaeri.platform.web.annotation.*;
 import io.javalin.http.Context;
-import io.javalin.http.HandlerType;
 import io.javalin.http.HttpCode;
 import org.example.okaeriplatformtest.persistence.User;
 import org.example.okaeriplatformtest.persistence.UserRepository;
@@ -15,17 +14,17 @@ import java.util.UUID;
 import java.util.concurrent.ThreadLocalRandom;
 
 @Component
+// prefix for paths of RequestHandlers inside this component
+@Controller(path = "/user")
 public class UserController {
 
     @Inject
     private UserRepository userRepository;
 
-    @Handler(path = "/user/{id}", type = HandlerType.GET, permittedRoles = {"USER_READ"})
-    public void userGet(Context context) {
+    @GetHandler(path = "/{id}", permittedRoles = {"USER_READ"})
+    public void userGet(Context context, @PathParam("id") UUID id) {
 
-        UUID id = UUID.fromString(context.pathParam("id")); // FIXME: invalid uuid error handling
         Optional<User> dataOptional = this.userRepository.findByPath(id);
-
         if (dataOptional.isEmpty()) {
             context.status(HttpCode.NOT_FOUND).json(Map.of("error", HttpCode.NOT_FOUND));
             return;
@@ -34,23 +33,22 @@ public class UserController {
         context.json(dataOptional.get());
     }
 
-    @Handler(path = "/user/{id}", type = HandlerType.DELETE, permittedRoles = {"USER_WRITE"})
-    public void userDelete(Context context) {
-        UUID id = UUID.fromString(context.pathParam("id")); // FIXME: invalid uuid error handling
+    @DeleteHandler(path = "/{id}", permittedRoles = {"USER_WRITE"})
+    public void userDelete(Context context, @PathParam("id") UUID id) {
         context.json(Map.of("status", this.userRepository.deleteByPath(id)));
     }
 
-    @Handler(path = "/user", type = HandlerType.GET, permittedRoles = {"USER_READ"})
+    @GetHandler(permittedRoles = {"USER_READ"})
     public void userList(Context context) {
         context.json(this.userRepository.findAll());
     }
 
-    @Handler(path = "/user", type = HandlerType.PUT, permittedRoles = {"USER_WRITE"})
+    @PutHandler(permittedRoles = {"USER_WRITE"})
     public void userPut(Context context) {
         context.json(this.userRepository.save(context.bodyAsClass(User.class)));
     }
 
-    @Handler(path = "/user/createRandom", type = HandlerType.GET, permittedRoles = {"USER_WRITE"})
+    @GetHandler(path = "/createRandom", permittedRoles = {"USER_WRITE"})
     public void createRandom(Context context) {
         User randomUser = this.userRepository.findOrCreateByPath(UUID.randomUUID());
         randomUser.setName("Random User " + ThreadLocalRandom.current().nextInt(10_000));
