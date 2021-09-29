@@ -172,10 +172,7 @@ public class OkaeriWebApplication {
     }
 
     @SneakyThrows
-    public static <T extends OkaeriWebApplication> T run(Class<? extends T> type, String[] args) {
-
-        // create instance
-        T app = type.newInstance();
+    public static <T extends OkaeriWebApplication> T run(T app, String[] args) {
 
         // shutdown hook
         Runtime.getRuntime().addShutdownHook(new Thread(app::callShutdown));
@@ -185,5 +182,10 @@ public class OkaeriWebApplication {
 
         // someone may need this
         return app;
+    }
+
+    @SneakyThrows
+    public static <T extends OkaeriWebApplication> T run(Class<? extends T> type, String[] args) {
+        return run(type.newInstance(), args);
     }
 }
