@@ -71,10 +71,10 @@ public class OkaeriWebApplication {
 
         // setup injector
         this.injector = OkaeriInjector.create(true);
-        this.injector.registerInjectable("injector", this.injector);
+        this.getInjector().registerInjectable("injector", this.getInjector());
 
         // register injectables
-        this.injector
+        this.getInjector()
                 .registerInjectable("dataFolder", this.getDataFolder())
                 .registerInjectable("jarFile", this.getJarFile())
                 .registerInjectable("logger", this.getLogger())
@@ -88,35 +88,35 @@ public class OkaeriWebApplication {
 
         // commands
         this.commandsCli = new CommandsCli();
-        this.commands = CommandsManager.create(CommandsInjector.of(this.commandsCli, this.injector));
-        this.injector.registerInjectable("commands", this.commands);
+        this.commands = CommandsManager.create(CommandsInjector.of(this.getCommandsCli(), this.getInjector()));
+        this.getInjector().registerInjectable("commands", this.getCommands());
 
         // setup creator
-        this.creator = new ApplicationComponentCreator(this, new ApplicationCreatorRegistry(this.injector));
+        this.creator = new ApplicationComponentCreator(this, new ApplicationCreatorRegistry(this.getInjector()));
 
         // allow additional setup
         this.setup();
 
         // loading tasks
         this.getLogger().info("Loading " + this.getClass().getSimpleName());
-        BeanManifest beanManifest = BeanManifest.of(this.getClass(), this.creator, true);
+        BeanManifest beanManifest = BeanManifest.of(this.getClass(), this.getCreator(), true);
         beanManifest.setObject(this);
 
         // load commands/other beans
         try {
             // execute component tree and register everything
-            beanManifest.execute(this.creator, this.injector, EXTERNAL_RESOURCE_PROVIDER);
+            beanManifest.execute(this.getCreator(), this.getInjector(), EXTERNAL_RESOURCE_PROVIDER);
             // sub-components do not require manual injecting because
             // these are filled at the initialization by the DI itself
             // plugin instance however is not, so here it goes
-            ComponentHelper.injectComponentFields(this, this.injector);
+            ComponentHelper.injectComponentFields(this, this.getInjector());
             // call PostConstruct
-            ComponentHelper.invokePostConstruct(this, this.injector);
+            ComponentHelper.invokePostConstruct(this, this.getInjector());
             // apply javalin customization
             this.applyJavalinComponents();
             // show platform summary
             long took = System.currentTimeMillis() - start;
-            this.getLogger().info(this.creator.getSummaryText(took));
+            this.getLogger().info(this.getCreator().getSummaryText(took));
             // ascii art
             this.getLogger().info("\n   ____  __                   _    ____  __      __  ____                   \n" +
                     "  / __ \\/ /______ ____  _____(_)  / __ \\/ /___ _/ /_/ __/___  _________ ___ \n" +
@@ -137,35 +137,35 @@ public class OkaeriWebApplication {
     private void applyJavalinComponents() {
 
         // setup access manager
-        AccessManager accessManager = this.injector.getExact("accessManager", AccessManager.class)
+        AccessManager accessManager = this.getInjector().getExact("accessManager", AccessManager.class)
                 .map(Injectable::getObject)
                 .orElse(new FallbackAccessManager());
-        this.javalin._conf.accessManager(accessManager);
+        this.getJavalin()._conf.accessManager(accessManager);
 
         // custom setup routine
-        this.injector.getExact("javalinConfigurer", Consumer.class).ifPresent(configurerInject -> {
+        this.getInjector().getExact("javalinConfigurer", Consumer.class).ifPresent(configurerInject -> {
             Consumer<JavalinConfig> configurer = configurerInject.getObject();
-            JavalinConfig.applyUserConfig(this.javalin, this.javalin._conf, configurer);
+            JavalinConfig.applyUserConfig(this.getJavalin(), this.getJavalin()._conf, configurer);
         });
     }
 
     void callShutdown() {
 
         // shutdown javalin
-        this.javalin.stop();
+        this.getJavalin().stop();
 
         // call custom disable method
         this.shutdown();
 
         // cleanup connections
-        ComponentHelper.closeAllOfType(Persistence.class, this.injector);
+        ComponentHelper.closeAllOfType(Persistence.class, this.getInjector());
     }
 
     public void setup() {
     }
 
     public void run(String... args) {
-        this.javalin.start();
+        this.getJavalin().start();
     }
 
     public void shutdown() {

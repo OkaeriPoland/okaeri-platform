@@ -48,10 +48,10 @@ public class OkaeriCliApplication {
 
         // setup injector
         this.injector = OkaeriInjector.create(true);
-        this.injector.registerInjectable("injector", this.injector);
+        this.getInjector().registerInjectable("injector", this.getInjector());
 
         // register injectables
-        this.injector
+        this.getInjector()
                 .registerInjectable("dataFolder", this.getDataFolder())
                 .registerInjectable("jarFile", this.getJarFile())
                 .registerInjectable("logger", this.getLogger())
@@ -63,33 +63,33 @@ public class OkaeriCliApplication {
 
         // commands
         this.commandsCli = new CommandsCli();
-        this.commands = CommandsManager.create(CommandsInjector.of(this.commandsCli, this.injector));
-        this.injector.registerInjectable("commands", this.commands);
+        this.commands = CommandsManager.create(CommandsInjector.of(this.getCommandsCli(), this.getInjector()));
+        this.getInjector().registerInjectable("commands", this.getCommands());
 
         // setup creator
-        this.creator = new ApplicationComponentCreator(this, new ApplicationCreatorRegistry(this.injector));
+        this.creator = new ApplicationComponentCreator(this, new ApplicationCreatorRegistry(this.getInjector()));
 
         // allow additional setup
         this.setup();
 
         // loading tasks
         if (DEBUG) this.getLogger().info("Loading " + this.getClass().getSimpleName());
-        BeanManifest beanManifest = BeanManifest.of(this.getClass(), this.creator, true);
+        BeanManifest beanManifest = BeanManifest.of(this.getClass(), this.getCreator(), true);
         beanManifest.setObject(this);
 
         // load commands/other beans
         try {
             // execute component tree and register everything
-            beanManifest.execute(this.creator, this.injector, EXTERNAL_RESOURCE_PROVIDER);
+            beanManifest.execute(this.getCreator(), this.getInjector(), EXTERNAL_RESOURCE_PROVIDER);
             // sub-components do not require manual injecting because
             // these are filled at the initialization by the DI itself
             // plugin instance however is not, so here it goes
-            ComponentHelper.injectComponentFields(this, this.injector);
+            ComponentHelper.injectComponentFields(this, this.getInjector());
             // call PostConstruct
-            ComponentHelper.invokePostConstruct(this, this.injector);
+            ComponentHelper.invokePostConstruct(this, this.getInjector());
             // show platform summary
             long took = System.currentTimeMillis() - start;
-            if (DEBUG) this.getLogger().info(this.creator.getSummaryText(took));
+            if (DEBUG) this.getLogger().info(this.getCreator().getSummaryText(took));
             // call custom enable method
             this.run(args);
         }
@@ -105,7 +105,7 @@ public class OkaeriCliApplication {
         this.shutdown();
 
         // cleanup connections
-        ComponentHelper.closeAllOfType(Persistence.class, this.injector);
+        ComponentHelper.closeAllOfType(Persistence.class, this.getInjector());
     }
 
     public void setup() {
@@ -113,7 +113,7 @@ public class OkaeriCliApplication {
 
     public void run(String... args) {
         try {
-            Object result = this.commands.call(String.join(" ", args));
+            Object result = this.getCommands().call(String.join(" ", args));
             System.out.println(result);
         } catch (Exception exception) {
             this.logger.log(Level.WARNING, "Failed command exectuion", exception);
