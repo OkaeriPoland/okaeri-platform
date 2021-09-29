@@ -47,6 +47,22 @@ public class TestConfig extends OkaeriConfig {
     @Comment("Example config value") // built-in comment support
     private String version = "1.0"; // default values
 
+    @Comment("Server settings")
+    private ServerConfig server = new ServerConfig();
+
+    @Getter
+    @Setter
+    public static class ServerConfig extends OkaeriConfig {
+
+        @Variable("OPE_SERVER_HOST")
+        @Comment("The hostname of the jetty server")
+        private String hostname = "0.0.0.0";
+
+        @Variable("OPE_SERVER_PORT")
+        @Comment("The hostname of the jetty server")
+        private int port = 8080;
+    }
+
     @Comment("Storage settings")
     private StorageConfig storage = new StorageConfig();
 

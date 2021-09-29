@@ -21,6 +21,7 @@ import eu.okaeri.platform.web.meta.serdes.SerdesWeb;
 import io.javalin.core.security.AccessManager;
 import io.javalin.core.validation.JavalinValidation;
 import io.javalin.http.Context;
+import io.javalin.jetty.JettyServer;
 import io.lettuce.core.RedisClient;
 import io.lettuce.core.RedisURI;
 import org.example.okaeriplatformtest.config.TestConfig;
@@ -48,11 +49,21 @@ public class ExampleWebApplication extends OkaeriWebApplication {
         OkaeriWebApplication.run(ExampleWebApplication.class, args);
     }
 
-    // setup platform
+    // setup platform before
+    // any beans are executed
     @Override
     public void setup() {
         // needed for uuid path parameters
         JavalinValidation.register(UUID.class, UUID::fromString);
+    }
+
+    // additional javalin setup with dependency aware method
+    // called before Javalin#start and javalinConfigurer
+    @PostConstruct
+    public void configureJetty(JettyServer jetty, TestConfig config) {
+        // custom hostname and port
+        jetty.setServerHost(config.getServer().getHostname());
+        jetty.setServerPort(config.getServer().getPort());
     }
 
     // setup access manager for javalin

@@ -36,6 +36,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
+import java.util.Objects;
 import java.util.function.Consumer;
 
 
@@ -79,6 +80,7 @@ public class OkaeriWebApplication {
                 .registerInjectable("logger", this.getLogger())
                 .registerInjectable("app", this)
                 .registerInjectable("javalin", this.getJavalin())
+                .registerInjectable("jetty", Objects.requireNonNull(this.getJavalin().jettyServer()))
                 .registerInjectable("placeholders", Placeholders.create(true))
                 .registerInjectable("defaultConfigurerProvider", (ConfigurerProvider) YamlSnakeYamlConfigurer::new)
                 .registerInjectable("defaultConfigurerSerdes", new Class[]{SerdesCommons.class, SerdesWeb.class})
@@ -147,7 +149,7 @@ public class OkaeriWebApplication {
         });
     }
 
-    public void callShutdown() {
+    void callShutdown() {
 
         // shutdown javalin
         this.javalin.stop();
@@ -170,15 +172,18 @@ public class OkaeriWebApplication {
     }
 
     @SneakyThrows
-    public static void run(Class<? extends OkaeriWebApplication> type, String[] args) {
+    public static <T extends OkaeriWebApplication> T run(Class<? extends T> type, String[] args) {
 
         // create instance
-        OkaeriWebApplication app = type.newInstance();
+        T app = type.newInstance();
 
         // shutdown hook
         Runtime.getRuntime().addShutdownHook(new Thread(app::callShutdown));
 
         // go!
         app.start(args);
+
+        // someone may need this
+        return app;
     }
 }
