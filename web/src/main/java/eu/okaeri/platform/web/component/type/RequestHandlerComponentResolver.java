@@ -28,8 +28,6 @@ import java.util.stream.Collectors;
 
 public class RequestHandlerComponentResolver implements ComponentResolver {
 
-    private static final Map<Integer, Object[]> prefilledCallCache = new CacheMap<>(256);
-
     @Inject private Javalin javalin;
     @Inject private Logger logger;
 
@@ -53,11 +51,12 @@ public class RequestHandlerComponentResolver implements ComponentResolver {
 
         RequestHandlerMeta handlerMeta = RequestHandlerMeta.of(parentClass, method);
         int[] contextIndexes = handlerMeta.getContextIndexes();
+        Map<Integer, Object[]> prefilledCallCache = new CacheMap<>(256);
 
         Handler handler = context -> {
             Object[] call = null;
             try {
-                call = this.getCall(handlerMeta, context, injector);
+                call = this.getCall(prefilledCallCache, handlerMeta, context, injector);
                 method.invoke(parent.getObject(), call);
                 this.flushCall(call, contextIndexes);
             }
@@ -91,7 +90,7 @@ public class RequestHandlerComponentResolver implements ComponentResolver {
         }
     }
 
-    private Object[] getCall(@NonNull RequestHandlerMeta handlerMeta, @NonNull Context context, @NonNull Injector injector) {
+    private Object[] getCall(@NonNull Map<Integer, Object[]> prefilledCallCache, @NonNull RequestHandlerMeta handlerMeta, @NonNull Context context, @NonNull Injector injector) {
 
         Object[] prefilledCall = prefilledCallCache.computeIfAbsent(Thread.currentThread().hashCode(), (hash) -> {
             OkaeriInjector okaeriInjector = (OkaeriInjector) injector;
