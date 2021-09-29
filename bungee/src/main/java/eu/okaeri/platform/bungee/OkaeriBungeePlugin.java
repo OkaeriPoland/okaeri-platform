@@ -212,6 +212,11 @@ public class OkaeriBungeePlugin extends Plugin {
         // call custom disable method
         this.onPlatformDisable();
 
+        // cleanup tasks
+        this.getInjector().getExact("scheduler", PlatformScheduler.class)
+                .map(Injectable::getObject)
+                .ifPresent(PlatformScheduler::cancelAll);
+
         // cleanup connections
         ComponentHelper.closeAllOfType(Persistence.class, this.injector);
     }
