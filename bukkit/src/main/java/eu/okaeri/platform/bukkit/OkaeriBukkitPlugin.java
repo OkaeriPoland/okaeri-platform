@@ -99,10 +99,10 @@ public class OkaeriBukkitPlugin extends JavaPlugin {
 
         // setup injector
         this.injector = OkaeriInjector.create(true);
-        this.injector.registerInjectable("injector", this.injector);
+        this.getInjector().registerInjectable("injector", this.getInjector());
 
         // register injectables
-        this.injector
+        this.getInjector()
                 .registerInjectable("server", this.getServer())
                 .registerInjectable("dataFolder", this.getDataFolder())
                 .registerInjectable("logger", this.getLogger())
@@ -115,18 +115,18 @@ public class OkaeriBukkitPlugin extends JavaPlugin {
 
         // commands
         this.commandsBukkit = CommandsBukkit.of(this).resultHandler(new BukkitCommandsResultHandler());
-        this.commands = CommandsManager.create(CommandsInjector.of(this.commandsBukkit, this.injector)).register(new CommandsBukkitTypes());
-        this.injector.registerInjectable("commands", this.commands);
+        this.commands = CommandsManager.create(CommandsInjector.of(this.getCommandsBukkit(), this.getInjector())).register(new CommandsBukkitTypes());
+        this.getInjector().registerInjectable("commands", this.getCommands());
 
         // setup creator
-        this.creator = new BukkitComponentCreator(this, new BukkitCreatorRegistry(this.injector));
+        this.creator = new BukkitComponentCreator(this, new BukkitCreatorRegistry(this.getInjector()));
 
         // allow additional setup
         this.setup();
 
         // (pre)load tasks
         this.getLogger().info("Preloading " + this.getName() + " " + this.getDescription().getVersion());
-        this.preloader.preloadData("Placeholders", () -> this.injector.registerInjectable("placeholders", BukkitPlaceholders.create(true)));
+        this.preloader.preloadData("Placeholders", () -> this.getInjector().registerInjectable("placeholders", BukkitPlaceholders.create(true)));
         this.preloader.preloadData("BeanManifest", this::preloadManifest);
 
         // optional tasks
@@ -142,29 +142,29 @@ public class OkaeriBukkitPlugin extends JavaPlugin {
     }
 
     private void preloadManifest() {
-        BeanManifest i18CommandsMessages = BeanManifest.of(I18nCommandsMessages.class, this.creator, false).name("i18n-platform-commands");
-        this.beanManifest = BeanManifest.of(this.getClass(), this.creator, true).withDepend(i18CommandsMessages);
+        BeanManifest i18CommandsMessages = BeanManifest.of(I18nCommandsMessages.class, this.getCreator(), false).name("i18n-platform-commands");
+        this.beanManifest = BeanManifest.of(this.getClass(), this.getCreator(), true).withDepend(i18CommandsMessages);
         this.beanManifest.setObject(this);
     }
 
     private void preloadBeans() {
         this.preloader.await("BeanManifest");
-        this.preloader.preloadBeans(this.beanManifest, this.injector, this.creator);
+        this.preloader.preloadBeans(this.beanManifest, this.getInjector(), this.getCreator());
     }
 
     private void preloadConfig() {
         this.preloader.await("BeanManifest");
-        this.preloader.preloadConfig(this.beanManifest, this.injector, this.creator);
+        this.preloader.preloadConfig(this.beanManifest, this.getInjector(), this.getCreator());
     }
 
     private void preloadLocaleConfig() {
         this.preloader.await("BeanManifest", "Placeholders");
-        this.preloader.preloadLocaleConfig(this.beanManifest, this.injector, this.creator);
+        this.preloader.preloadLocaleConfig(this.beanManifest, this.getInjector(), this.getCreator());
     }
 
     private void preloadCommands() {
         this.preloader.await("BeanManifest", "Config", "LocaleConfig");
-        this.preloader.preloadCommands(this.beanManifest, this.injector, this.creator);
+        this.preloader.preloadCommands(this.beanManifest, this.getInjector(), this.getCreator());
     }
 
     @Override
@@ -181,13 +181,13 @@ public class OkaeriBukkitPlugin extends JavaPlugin {
         // apply i18n text resolver for commands framework
         Set<BI18n> i18nCommandsProviders = new HashSet<>();
         AtomicReference<I18nPrefixProvider> prefixProvider = new AtomicReference<>();
-        this.injector.getInjectable("i18n", BI18n.class)
+        this.getInjector().getInjectable("i18n", BI18n.class)
                 .ifPresent(i18n -> {
                     BI18n bi18n = i18n.getObject();
                     prefixProvider.set(bi18n.getPrefixProvider());
                     i18nCommandsProviders.add(bi18n);
                 });
-        this.injector.getInjectable("i18n-platform-commands", BI18n.class)
+        this.getInjector().getInjectable("i18n-platform-commands", BI18n.class)
                 .ifPresent(i18n -> {
                     BI18n bi18n = i18n.getObject();
                     I18nPrefixProvider i18nPrefixProvider = prefixProvider.get();
@@ -196,29 +196,29 @@ public class OkaeriBukkitPlugin extends JavaPlugin {
                     }
                     i18nCommandsProviders.add(bi18n);
                 });
-        this.commandsBukkit.textHandler(new I18nCommandsTextHandler(i18nCommandsProviders));
+        this.getCommandsBukkit().textHandler(new I18nCommandsTextHandler(i18nCommandsProviders));
 
         // dispatch async logs
         // to show that these were loaded
         // before other components here
-        this.creator.dispatchLogs();
+        this.getCreator().dispatchLogs();
 
         // register late injectables
-        this.injector.registerInjectable("scoreboardManager", this.getServer().getScoreboardManager());
+        this.getInjector().registerInjectable("scoreboardManager", this.getServer().getScoreboardManager());
 
         // load commands/other beans
         try {
             // execute component tree and register everything
-            this.beanManifest.execute(this.creator, this.injector, EXTERNAL_RESOURCE_PROVIDER);
+            this.beanManifest.execute(this.getCreator(), this.getInjector(), EXTERNAL_RESOURCE_PROVIDER);
             // sub-components do not require manual injecting because
             // these are filled at the initialization by the DI itself
             // plugin instance however is not, so here it goes
-            ComponentHelper.injectComponentFields(this, this.injector);
+            ComponentHelper.injectComponentFields(this, this.getInjector());
             // call PostConstruct
-            ComponentHelper.invokePostConstruct(this, this.injector);
+            ComponentHelper.invokePostConstruct(this, this.getInjector());
             // show platform summary
             long took = System.currentTimeMillis() - start;
-            this.getLogger().info(this.creator.getSummaryText(took + this.setupTook));
+            this.getLogger().info(this.getCreator().getSummaryText(took + this.setupTook));
             // call custom enable method
             this.onPlatformEnable();
         }
@@ -235,7 +235,7 @@ public class OkaeriBukkitPlugin extends JavaPlugin {
         this.onPlatformDisable();
 
         // cleanup connections
-        ComponentHelper.closeAllOfType(Persistence.class, this.injector);
+        ComponentHelper.closeAllOfType(Persistence.class, this.getInjector());
     }
 
     public void setup() {
