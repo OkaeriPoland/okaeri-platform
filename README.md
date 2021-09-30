@@ -18,10 +18,10 @@ Whole ecosystems built on top of the best okaeri packages.
 
 ## Supported platforms
 - **Minecraft**
-  - [bukkit](https://github.com/OkaeriPoland/okaeri-platform/tree/master/bukkit): your platform of choice for best Spigot/Paper development experience
-  - [bungee](https://github.com/OkaeriPoland/okaeri-platform/tree/master/bungee): your platform of choice for best BungeeCord development experience
+  - [bukkit](https://github.com/OkaeriPoland/okaeri-platform/tree/master/bukkit): your platform of choice for best Spigot/Paper development experience (*beta - possible breaking changes*)
+  - [bungee](https://github.com/OkaeriPoland/okaeri-platform/tree/master/bungee): your platform of choice for best BungeeCord development experience (*alpha - missing features, possible breaking changes*)
 - **Standalone**
-  - [web](https://github.com/OkaeriPoland/okaeri-platform/tree/master/web): best used as web side of other platforms but can be used fully standalone
+  - [web](https://github.com/OkaeriPoland/okaeri-platform/tree/master/web): best used as web side of other platforms but can be used fully standalone (*beta - basic features, possible breaking changes*)
 
 ## Documentation
 We believe Okaeri Platform is best learned by examples, so feel free to explore README files of supported platforms and linked example projects. 
