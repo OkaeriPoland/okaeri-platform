@@ -1,6 +1,7 @@
 package eu.okaeri.platform.bungee.component;
 
 import eu.okaeri.injector.Injector;
+import eu.okaeri.injector.annotation.Inject;
 import eu.okaeri.platform.bungee.component.type.DelayedComponentResolver;
 import eu.okaeri.platform.bungee.component.type.ListenerComponentResolver;
 import eu.okaeri.platform.bungee.component.type.MessagesComponentResolver;
@@ -13,6 +14,7 @@ import eu.okaeri.platform.core.component.type.GenericComponentResolver;
 
 public class BungeeCreatorRegistry extends ComponentCreatorRegistry {
 
+    @Inject
     public BungeeCreatorRegistry(Injector injector) {
         super(injector);
         // custom first
