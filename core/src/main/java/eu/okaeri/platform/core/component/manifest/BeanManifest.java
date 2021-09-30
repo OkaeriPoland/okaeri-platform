@@ -3,13 +3,12 @@ package eu.okaeri.platform.core.component.manifest;
 import eu.okaeri.injector.Injectable;
 import eu.okaeri.injector.Injector;
 import eu.okaeri.injector.annotation.Inject;
-import eu.okaeri.platform.core.DependsOn;
 import eu.okaeri.platform.core.annotation.Bean;
+import eu.okaeri.platform.core.annotation.DependsOn;
 import eu.okaeri.platform.core.annotation.External;
 import eu.okaeri.platform.core.annotation.Register;
-import eu.okaeri.platform.core.component.ComponentCreator;
 import eu.okaeri.platform.core.component.ExternalResourceProvider;
-import lombok.AllArgsConstructor;
+import eu.okaeri.platform.core.component.creator.ComponentCreator;
 import lombok.Data;
 import lombok.NonNull;
 
@@ -64,16 +63,11 @@ public class BeanManifest {
 
         BeanManifest manifest = new BeanManifest();
         manifest.setType(clazz);
-//        manifest.setName(decapitalize(clazz.getSimpleName()));
-        manifest.setName("");
+        manifest.setName(nameClass(clazz));
         manifest.setSource(BeanSource.COMPONENT);
         manifest.setFullLoad(fullLoad);
 
-        List<External> externals = new ArrayList<>();
-        External.List listAnnotation = clazz.getAnnotation(External.List.class);
-        if (listAnnotation != null) externals.addAll(Arrays.asList(listAnnotation.value()));
-        External externalAnnotation = clazz.getAnnotation(External.class);
-        if (externalAnnotation != null) externals.add(externalAnnotation);
+        List<External> externals = Arrays.asList(clazz.getAnnotationsByType(External.class));
         manifest.setExternals(externals);
 
         List<BeanManifest> depends = new ArrayList<>();
@@ -84,29 +78,19 @@ public class BeanManifest {
                 .map(BeanManifest::of)
                 .collect(Collectors.toList()));
 
-        List<Register> registers = new ArrayList<>();
-        registers.add(clazz.getAnnotation(Register.class));
-        Register.List annotationList = clazz.getAnnotation(Register.List.class);
-        registers.addAll((annotationList == null) ? Collections.emptyList() : Arrays.asList(annotationList.value()));
-
-        depends.addAll(registers.stream()
+        depends.addAll(Arrays.stream(clazz.getAnnotationsByType(Register.class))
                 .filter(Objects::nonNull)
                 .map(reg -> BeanManifest.of(reg, creator))
                 .collect(Collectors.toList()));
 
-        List<DependsOn> dependsOn = new ArrayList<>();
-        dependsOn.add(clazz.getAnnotation(DependsOn.class));
-        DependsOn.List dependsOnAnnotations = clazz.getAnnotation(DependsOn.List.class);
-        dependsOn.addAll((dependsOnAnnotations == null) ? Collections.emptyList() : Arrays.asList(dependsOnAnnotations.value()));
-
-        depends.addAll(dependsOn.stream()
+        depends.addAll(Arrays.stream(clazz.getAnnotationsByType(DependsOn.class))
                 .filter(Objects::nonNull)
                 .map(dependency -> BeanManifest.ofRequirement(dependency.type(), dependency.name()))
                 .collect(Collectors.toList()));
 
         depends.addAll(Arrays.stream(clazz.getDeclaredMethods())
                 .filter(creator::isComponentMethod)
-                .map(method -> BeanManifest.of(method, creator))
+                .map(method -> BeanManifest.of(manifest, method, creator))
                 .collect(Collectors.toList()));
 
         return manifest;
@@ -124,58 +108,48 @@ public class BeanManifest {
         return manifest;
     }
 
-    public static BeanManifest of(@NonNull Method method, @NonNull ComponentCreator creator) {
+    public static BeanManifest of(@NonNull BeanManifest parent, @NonNull Method method, @NonNull ComponentCreator creator) {
 
         Bean annotation = method.getAnnotation(Bean.class);
         if ((annotation == null) && !creator.isComponentMethod(method)) {
-            throw new IllegalArgumentException("cannot create BeanManifest from method without @Bean: " + method);
+            throw new IllegalArgumentException("Cannot create BeanManifest from method without @Bean: " + method);
         }
 
         BeanManifest manifest = new BeanManifest();
         manifest.setType(method.getReturnType());
         manifest.setName((annotation == null) ? "" : annotation.value());
+        manifest.setPreload(annotation != null && annotation.preload());
 
-        List<BeanManifest> depends = new ArrayList<>();
-//        depends.add(ofRequirement(method.getDeclaringClass(), decapitalize(method.getDeclaringClass().getSimpleName())));
-        depends.addAll(Arrays.stream(method.getParameters()).map(BeanManifest::of).collect(Collectors.toList()));
-        manifest.setDepends(depends);
+        manifest.setDepends(Arrays.stream(method.getParameters())
+                .filter(parameter -> !creator.getRegistry().isDynamicParameter(parameter))
+                .map(BeanManifest::of)
+                .collect(Collectors.toList()));
         manifest.setExternals(Collections.emptyList());
 
         manifest.setSource(BeanSource.METHOD);
         manifest.setMethod(method);
-        manifest.setRegister((annotation == null) || annotation.register());
+        manifest.setParent(parent);
 
         return manifest;
     }
 
     public static BeanManifest of(@NonNull Register register, @NonNull ComponentCreator creator) {
-
-        BeanManifest manifest = of(register.value(), creator, false);
-        manifest.setRegister(register.register());
-
-        return manifest;
+        return of(register.value(), creator, false);
     }
 
     private String name;
     private Object object;
     private Class<?> type;
     private BeanSource source;
-    private Object parent;
+    private BeanManifest parent;
     private Method method;
-    private boolean register = true;
+    private boolean preload = false;
     private boolean fullLoad = false;
     private List<BeanManifest> depends;
     private List<External> externals;
     private Map<DependencyPair, Integer> failCounter = new HashMap<>();
 
-    @Data
-    @AllArgsConstructor
-    class DependencyPair {
-        private String name;
-        private Class<?> type;
-    }
-
-    public BeanManifest withDepend(@NonNull int pos, BeanManifest beanManifest) {
+    public BeanManifest withDepend(int pos, @NonNull BeanManifest beanManifest) {
         this.depends.add(pos, beanManifest);
         return this;
     }
@@ -196,8 +170,8 @@ public class BeanManifest {
             Optional<? extends Injectable<?>> injectable = injector.getExact(this.name, this.type);
             if (injectable.isPresent()) {
                 this.object = injectable.get().getObject();
-            } else if (this.ready(injector) && creator.isComponent(this.type) && (this.source != BeanSource.INJECT)) {
-                this.object = creator.makeObject(this, injector);
+            } else if (this.ready(creator, injector) && creator.isComponent(this.type) && (this.source != BeanSource.INJECT)) {
+                this.object = creator.make(this, injector);
                 injector.registerInjectable(this.name, this.object);
             }
         }
@@ -217,14 +191,14 @@ public class BeanManifest {
     private void invokeMethodDependencies(@NonNull ComponentCreator creator, @NonNull Injector injector) {
         for (BeanManifest depend : this.depends) {
 
-            if ((this.object == null) || !depend.ready(injector) || (depend.getSource() != BeanSource.METHOD) || (depend.getObject() != null)) {
+            if ((this.object == null) || !depend.ready(creator, injector) || (depend.getSource() != BeanSource.METHOD) || (depend.getObject() != null)) {
                 continue;
             }
 
-            depend.setParent(this.object);
-            Object createdObject = creator.makeObject(depend, injector);
+            // create object using creator
+            Object createdObject = creator.make(depend, injector);
 
-            // a little hack to fool stO0opid BeanManifest - void bean can be executable method eg. @Timer
+            // a little hack to fool stO0opid BeanManifest - void bean can be executable method eg. @Scheduled
             if ((createdObject == null) && (depend.getMethod().getReturnType() == void.class)) {
                 depend.setObject(void.class);
                 continue;
@@ -272,7 +246,11 @@ public class BeanManifest {
         }
     }
 
-    public boolean ready(@NonNull Injector injector) {
+    public boolean ready(@NonNull ComponentCreator creator, @NonNull Injector injector) {
+        return this.ready(creator, injector, true);
+    }
+
+    public boolean ready(@NonNull ComponentCreator creator, @NonNull Injector injector, boolean registerFail) {
 
         for (BeanManifest depend : this.depends) {
 
@@ -281,6 +259,10 @@ public class BeanManifest {
                 Optional<? extends Injectable<?>> injectable = injector.getExact(depend.getName(), depend.getType());
 
                 if (!injectable.isPresent()) {
+
+                    if (!registerFail) {
+                        return false;
+                    }
 
                     Class<?> dependClass = depend.getType();
                     DependencyPair dependencyPair = new DependencyPair(depend.getName(), dependClass);
@@ -292,7 +274,8 @@ public class BeanManifest {
                                 .sorted(Collections.reverseOrder(Map.Entry.comparingByValue()))
                                 .filter(entry -> entry.getValue() > 10)
                                 .forEach((entry) -> LOGGER.severe(entry.getKey() + " - " + entry.getValue() + " fails"));
-                        throw new RuntimeException("Failed to resolve component/bean " + dependClass + " (" + depend.getName() + "=" + depend.getSource() + ")");
+                        throw new RuntimeException("Failed to resolve component/bean " + dependClass + " (" + depend.getName() + "=" + depend.getSource() + ") in " + this.getType() + ":\n"
+                                + injector.all().stream().map(i -> "- '" + i.getName() + "' -> " + i.getType()).collect(Collectors.joining("\n")));
                     }
 
                     return false;
@@ -315,7 +298,7 @@ public class BeanManifest {
         long start = System.currentTimeMillis();
         this.injectExternals(injector, resourceProvider);
 
-        while (!this.ready(injector) || (this.fullLoad && !this.fullLoadReady(injector))) {
+        while (!this.ready(creator, injector) || (this.fullLoad && !this.fullLoadReady(injector))) {
 
             // emergency break
             if ((System.currentTimeMillis() - start) > TimeUnit.SECONDS.toMillis(60)) {
@@ -330,7 +313,7 @@ public class BeanManifest {
 
     public static String nameClass(@NonNull Class<?> clazz) {
         String text = clazz.getSimpleName();
-        char chars[] = text.toCharArray();
+        char[] chars = text.toCharArray();
         chars[0] = Character.toLowerCase(chars[0]);
         return new String(chars);
     }

@@ -5,7 +5,7 @@
     <parent>
         <artifactId>okaeri-platform</artifactId>
         <groupId>eu.okaeri</groupId>
-        <version>0.3.21</version>
+        <version>0.4.0-preview13</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
@@ -15,63 +15,41 @@
         <!-- core -->
         <dependency>
             <groupId>eu.okaeri</groupId>
-            <artifactId>okaeri-platform-core</artifactId>
-            <version>0.3.21</version>
+            <artifactId>okaeri-platform-minecraft</artifactId>
+            <version>0.4.0-preview13</version>
         </dependency>
 
         <!-- commons -->
         <dependency>
             <groupId>eu.okaeri</groupId>
             <artifactId>okaeri-commons-bukkit</artifactId>
-            <version>0.1.3</version>
-        </dependency>
-
-        <!-- persistence -->
-        <dependency>
-            <groupId>eu.okaeri</groupId>
-            <artifactId>okaeri-persistence-flat</artifactId>
-            <version>1.5.1</version>
+            <version>0.1.5</version>
         </dependency>
 
         <!-- configs -->
         <dependency>
             <groupId>eu.okaeri</groupId>
             <artifactId>okaeri-configs-yaml-bukkit</artifactId>
-            <version>3.3.4</version>
+            <version>3.3.5</version>
         </dependency>
         <dependency>
             <groupId>eu.okaeri</groupId>
             <artifactId>okaeri-configs-serdes-bukkit</artifactId>
-            <version>3.3.4</version>
-        </dependency>
-        <dependency>
-            <groupId>eu.okaeri</groupId>
-            <artifactId>okaeri-configs-serdes-commons</artifactId>
-            <version>3.3.4</version>
-        </dependency>
-        <dependency>
-            <groupId>eu.okaeri</groupId>
-            <artifactId>okaeri-configs-validator-okaeri</artifactId>
-            <version>3.3.4</version>
+            <version>3.3.5</version>
         </dependency>
 
         <!-- messages -->
         <dependency>
             <groupId>eu.okaeri</groupId>
             <artifactId>okaeri-placeholders-bukkit</artifactId>
-            <version>1.4.4</version>
+            <version>1.4.6</version>
         </dependency>
 
         <!-- commands -->
         <dependency>
             <groupId>eu.okaeri</groupId>
             <artifactId>okaeri-commands-bukkit</artifactId>
-            <version>0.5.2</version>
-        </dependency>
-        <dependency>
-            <groupId>eu.okaeri</groupId>
-            <artifactId>okaeri-commands-injector</artifactId>
-            <version>0.5.2</version>
+            <version>0.5.3</version>
         </dependency>
 
         <!-- spigot -->

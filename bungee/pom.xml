@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <parent>
+        <artifactId>okaeri-platform</artifactId>
+        <groupId>eu.okaeri</groupId>
+        <version>0.4.0-preview13</version>
+    </parent>
+    <modelVersion>4.0.0</modelVersion>
+
+    <artifactId>okaeri-platform-bungee</artifactId>
+
+    <dependencies>
+        <!-- core -->
+        <dependency>
+            <groupId>eu.okaeri</groupId>
+            <artifactId>okaeri-platform-minecraft</artifactId>
+            <version>0.4.0-preview13</version>
+        </dependency>
+
+        <!-- configs -->
+        <dependency>
+            <groupId>eu.okaeri</groupId>
+            <artifactId>okaeri-configs-yaml-bungee</artifactId>
+            <version>3.3.5</version>
+        </dependency>
+        <dependency>
+            <groupId>eu.okaeri</groupId>
+            <artifactId>okaeri-configs-serdes-bungee</artifactId>
+            <version>3.3.5</version>
+        </dependency>
+
+        <!-- messages -->
+        <dependency>
+            <groupId>eu.okaeri</groupId>
+            <artifactId>okaeri-placeholders-bungee</artifactId>
+            <version>1.4.6</version>
+        </dependency>
+
+        <!-- commands -->
+<!--        <dependency>-->
+<!--            <groupId>eu.okaeri</groupId>-->
+<!--            <artifactId>okaeri-commands-bukkit</artifactId>-->
+<!--            <version>0.5.2</version>-->
+<!--        </dependency>-->
+<!--        <dependency>-->
+<!--            <groupId>eu.okaeri</groupId>-->
+<!--            <artifactId>okaeri-commands-injector</artifactId>-->
+<!--            <version>0.5.2</version>-->
+<!--        </dependency>-->
+
+        <!-- bungeecord -->
+        <dependency>
+            <groupId>net.md-5</groupId>
+            <artifactId>bungeecord-api</artifactId>
+            <version>1.17-R0.1-SNAPSHOT</version>
+            <type>jar</type>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>net.md-5</groupId>
+            <artifactId>bungeecord-api</artifactId>
+            <version>1.17-R0.1-SNAPSHOT</version>
+            <type>javadoc</type>
+            <scope>provided</scope>
+        </dependency>
+    </dependencies>
+
+    <repositories>
+        <repository>
+            <id>bungeecord-repo</id>
+            <url>https://oss.sonatype.org/content/repositories/snapshots</url>
+        </repository>
+    </repositories>
+
+</project>

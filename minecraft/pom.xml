@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <parent>
+        <artifactId>okaeri-platform</artifactId>
+        <groupId>eu.okaeri</groupId>
+        <version>0.4.0-preview13</version>
+    </parent>
+    <modelVersion>4.0.0</modelVersion>
+
+    <artifactId>okaeri-platform-minecraft</artifactId>
+
+    <dependencies>
+        <!-- core -->
+        <dependency>
+            <groupId>eu.okaeri</groupId>
+            <artifactId>okaeri-platform-core</artifactId>
+            <version>0.4.0-preview13</version>
+        </dependency>
+
+        <!-- commons -->
+        <dependency>
+            <groupId>eu.okaeri</groupId>
+            <artifactId>okaeri-commons-core</artifactId>
+            <version>0.1.5</version>
+        </dependency>
+
+        <!-- persistence -->
+        <dependency>
+            <groupId>eu.okaeri</groupId>
+            <artifactId>okaeri-persistence-flat</artifactId>
+            <version>1.5.5</version>
+        </dependency>
+    </dependencies>
+
+</project>

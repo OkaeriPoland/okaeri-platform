@@ -8,7 +8,6 @@ import java.lang.annotation.*;
 public @interface Register {
 
     Class<?> value();
-    boolean register() default true;
 
     @Target(ElementType.TYPE)
     @Retention(RetentionPolicy.RUNTIME)

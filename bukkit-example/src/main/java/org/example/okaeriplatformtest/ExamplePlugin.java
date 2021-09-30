@@ -15,10 +15,13 @@ import eu.okaeri.persistence.jdbc.H2Persistence;
 import eu.okaeri.persistence.jdbc.MariaDbPersistence;
 import eu.okaeri.persistence.redis.RedisPersistence;
 import eu.okaeri.platform.bukkit.OkaeriBukkitPlugin;
-import eu.okaeri.platform.bukkit.annotation.Timer;
+import eu.okaeri.platform.bukkit.annotation.Delayed;
+import eu.okaeri.platform.bukkit.annotation.Scheduled;
 import eu.okaeri.platform.bukkit.persistence.YamlBukkitPersistence;
 import eu.okaeri.platform.core.annotation.Bean;
 import eu.okaeri.platform.core.annotation.Register;
+import eu.okaeri.platform.core.plan.ExecutionPhase;
+import eu.okaeri.platform.core.plan.Planned;
 import io.lettuce.core.RedisClient;
 import io.lettuce.core.RedisURI;
 import org.bukkit.Bukkit;
@@ -27,6 +30,8 @@ import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.Plugin;
+import org.example.okaeriplatformtest.command.TestCommand;
+import org.example.okaeriplatformtest.command.TestPreloadedCommand;
 import org.example.okaeriplatformtest.config.TestConfig;
 import org.example.okaeriplatformtest.config.TestLocaleConfig;
 import org.example.okaeriplatformtest.persistence.PlayerRepository;
@@ -42,31 +47,32 @@ import java.util.concurrent.atomic.AtomicInteger;
 // - okaeri-commands' CommandService
 // - bukkit's Listener (@Component required)
 // - okaeri-configs configs' (@Configuration required)
-// - Runnables (@Timer required)
+// - Runnables (@Scheduled required)
 // - any beans located in class with @Component
 // skip registration using register=false
 @Register(TestConfig.class)
 @Register(TestLocaleConfig.class)
 @Register(PlayerRepository.class)
 @Register(TestCommand.class)
+@Register(TestPreloadedCommand.class)
 @Register(TestListener.class)
 @Register(TestTask.class)
 public class ExamplePlugin extends OkaeriBukkitPlugin {
 
-    @Override // do not use onEnable (especially without calling super)
-    public void onPlatformEnabled() {
+    @Planned(ExecutionPhase.STARTUP) // do not use onEnable (especially without calling super)
+    public void onStartup() {
         this.getLogger().info("Enabled!");
     }
 
-    @Override // do not use onDisable (especially without calling super)
-    public void onPlatformDisabled() {
+    @Planned(ExecutionPhase.SHUTDOWN) // do not use onDisable (especially without calling super)
+    public void onShutdown() {
         this.getLogger().info("Disabled!");
     }
 
     // built-in persistence utils
     // easy storage for e.g. player properties
     // see persistence/PlayerPersistence for details
-    @Bean("persistence")
+    @Bean(value = "persistence", preload = true)
     public DocumentPersistence configurePersistence(@Inject("dataFolder") File dataFolder, Plugin plugin, TestConfig config) {
 
         // jdbc drivers may require initialization for jdbc urls to work
@@ -140,12 +146,12 @@ public class ExamplePlugin extends OkaeriBukkitPlugin {
         return new AtomicInteger();
     }
 
-    // timer with injected properties
+    // scheduled with injected properties
     // supports all bukkit scheduler features:
     // delay: time before first call (defaults to same as rate)
     // rate: time between executions (in ticks)
     // async: should runTaskTimerAsynchronously be used
-    @Timer(rate = MinecraftTimeEquivalent.MINUTE, async = true)
+    @Scheduled(rate = MinecraftTimeEquivalent.MINUTE, async = true)
     public void exampleTimer(TestConfig config, @Inject("exampleCounter") AtomicInteger counter) {
         Bukkit.broadcastMessage(config.getGreeting() + " [" + counter.getAndIncrement() + "]");
     }
@@ -160,10 +166,10 @@ public class ExamplePlugin extends OkaeriBukkitPlugin {
     }
 
     // QueuedTeleports requires a task to be registered manually for fine control
-    // this also demonstrates using @Timer with classes implementing Runnable
+    // this also demonstrates using @Scheduled with classes implementing Runnable
     // SECONDS_1/5 = 20/4 = 4 ticks = tries to teleport 1 player (3rd argument) every 4 ticks
     // it is always recommended to decrease rate before increasing teleportsPerRun
-    @Timer(rate = MinecraftTimeEquivalent.SECOND / 5)
+    @Scheduled(rate = MinecraftTimeEquivalent.SECOND / 5)
     public QueuedTeleportsTask configureTeleportsTask(QueuedTeleports teleports) {
         return new QueuedTeleportsTask(teleports, this, 1);
     }
@@ -194,5 +200,12 @@ public class ExamplePlugin extends OkaeriBukkitPlugin {
         // getting value is done using #get(), it is possible to force update using #update()
         // remember however that if supplier is blocking it would affect your current thread
         return Cached.of(Duration.ofMinutes(1), () -> config.getGreeting() + " [" + Instant.now() + "]");
+    }
+
+    // run methods scheduled delayed after full server startup
+    // useful for update notifications and other similar tasks
+    @Delayed(time = MinecraftTimeEquivalent.SECOND, async = true)
+    public void runAfterServerIsFullyLoaded() {
+        this.getLogger().info("Looks like server is now fully loaded!");
     }
 }

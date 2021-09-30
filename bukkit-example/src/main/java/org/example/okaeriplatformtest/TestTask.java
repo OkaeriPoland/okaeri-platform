@@ -4,7 +4,7 @@ import eu.okaeri.commons.bukkit.command.CommandRunner;
 import eu.okaeri.commons.bukkit.time.MinecraftTimeEquivalent;
 import eu.okaeri.injector.annotation.Inject;
 import eu.okaeri.persistence.cache.Cached;
-import eu.okaeri.platform.bukkit.annotation.Timer;
+import eu.okaeri.platform.bukkit.annotation.Scheduled;
 import org.bukkit.Bukkit;
 import org.bukkit.Server;
 import org.bukkit.entity.HumanEntity;
@@ -13,9 +13,9 @@ import org.example.okaeriplatformtest.config.TestConfig;
 
 import java.util.Arrays;
 
-// example of timer component class
+// example of scheduled component class
 // async=true - simulating blocking fetching scenario
-@Timer(rate = MinecraftTimeEquivalent.MINUTE * 5, async = true)
+@Scheduled(rate = MinecraftTimeEquivalent.MINUTE * 5, async = true)
 public class TestTask implements Runnable {
 
     @Inject private TestConfig config;

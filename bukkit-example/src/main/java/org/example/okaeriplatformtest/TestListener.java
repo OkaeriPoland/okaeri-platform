@@ -4,6 +4,7 @@ import eu.okaeri.commands.bukkit.handler.CommandsUnknownErrorEvent;
 import eu.okaeri.commands.service.CommandContext;
 import eu.okaeri.commons.bukkit.teleport.QueuedTeleports;
 import eu.okaeri.injector.annotation.Inject;
+import eu.okaeri.platform.bukkit.scheduler.PlatformScheduler;
 import eu.okaeri.platform.core.annotation.Component;
 import org.bukkit.Location;
 import org.bukkit.Server;
@@ -13,7 +14,6 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.player.AsyncPlayerChatEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.scheduler.BukkitScheduler;
 import org.example.okaeriplatformtest.config.TestConfig;
 import org.example.okaeriplatformtest.persistence.PlayerProperties;
 import org.example.okaeriplatformtest.persistence.PlayerRepository;
@@ -29,7 +29,7 @@ public class TestListener implements Listener {
     @Inject private ExamplePlugin plugin;
     @Inject private Logger logger; // plugin's logger (name=logger)
     @Inject private Server server;
-    @Inject private BukkitScheduler scheduler;
+    @Inject private PlatformScheduler scheduler;
     @Inject private TestConfig config;
 
     @Inject private QueuedTeleports queuedTeleports;
@@ -52,7 +52,7 @@ public class TestListener implements Listener {
         // this is especially true for loading and saving
         // failing to do this may cause lag spikes which can
         // range from minor for flat storages and major for databases
-        this.scheduler.runTaskAsynchronously(this.plugin, () -> {
+        this.scheduler.runAsync(() -> {
 
             // read example
             PlayerProperties playerProperties = this.playerPersistence.get(event.getPlayer());

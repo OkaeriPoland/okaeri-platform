@@ -1,0 +1,183 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>org.example</groupId>
+    <artifactId>bungee-test</artifactId>
+    <version>1.0-SNAPSHOT</version>
+
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <maven.compiler.source>8</maven.compiler.source>
+        <maven.compiler.target>8</maven.compiler.target>
+    </properties>
+
+    <dependencies>
+        <!-- base platform -->
+        <dependency>
+            <groupId>eu.okaeri</groupId>
+            <artifactId>okaeri-platform-bungee</artifactId>
+            <version>0.4.0-preview13</version>
+            <scope>compile</scope>
+        </dependency>
+
+        <!-- json configurer for redis/jdbc backends -->
+        <dependency>
+            <groupId>eu.okaeri</groupId>
+            <artifactId>okaeri-configs-json-simple</artifactId>
+            <version>3.3.5</version>
+            <scope>compile</scope>
+        </dependency>
+
+        <!-- additional redis backend -->
+        <dependency>
+            <groupId>eu.okaeri</groupId>
+            <artifactId>okaeri-persistence-redis</artifactId>
+            <version>1.5.5</version>
+            <scope>compile</scope>
+        </dependency>
+
+        <!-- additional jdbc backend with the clients of choice (mariadb/mysql here) -->
+        <dependency>
+            <groupId>eu.okaeri</groupId>
+            <artifactId>okaeri-persistence-jdbc</artifactId>
+            <version>1.5.5</version>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.mariadb.jdbc</groupId>
+            <artifactId>mariadb-java-client</artifactId>
+            <version>2.7.2</version>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.h2database</groupId>
+            <artifactId>h2</artifactId>
+            <version>1.4.200</version>
+            <scope>compile</scope>
+        </dependency>
+
+        <!-- spigot-api/paper-api -->
+        <dependency>
+            <groupId>net.md-5</groupId>
+            <artifactId>bungeecord-api</artifactId>
+            <version>1.17-R0.1-SNAPSHOT</version>
+            <type>jar</type>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>net.md-5</groupId>
+            <artifactId>bungeecord-api</artifactId>
+            <version>1.17-R0.1-SNAPSHOT</version>
+            <type>javadoc</type>
+            <scope>provided</scope>
+        </dependency>
+
+        <!-- lombok for cleaner examples -->
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <version>1.18.20</version>
+            <scope>provided</scope>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <finalName>okaeriplatformtest-bungee-${project.version}</finalName>
+        <defaultGoal>clean package</defaultGoal>
+        <resources>
+            <resource>
+                <directory>src/main/resources</directory>
+                <filtering>true</filtering>
+            </resource>
+        </resources>
+
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-shade-plugin</artifactId>
+                <version>3.2.4</version>
+                <executions>
+                    <execution>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>shade</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <minimizeJar>false</minimizeJar>
+                    <createDependencyReducedPom>false</createDependencyReducedPom>
+                    <transformers>
+                        <!-- support for multiple jdbc drivers -->
+                        <transformer implementation="org.apache.maven.plugins.shade.resource.AppendingTransformer">
+                            <resource>META-INF/services/java.sql.Driver</resource>
+                        </transformer>
+                    </transformers>
+                    <relocations>
+                        <!-- platform -->
+<!--                        <relocation>-->
+<!--                            <pattern>eu.okaeri.</pattern>-->
+<!--                            <shadedPattern>org.example.okaeriplatformtest.platform.</shadedPattern>-->
+<!--                        </relocation>-->
+                        <!-- redis dependencies -->
+                        <relocation>
+                            <pattern>io.lettuce.core.</pattern>
+                            <shadedPattern>org.example.okaeriplatformtest.libs.io.lettuce.core.</shadedPattern>
+                        </relocation>
+                        <relocation>
+                            <pattern>io.netty.</pattern>
+                            <shadedPattern>org.example.okaeriplatformtest.libs.io.netty.</shadedPattern>
+                        </relocation>
+                        <relocation>
+                            <pattern>reactor.</pattern>
+                            <shadedPattern>org.example.okaeriplatformtest.libs.reactor.</shadedPattern>
+                        </relocation>
+                        <relocation>
+                            <pattern>org.reactivestreams.</pattern>
+                            <shadedPattern>org.example.okaeriplatformtest.libs.org.reactivestreams.</shadedPattern>
+                        </relocation>
+                        <!-- jdbc dependencies -->
+                        <relocation>
+                            <pattern>com.zaxxer.hikari.</pattern>
+                            <shadedPattern>org.example.okaeriplatformtest.libs.com.zaxxer.hikari.</shadedPattern>
+                        </relocation>
+                        <relocation>
+                            <pattern>org.slf4j.</pattern>
+                            <shadedPattern>org.example.okaeriplatformtest.libs.org.slf4j.</shadedPattern>
+                        </relocation>
+                        <!-- jdbc - mariadb/mysql driver -->
+                        <relocation>
+                            <pattern>org.mariadb.jdbc.</pattern>
+                            <shadedPattern>org.example.okaeriplatformtest.libs.org.mariadb.jdbc.</shadedPattern>
+                        </relocation>
+                        <!-- jdbc - h2 driver -->
+                        <relocation>
+                            <pattern>org.h2.</pattern>
+                            <shadedPattern>org.example.okaeriplatformtest.libs.org.h2.</shadedPattern>
+                        </relocation>
+                        <!-- okaeri-configs json-simple dependency used for redis/jdbc -->
+                        <relocation>
+                            <pattern>org.json.simple.</pattern>
+                            <shadedPattern>org.example.okaeriplatformtest.libs.org.json.simple.</shadedPattern>
+                        </relocation>
+                    </relocations>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+
+    <repositories>
+        <repository>
+            <id>okaeri-repo</id>
+            <url>https://storehouse.okaeri.eu/repository/maven-public/</url>
+        </repository>
+        <repository>
+            <id>bungeecord-repo</id>
+            <url>https://oss.sonatype.org/content/repositories/snapshots</url>
+        </repository>
+    </repositories>
+
+</project>

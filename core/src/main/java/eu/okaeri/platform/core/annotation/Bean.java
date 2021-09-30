@@ -9,5 +9,5 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 public @interface Bean {
     String value() default "";
-    boolean register() default true;
+    boolean preload() default false;
 }
