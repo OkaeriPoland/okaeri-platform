@@ -1,6 +1,7 @@
 package eu.okaeri.platform.bukkit.component;
 
 import eu.okaeri.injector.Injector;
+import eu.okaeri.injector.annotation.Inject;
 import eu.okaeri.platform.bukkit.component.type.DelayedComponentResolver;
 import eu.okaeri.platform.bukkit.component.type.ListenerComponentResolver;
 import eu.okaeri.platform.bukkit.component.type.MessagesComponentResolver;
@@ -10,6 +11,7 @@ import eu.okaeri.platform.core.component.type.*;
 
 public class BukkitCreatorRegistry extends ComponentCreatorRegistry {
 
+    @Inject
     public BukkitCreatorRegistry(Injector injector) {
         super(injector);
         // custom first

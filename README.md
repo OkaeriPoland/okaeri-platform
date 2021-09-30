@@ -67,13 +67,13 @@ public class ExamplePlugin extends OkaeriBukkitPlugin {
   @Inject("subbean")
   private String subbeanStr;
 
-  @Override // do not use onEnable (especially without calling super)
-  public void onPlatformEnable() {
+  @Planned(ExecutionPhase.STARTUP) // do not use onEnable (especially without calling super)
+  public void onStartup() {
     this.getLogger().info("Enabled!");
   }
 
-  @Override // do not use onDisable (especially without calling super)
-  public void onPlatformDisable() {
+  @Planned(ExecutionPhase.SHUTDOWN) // do not use onDisable (especially without calling super)
+  public void onShutdown() {
     this.getLogger().info("Disabled!");
   }
 
@@ -384,35 +384,28 @@ public void setup() {
 
 ### Performance
 
-The example plugin loads in about 50 ms on the AMD Ryzen 3600 system. Runtime overhead for most of the components is negligible
-as most of the work is done at the startup, which is relatively fast, and even less noticeable thanks to special async preloading
-technology (up to 5x faster loading time). We use highly parallelized startup routine that can load most of the data at
-the time server is loading worlds or other plugins. Blocking time is the real time server spent waiting for the platform.
-
-#### Startup Speed
-| Type                           | Single Thread Speed | Okaeri Preloader Speed | Average relative gain |
-|--------------------------------|---------------------|------------------------|-----------------------|
-| Example with FLAT persistence  | ~250 ms             | ~50 ms                 | 5x                   |
-| Example with REDIS persistence | ~1250 ms            | ~50 ms                 | 25x                   |
+The example plugin with flat persistence loads in about 250 ms on the AMD Ryzen 3600 system. Runtime overhead for
+most of the components is negligible as most of the work is done at the startup, which is relatively fast.
 
 ### Startup logs
 ```console
 # platform startup speed
 [..] Enabling OkaeriPlatformBukkitExample v1.0-SNAPSHOT
-[..] Initializing class org.example.okaeriplatformtest.ExamplePlugin
-[..] ~ Loaded messages: TestLocaleConfig { path = 'i18n', provider = 'DEFAULT', suffix = '.yml' } [42 ms]
-[..]   > es, en
-[..] ~ Loaded configuration: TestConfig { path = 'config.yml', provider = 'DEFAULT' } [133 ms]
-[..] ~ Added command: TestPreloadedCommand { aliases = [testing], description = '', label = 'testpcmd' } [10 ms]
-[..] ~ Added generic bean: persistence [11 ms]
-[..] - Added delayed: runAfterServerIsFullyLoaded { async = true, time = 20 } [0 ms]
+[..] Loading ExamplePlugin
+[..] - Added generic bean: joinReward [24 ms]
 [..] - Added scheduled: configureTeleportsTask { async = false, delay = 4, rate = 4 } [0 ms]
+[..] - Added delayed: runAfterServerIsFullyLoaded { async = true, time = 20 } [0 ms]
+[..] - Loaded configuration: TestConfig { path = 'config.yml', provider = 'DEFAULT' } [42 ms]
+[..] - Loaded messages: TestLocaleConfig { path = 'i18n', provider = 'DEFAULT', suffix = '.yml' } [21 ms]
+[..]   > en, es
+[..] - Added command: TestPreloadedCommand { aliases = [testing], description = '', label = 'testpcmd' } [9 ms]
+[..] - Added generic bean: persistence [9 ms]
 [..] - Added scheduled: exampleTimer { async = true, delay = 1200, rate = 1200 } [0 ms]
-[..] - Added persistence repository: PlayerRepository { dependsOn = 'persistence->DocumentPersistence' } [11 ms]
-[..] - Added command: TestCommand { aliases = [testing], description = '', label = 'testcmd' } [3 ms]
-[..] - Added listener: TestListener { methods = [onJoin, onCommandsUnknownError, onAsyncChat] } [2 ms]
+[..] - Added persistence repository: PlayerRepository { dependsOn = 'persistence->DocumentPersistence' } [19 ms]
+[..] - Added command: TestCommand { aliases = [testing], description = '', label = 'testcmd' } [4 ms]
+[..] - Added listener: TestListener { methods = [onCommandsUnknownError, onAsyncChat, onJoin] } [2 ms]
 [..] - Added scheduled: TestTask { async = true, delay = 6000, rate = 6000 } [0 ms]
-[..] = (beans: 8, commands: 2, configs: 1, delayed: 1, listeners: 1, localeConfigs: 11, persistenceRepositories: 1, scheduled: 3) [blocking: 22 ms]
+[..] = (beans: 8, commands: 2, configs: 1, delayed: 1, listeners: 1, localeConfigs: 11, persistenceRepositories: 1, scheduled: 3) [blocking: 247 ms]
 ```
 
 **Commands (okaeri-commands)**

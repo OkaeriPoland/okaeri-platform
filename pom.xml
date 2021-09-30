@@ -16,7 +16,6 @@
         <module>bungee</module>
         <!-- standalone -->
         <module>standalone</module>
-        <module>cli</module>
         <module>web</module>
     </modules>
 

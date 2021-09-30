@@ -1,5 +1,6 @@
 package eu.okaeri.platform.web.component;
 
+import eu.okaeri.injector.annotation.Inject;
 import eu.okaeri.platform.core.component.creator.ComponentCreator;
 import eu.okaeri.platform.core.component.creator.ComponentCreatorRegistry;
 import eu.okaeri.platform.web.OkaeriWebApplication;
@@ -9,6 +10,7 @@ public class ApplicationComponentCreator extends ComponentCreator {
 
     private final OkaeriWebApplication app;
 
+    @Inject
     public ApplicationComponentCreator(@NonNull OkaeriWebApplication app, @NonNull ComponentCreatorRegistry creatorRegistry) {
         super(creatorRegistry);
         this.app = app;

@@ -20,6 +20,8 @@ import eu.okaeri.platform.bukkit.annotation.Scheduled;
 import eu.okaeri.platform.bukkit.persistence.YamlBukkitPersistence;
 import eu.okaeri.platform.core.annotation.Bean;
 import eu.okaeri.platform.core.annotation.Register;
+import eu.okaeri.platform.core.plan.ExecutionPhase;
+import eu.okaeri.platform.core.plan.Planned;
 import io.lettuce.core.RedisClient;
 import io.lettuce.core.RedisURI;
 import org.bukkit.Bukkit;
@@ -57,13 +59,13 @@ import java.util.concurrent.atomic.AtomicInteger;
 @Register(TestTask.class)
 public class ExamplePlugin extends OkaeriBukkitPlugin {
 
-    @Override // do not use onEnable (especially without calling super)
-    public void onPlatformEnable() {
+    @Planned(ExecutionPhase.STARTUP) // do not use onEnable (especially without calling super)
+    public void onStartup() {
         this.getLogger().info("Enabled!");
     }
 
-    @Override // do not use onDisable (especially without calling super)
-    public void onPlatformDisable() {
+    @Planned(ExecutionPhase.SHUTDOWN) // do not use onDisable (especially without calling super)
+    public void onShutdown() {
         this.getLogger().info("Disabled!");
     }
 

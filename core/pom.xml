@@ -25,6 +25,17 @@
             <artifactId>okaeri-commands-core</artifactId>
             <version>0.5.3</version>
         </dependency>
+        <dependency>
+            <groupId>eu.okaeri</groupId>
+            <artifactId>okaeri-commands-injector</artifactId>
+            <version>0.5.3</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>eu.okaeri</groupId>
+                    <artifactId>okaeri-injector</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
 
         <!-- commons -->
         <dependency>
@@ -61,7 +72,7 @@
         <dependency>
             <groupId>eu.okaeri</groupId>
             <artifactId>okaeri-injector</artifactId>
-            <version>1.6.2</version>
+            <version>1.7.0</version>
         </dependency>
     </dependencies>
 

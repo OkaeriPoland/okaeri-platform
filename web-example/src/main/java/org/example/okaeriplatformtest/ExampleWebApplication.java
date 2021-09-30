@@ -5,7 +5,6 @@ import eu.okaeri.commons.Strings;
 import eu.okaeri.configs.json.simple.JsonSimpleConfigurer;
 import eu.okaeri.configs.yaml.snakeyaml.YamlSnakeYamlConfigurer;
 import eu.okaeri.injector.annotation.Inject;
-import eu.okaeri.injector.annotation.PostConstruct;
 import eu.okaeri.persistence.PersistencePath;
 import eu.okaeri.persistence.document.DocumentPersistence;
 import eu.okaeri.persistence.flat.FlatPersistence;
@@ -14,6 +13,8 @@ import eu.okaeri.persistence.jdbc.MariaDbPersistence;
 import eu.okaeri.persistence.redis.RedisPersistence;
 import eu.okaeri.platform.core.annotation.Bean;
 import eu.okaeri.platform.core.annotation.Register;
+import eu.okaeri.platform.core.plan.ExecutionPhase;
+import eu.okaeri.platform.core.plan.Planned;
 import eu.okaeri.platform.web.OkaeriWebApplication;
 import eu.okaeri.platform.web.meta.role.SimpleAccessManager;
 import eu.okaeri.platform.web.meta.role.SimpleRouteRole;
@@ -49,9 +50,9 @@ public class ExampleWebApplication extends OkaeriWebApplication {
         OkaeriWebApplication.run(ExampleWebApplication.class, args);
     }
 
-    // setup platform before
-    // any beans are executed
-    @Override
+    // setup platform before any beans are executed
+    // still supports basic injectables
+    @Planned(ExecutionPhase.SETUP)
     public void setup() {
         // needed for uuid path parameters
         JavalinValidation.register(UUID.class, UUID::fromString);
@@ -59,7 +60,7 @@ public class ExampleWebApplication extends OkaeriWebApplication {
 
     // additional javalin setup with dependency aware method
     // called before Javalin#start and javalinConfigurer
-    @PostConstruct
+    @Planned(ExecutionPhase.PRE_STARTUP)
     public void configureJetty(JettyServer jetty, TestConfig config) {
         // custom hostname and port
         jetty.setServerHost(config.getServer().getHostname());
@@ -93,7 +94,7 @@ public class ExampleWebApplication extends OkaeriWebApplication {
     }
 
     // generate default access
-    @PostConstruct
+    @Planned(ExecutionPhase.POST_STARTUP)
     public void generateDefaultAccess(AccessRepository accessRepository) {
         // access already exists
         if (accessRepository.count() > 0) {
