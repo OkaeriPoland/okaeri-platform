@@ -106,11 +106,11 @@ public class ExampleWebApplication extends OkaeriWebApplication {
         access.setRoles(Set.of(SimpleRouteRole.SUPERADMIN));
         access.save();
         // log info banner
-        this.getLogger().info("=".repeat(88));
-        this.getLogger().info("");
-        this.getLogger().info("Your new access token: " + access.getToken());
-        this.getLogger().info("");
-        this.getLogger().info("=".repeat(88));
+        this.log("=".repeat(88));
+        this.log("");
+        this.log("Your new access token: " + access.getToken());
+        this.log("");
+        this.log("=".repeat(88));
     }
 
     // built-in persistence utils
