@@ -1,6 +1,7 @@
 package eu.okaeri.platform.bungee.i18n;
 
 import eu.okaeri.i18n.configs.LocaleConfig;
+import eu.okaeri.platform.bungee.i18n.message.BungeeMessageDispatcher;
 import eu.okaeri.platform.minecraft.i18n.I18nMessageColors;
 import eu.okaeri.platform.minecraft.i18n.MI18n;
 import lombok.Getter;
@@ -24,6 +25,11 @@ public class BI18n extends MI18n {
     public BI18n(I18nColorsConfig colorsConfig, String prefixField, String prefixMarker) {
         super(prefixField, prefixMarker);
         this.colorsConfig = colorsConfig;
+    }
+
+    @Override
+    public BungeeMessageDispatcher get(@NonNull String key) {
+        return new BungeeMessageDispatcher(this, key, this.getPlaceholders());
     }
 
     @Override

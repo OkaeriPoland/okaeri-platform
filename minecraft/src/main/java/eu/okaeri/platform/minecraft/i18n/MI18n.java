@@ -3,10 +3,8 @@ package eu.okaeri.platform.minecraft.i18n;
 import eu.okaeri.configs.schema.ConfigDeclaration;
 import eu.okaeri.configs.schema.FieldDeclaration;
 import eu.okaeri.i18n.configs.LocaleConfig;
-import eu.okaeri.i18n.configs.OCI18n;
 import eu.okaeri.i18n.configs.impl.MOCI18n;
 import eu.okaeri.i18n.message.Message;
-import eu.okaeri.placeholders.message.CompiledMessage;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
@@ -32,10 +30,10 @@ public abstract class MI18n extends MOCI18n {
     private I18nPrefixProvider prefixProvider;
 
     @Override
-    public OCI18n<CompiledMessage, Message> registerConfig(@NonNull Locale locale, @NonNull LocaleConfig config) {
+    public MI18n registerConfig(@NonNull Locale locale, @NonNull LocaleConfig config) {
         this.update(config);
         this.configs.put(locale, config);
-        return super.registerConfig(locale, config);
+        return (MI18n) super.registerConfig(locale, config);
     }
 
     @Override
