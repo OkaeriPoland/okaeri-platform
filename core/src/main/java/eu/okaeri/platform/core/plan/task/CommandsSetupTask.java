@@ -33,6 +33,7 @@ public class CommandsSetupTask implements ExecutionTask<OkaeriPlatform> {
             commands.register(typePack);
         }
 
+        platform.registerInjectable("commands", this.adapter);
         platform.registerInjectable("commands", commands);
     }
 }
