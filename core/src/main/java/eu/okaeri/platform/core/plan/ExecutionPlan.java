@@ -48,7 +48,7 @@ public class ExecutionPlan {
     }
 
     public ExecutionResult execute(long startTime) {
-        return this.execute(System.currentTimeMillis(), ExecutionPhase.SHUTDOWN);
+        return this.execute(System.currentTimeMillis(), ExecutionPhase.PRE_SHUTDOWN, ExecutionPhase.SHUTDOWN, ExecutionPhase.POST_SHUTDOWN);
     }
 
     public ExecutionResult execute(long startTime, @NonNull ExecutionPhase... blacklistedPhases) {
@@ -65,6 +65,13 @@ public class ExecutionPlan {
 
         long took = System.currentTimeMillis() - startTime;
         return new ExecutionResult(this, startTime, totalTasks, took);
+    }
+
+    public long execute(@NonNull List<ExecutionPhase> phases) {
+        return phases.stream()
+                .map(this::execute)
+                .mapToInt(Long::intValue)
+                .sum();
     }
 
     @SuppressWarnings({"rawtypes", "unchecked"})

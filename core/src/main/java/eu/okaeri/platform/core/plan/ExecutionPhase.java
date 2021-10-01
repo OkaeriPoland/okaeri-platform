@@ -7,6 +7,8 @@ public enum ExecutionPhase {
     PRE_STARTUP,
     STARTUP,
     POST_STARTUP,
+    PRE_SHUTDOWN,
     SHUTDOWN,
+    POST_SHUTDOWN,
     ;
 }

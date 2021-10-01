@@ -18,6 +18,7 @@ import lombok.Setter;
 import lombok.SneakyThrows;
 import org.bukkit.plugin.java.JavaPlugin;
 
+import java.util.Arrays;
 import java.util.Collections;
 
 import static eu.okaeri.platform.core.plan.ExecutionPhase.*;
@@ -68,7 +69,7 @@ public class OkaeriBukkitPlugin extends JavaPlugin implements OkaeriPlatform {
     @Override
     public void onDisable() {
         // call shutdown hooks
-        this.plan.execute(SHUTDOWN);
+        this.plan.execute(Arrays.asList(PRE_SHUTDOWN, SHUTDOWN, POST_SHUTDOWN));
         // compatibility
         this.onPlatformDisable();
     }

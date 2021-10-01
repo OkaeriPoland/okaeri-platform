@@ -23,6 +23,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
+import java.util.Arrays;
 
 import static eu.okaeri.platform.core.plan.ExecutionPhase.*;
 
@@ -68,7 +69,7 @@ public class OkaeriWebApplication implements OkaeriPlatform {
         ExecutionResult result = ExecutionPlan.dispatch(app);
         app.log(app.getCreator().getSummaryText(result.getTotalMillis()));
 
-        Thread shutdownHook = new Thread(() -> result.getPlan().execute(SHUTDOWN));
+        Thread shutdownHook = new Thread(() -> result.getPlan().execute(Arrays.asList(PRE_SHUTDOWN, SHUTDOWN, POST_SHUTDOWN)));
         Runtime.getRuntime().addShutdownHook(shutdownHook);
 
         return app;

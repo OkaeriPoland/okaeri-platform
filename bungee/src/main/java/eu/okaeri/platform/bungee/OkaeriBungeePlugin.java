@@ -18,6 +18,8 @@ import lombok.Setter;
 import lombok.SneakyThrows;
 import net.md_5.bungee.api.plugin.Plugin;
 
+import java.util.Arrays;
+
 import static eu.okaeri.platform.core.plan.ExecutionPhase.*;
 
 
@@ -64,7 +66,7 @@ public class OkaeriBungeePlugin extends Plugin implements OkaeriPlatform {
     @Override
     public void onDisable() {
         // call shutdown hooks
-        this.plan.execute(SHUTDOWN);
+        this.plan.execute(Arrays.asList(PRE_SHUTDOWN, SHUTDOWN, POST_SHUTDOWN));
         // compatibility
         this.onPlatformDisable();
     }
