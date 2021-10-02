@@ -97,6 +97,7 @@ public void setup(Injector injector) {
 |-|-|-|
 | `defaultConfigurerProvider` | eu.okaeri.persistence.document.`ConfigurerProvider` | default configuration provider for @Configuration, @Messages and others |
 | `defaultConfigurerSerdes` | Class[] | list of default OkaeriSerdesPack(s) classes to be used with `defaultConfigurerProvider` |
+| `defaultPlaceholdersFactory` | eu.okaeri.platform.core.placeholder.`DefaultPlaceholdersFactory` | default placeholders provider to be used e.g. in i18n |
 | `i18nLocaleProvider` | eu.okaeri.i18n.provider.`LocaleProvider` | platform's locale provider for i18n components e.g. commands |
 
 ### Performance

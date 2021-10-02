@@ -5,7 +5,7 @@
     <parent>
         <artifactId>okaeri-platform</artifactId>
         <groupId>eu.okaeri</groupId>
-        <version>0.4.0-preview16</version>
+        <version>0.4.0-preview17</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
@@ -16,14 +16,14 @@
         <dependency>
             <groupId>eu.okaeri</groupId>
             <artifactId>okaeri-platform-minecraft</artifactId>
-            <version>0.4.0-preview16</version>
+            <version>0.4.0-preview17</version>
         </dependency>
 
         <!-- commons -->
         <dependency>
             <groupId>eu.okaeri</groupId>
             <artifactId>okaeri-commons-bukkit</artifactId>
-            <version>0.1.6</version>
+            <version>0.1.7</version>
         </dependency>
 
         <!-- configs -->
@@ -42,7 +42,7 @@
         <dependency>
             <groupId>eu.okaeri</groupId>
             <artifactId>okaeri-placeholders-bukkit</artifactId>
-            <version>1.4.6</version>
+            <version>1.4.7</version>
         </dependency>
 
         <!-- commands -->

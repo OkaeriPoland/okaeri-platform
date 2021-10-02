@@ -52,6 +52,7 @@ public class OkaeriBungeePlugin extends Plugin implements OkaeriPlatform {
     private ExecutionPlan plan;
 
     @Override
+    @Deprecated
     @SneakyThrows
     public void onEnable() {
         // execute using plan
@@ -64,6 +65,7 @@ public class OkaeriBungeePlugin extends Plugin implements OkaeriPlatform {
     }
 
     @Override
+    @Deprecated
     public void onDisable() {
         // call shutdown hooks
         this.plan.execute(Arrays.asList(PRE_SHUTDOWN, SHUTDOWN, POST_SHUTDOWN));

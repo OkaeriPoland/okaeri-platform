@@ -17,6 +17,7 @@ import eu.okaeri.platform.core.component.ComponentHelper;
 import eu.okaeri.platform.core.component.creator.ComponentCreator;
 import eu.okaeri.platform.core.component.creator.ComponentResolver;
 import eu.okaeri.platform.core.component.manifest.BeanManifest;
+import eu.okaeri.platform.core.placeholder.PlaceholdersFactory;
 import eu.okaeri.platform.minecraft.i18n.I18nCommandsMessages;
 import lombok.NonNull;
 import net.md_5.bungee.api.plugin.Plugin;
@@ -46,6 +47,7 @@ public class MessagesComponentResolver implements ComponentResolver {
         return false;
     }
 
+    @Inject private PlaceholdersFactory defaultPlaceholdersFactory;
     @Inject private ConfigurerProvider defaultConfigurerProvider;
     @Inject private Class<? extends OkaeriSerdesPack>[] defaultConfigurerSerdes;
     @Inject private LocaleProvider<?> i18nLocaleProvider;
@@ -147,7 +149,7 @@ public class MessagesComponentResolver implements ComponentResolver {
             File[] files = directory.listFiles((dir, name) -> name.toLowerCase(Locale.ROOT).endsWith(suffix));
             if (files == null) files = new File[0];
 
-            BI18n i18n = new BI18n(colorsConfig, messages.prefix().field(), messages.prefix().marker());
+            BI18n i18n = new BI18n(colorsConfig, messages.prefix().field(), messages.prefix().marker(), this.defaultPlaceholdersFactory);
             i18n.setDefaultLocale(defaultLocale);
             i18n.registerLocaleProvider(this.i18nLocaleProvider);
             i18n.setPlaceholders(defaultPlaceholders.copy());
@@ -229,8 +231,7 @@ public class MessagesComponentResolver implements ComponentResolver {
             return i18n;
         }
         catch (Exception exception) {
-            this.plugin.getLogger().log(Level.SEVERE, "Failed to load messages configuration " + path, exception);
-            throw new RuntimeException("Messages configuration load failure");
+            throw new RuntimeException("Messages configuration load failure", exception);
         }
     }
 }

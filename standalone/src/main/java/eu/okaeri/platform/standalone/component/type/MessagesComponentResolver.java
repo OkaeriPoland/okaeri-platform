@@ -16,6 +16,7 @@ import eu.okaeri.platform.core.component.ComponentHelper;
 import eu.okaeri.platform.core.component.creator.ComponentCreator;
 import eu.okaeri.platform.core.component.creator.ComponentResolver;
 import eu.okaeri.platform.core.component.manifest.BeanManifest;
+import eu.okaeri.platform.core.placeholder.PlaceholdersFactory;
 import lombok.NonNull;
 
 import java.io.*;
@@ -39,6 +40,7 @@ public class MessagesComponentResolver implements ComponentResolver {
         return false;
     }
 
+    @Inject private PlaceholdersFactory defaultPlaceholdersFactory; // TODO: make use of this
     @Inject private ConfigurerProvider defaultConfigurerProvider;
     @Inject private Class<? extends OkaeriSerdesPack>[] defaultConfigurerSerdes;
     @Inject private LocaleProvider<?> i18nLocaleProvider;

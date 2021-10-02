@@ -92,7 +92,7 @@ public class ConfigurationComponentResolver implements ComponentResolver {
             return config;
         }
         catch (Exception exception) {
-            throw new RuntimeException("Configuration load failure");
+            throw new RuntimeException("Configuration load failure", exception);
         }
     }
 }

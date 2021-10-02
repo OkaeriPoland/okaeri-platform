@@ -4,6 +4,7 @@ import eu.okaeri.configs.serdes.commons.SerdesCommons;
 import eu.okaeri.configs.yaml.snakeyaml.YamlSnakeYamlConfigurer;
 import eu.okaeri.persistence.document.ConfigurerProvider;
 import eu.okaeri.placeholders.Placeholders;
+import eu.okaeri.platform.core.placeholder.SimplePlaceholdersFactory;
 import eu.okaeri.platform.core.plan.ExecutionTask;
 import eu.okaeri.platform.web.OkaeriWebApplication;
 import eu.okaeri.platform.web.i18n.SystemLocaleProvider;
@@ -28,6 +29,7 @@ public class WebInjectablesSetupTask implements ExecutionTask<OkaeriWebApplicati
 
         platform.registerInjectable("defaultConfigurerProvider", (ConfigurerProvider) YamlSnakeYamlConfigurer::new);
         platform.registerInjectable("defaultConfigurerSerdes", new Class[]{SerdesCommons.class, SerdesWeb.class});
+        platform.registerInjectable("defaultPlaceholdersFactory", new SimplePlaceholdersFactory());
         platform.registerInjectable("i18nLocaleProvider", new SystemLocaleProvider());
     }
 }

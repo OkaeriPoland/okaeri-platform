@@ -7,6 +7,7 @@ import eu.okaeri.persistence.document.ConfigurerProvider;
 import eu.okaeri.platform.bungee.OkaeriBungeePlugin;
 import eu.okaeri.platform.bungee.i18n.ProxiedPlayerLocaleProvider;
 import eu.okaeri.platform.bungee.scheduler.PlatformScheduler;
+import eu.okaeri.platform.core.placeholder.SimplePlaceholdersFactory;
 import eu.okaeri.platform.core.plan.ExecutionTask;
 
 public class BungeeInjectablesSetupTask implements ExecutionTask<OkaeriBungeePlugin> {
@@ -23,6 +24,7 @@ public class BungeeInjectablesSetupTask implements ExecutionTask<OkaeriBungeePlu
 
         platform.registerInjectable("defaultConfigurerProvider", (ConfigurerProvider) YamlBungeeConfigurer::new);
         platform.registerInjectable("defaultConfigurerSerdes", new Class[]{SerdesBungee.class, SerdesCommons.class});
+        platform.registerInjectable("defaultPlaceholdersFactory", new SimplePlaceholdersFactory());
         platform.registerInjectable("i18nLocaleProvider", new ProxiedPlayerLocaleProvider());
     }
 }

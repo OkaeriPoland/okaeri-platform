@@ -1,7 +1,9 @@
 package eu.okaeri.platform.bungee.i18n;
 
 import eu.okaeri.i18n.configs.LocaleConfig;
+import eu.okaeri.i18n.message.Message;
 import eu.okaeri.platform.bungee.i18n.message.BungeeMessageDispatcher;
+import eu.okaeri.platform.core.placeholder.PlaceholdersFactory;
 import eu.okaeri.platform.minecraft.i18n.I18nMessageColors;
 import eu.okaeri.platform.minecraft.i18n.MI18n;
 import lombok.Getter;
@@ -21,25 +23,34 @@ public class BI18n extends MI18n {
 
     @Getter private final Map<Locale, LocaleConfig> configs = new HashMap<>();
     @Getter private final I18nColorsConfig colorsConfig;
+    @Getter private final PlaceholdersFactory placeholdersFactory;
 
-    public BI18n(I18nColorsConfig colorsConfig, String prefixField, String prefixMarker) {
+    public BI18n(@NonNull I18nColorsConfig colorsConfig, @NonNull String prefixField, @NonNull String prefixMarker, @NonNull PlaceholdersFactory placeholdersFactory) {
         super(prefixField, prefixMarker);
         this.colorsConfig = colorsConfig;
+        this.placeholdersFactory = placeholdersFactory;
     }
 
     @Override
     public BungeeMessageDispatcher get(@NonNull String key) {
-        return new BungeeMessageDispatcher(this, key, this.getPlaceholders());
+        return new BungeeMessageDispatcher(this, key, this.getPlaceholders(), this.getPlaceholdersFactory());
+    }
+
+    @Override
+    public Message get(@NonNull Object entity, @NonNull String key) {
+        Message message = super.get(entity, key);
+        this.getPlaceholdersFactory().provide(entity).forEach(message::with);
+        return message;
     }
 
     @Override
     public void load() {
 
-        if ((this.colorsConfig.getBindFile() != null) && Files.exists(this.colorsConfig.getBindFile())) {
-            this.colorsConfig.load();
+        if ((this.getColorsConfig().getBindFile() != null) && Files.exists(this.getColorsConfig().getBindFile())) {
+            this.getColorsConfig().load();
         }
 
-        for (Map.Entry<Locale, LocaleConfig> entry : this.configs.entrySet()) {
+        for (Map.Entry<Locale, LocaleConfig> entry : this.getConfigs().entrySet()) {
             LocaleConfig config = entry.getValue();
             this.update(config);
             super.registerConfig(entry.getKey(), config);
@@ -58,7 +69,7 @@ public class BI18n extends MI18n {
 
     @Override
     protected Optional<I18nMessageColors> matchColors(String fieldName) {
-        return this.colorsConfig.getMatchers().stream()
+        return this.getColorsConfig().getMatchers().stream()
                 .filter(matcher -> matcher.getPattern().matcher(fieldName).matches())
                 .map(matcher -> I18nMessageColors.of(String.valueOf(matcher.getMessageColor()), String.valueOf(matcher.getFieldsColor())))
                 .findAny();

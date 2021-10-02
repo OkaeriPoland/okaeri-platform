@@ -7,6 +7,7 @@ import eu.okaeri.persistence.document.ConfigurerProvider;
 import eu.okaeri.platform.bukkit.OkaeriBukkitPlugin;
 import eu.okaeri.platform.bukkit.i18n.PlayerLocaleProvider;
 import eu.okaeri.platform.bukkit.scheduler.PlatformScheduler;
+import eu.okaeri.platform.core.placeholder.SimplePlaceholdersFactory;
 import eu.okaeri.platform.core.plan.ExecutionTask;
 
 public class BukkitInjectablesSetupTask implements ExecutionTask<OkaeriBukkitPlugin> {
@@ -23,6 +24,7 @@ public class BukkitInjectablesSetupTask implements ExecutionTask<OkaeriBukkitPlu
 
         platform.registerInjectable("defaultConfigurerProvider", (ConfigurerProvider) YamlBukkitConfigurer::new);
         platform.registerInjectable("defaultConfigurerSerdes", new Class[]{SerdesBukkit.class, SerdesCommons.class});
+        platform.registerInjectable("defaultPlaceholdersFactory", new SimplePlaceholdersFactory());
         platform.registerInjectable("i18nLocaleProvider", new PlayerLocaleProvider());
     }
 }

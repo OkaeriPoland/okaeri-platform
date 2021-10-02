@@ -7,6 +7,7 @@ import eu.okaeri.placeholders.Placeholders;
 import eu.okaeri.placeholders.context.PlaceholderContext;
 import eu.okaeri.placeholders.message.CompiledMessage;
 import eu.okaeri.platform.bukkit.i18n.BI18n;
+import eu.okaeri.platform.core.placeholder.PlaceholdersFactory;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.bukkit.Bukkit;
@@ -25,6 +26,7 @@ public class BukkitMessageDispatcher implements MessageDispatcher<Message> {
     private final BI18n i18n;
     private final String key;
     private final Placeholders placeholders;
+    private final PlaceholdersFactory placeholdersFactory;
     private final Map<String, Object> fields = new LinkedHashMap<>();
 
     private BukkitMessageTarget target = BukkitMessageTarget.CHAT;
@@ -86,6 +88,7 @@ public class BukkitMessageDispatcher implements MessageDispatcher<Message> {
 
         CompiledMessage compiled = this.i18n.get(receiver, this.key).compiled();
         PlaceholderContext context = PlaceholderContext.of(this.placeholders, compiled);
+        this.placeholdersFactory.provide(receiver).forEach(context::with);
         this.fields.forEach(context::with);
         String contents = context.apply();
 
