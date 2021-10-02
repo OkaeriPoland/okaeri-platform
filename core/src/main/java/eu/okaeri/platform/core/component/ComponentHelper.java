@@ -5,6 +5,7 @@ import eu.okaeri.injector.Injector;
 import eu.okaeri.injector.annotation.Inject;
 import eu.okaeri.injector.annotation.PostConstruct;
 import eu.okaeri.platform.core.component.manifest.BeanManifest;
+import eu.okaeri.platform.core.component.manifest.BeanSource;
 import eu.okaeri.platform.core.exception.BreakException;
 import lombok.NonNull;
 import lombok.SneakyThrows;
@@ -144,6 +145,26 @@ public final class ComponentHelper {
         } catch (URISyntaxException exception) {
             throw new RuntimeException("Failed to resolve jar file of " + clazz, exception);
         }
+    }
+
+    public static Runnable manifestToRunnable(BeanManifest manifest, Injector injector) {
+        Runnable runnable;
+        if (manifest.getSource() == BeanSource.METHOD) {
+            if (Runnable.class.isAssignableFrom(manifest.getType())) {
+                runnable = (Runnable) invokeMethod(manifest, injector);
+            } else if (manifest.getType() == void.class) {
+                runnable = () -> invokeMethod(manifest, injector);
+            } else {
+                throw new IllegalArgumentException("Scheduled/Delayed method should return java.lang.Runnable or void: " + manifest);
+            }
+            manifest.setName(manifest.getMethod().getName());
+        } else {
+            if (!Runnable.class.isAssignableFrom(manifest.getType())) {
+                throw new IllegalArgumentException("Scheduled/Delayed component requires class to be a java.lang.Runnable: " + manifest);
+            }
+            runnable = (Runnable) injector.createInstance(manifest.getType());
+        }
+        return runnable;
     }
 
     @ToString

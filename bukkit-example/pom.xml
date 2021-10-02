@@ -19,7 +19,7 @@
         <dependency>
             <groupId>eu.okaeri</groupId>
             <artifactId>okaeri-platform-bukkit</artifactId>
-            <version>0.4.0-preview21</version>
+            <version>0.4.0-preview22</version>
             <scope>compile</scope>
         </dependency>
 

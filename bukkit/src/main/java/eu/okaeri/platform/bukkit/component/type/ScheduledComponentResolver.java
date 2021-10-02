@@ -14,8 +14,6 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 import java.lang.reflect.Method;
 
-import static eu.okaeri.platform.core.component.ComponentHelper.invokeMethod;
-
 public class ScheduledComponentResolver implements ComponentResolver {
 
     @Override
@@ -35,18 +33,8 @@ public class ScheduledComponentResolver implements ComponentResolver {
     public Object make(@NonNull ComponentCreator creator, @NonNull BeanManifest manifest, @NonNull Injector injector) {
 
         long start = System.currentTimeMillis();
-        Object object;
-        if (manifest.getSource() == BeanSource.METHOD) {
-            object = (Runnable) () -> invokeMethod(manifest, injector);
-            manifest.setName(manifest.getMethod().getName());
-        } else {
-            if (!Runnable.class.isAssignableFrom(manifest.getType())) {
-                throw new IllegalArgumentException("Component of @Scheduled on type requires class to be a java.lang.Runnable: " + manifest);
-            }
-            object = injector.createInstance(manifest.getType());
-        }
+        Runnable runnable = ComponentHelper.manifestToRunnable(manifest, injector);
 
-        Runnable runnable = (Runnable) object;
         Scheduled scheduled = manifest.getSource() == BeanSource.METHOD
                 ? manifest.getMethod().getAnnotation(Scheduled.class)
                 : manifest.getType().getAnnotation(Scheduled.class);
@@ -72,6 +60,6 @@ public class ScheduledComponentResolver implements ComponentResolver {
                 .build());
         creator.increaseStatistics("scheduled", 1);
 
-        return object;
+        return runnable;
     }
 }
