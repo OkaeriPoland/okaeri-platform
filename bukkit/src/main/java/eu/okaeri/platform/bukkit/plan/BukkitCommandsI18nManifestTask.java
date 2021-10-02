@@ -7,6 +7,7 @@ import eu.okaeri.platform.core.plan.ExecutionTask;
 import eu.okaeri.platform.minecraft.i18n.I18nCommandsMessages;
 
 public class BukkitCommandsI18nManifestTask implements ExecutionTask<OkaeriBukkitPlugin> {
+
     @Override
     public void execute(OkaeriBukkitPlugin platform) {
 

@@ -26,3 +26,35 @@ Whole ecosystems built on top of the best okaeri packages.
 ## Documentation
 We believe Okaeri Platform is best learned by examples, so feel free to explore README files of supported platforms and linked example projects. 
 This approach also allows us to keep examples always up-to-date. You can also ask/search for any related questions in [discussions](https://github.com/OkaeriPoland/okaeri-platform/discussions).
+
+## Recommendations
+It is highly recommended to use `-parameters` compiler flag for better overall feature support.
+
+### Maven
+```xml
+<build>
+    <pluginManagement>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>3.8.1</version>
+                <configuration>
+                    <compilerArgs>
+                        <arg>-parameters</arg>
+                    </compilerArgs>
+                </configuration>
+            </plugin>
+        </plugins>
+    </pluginManagement>
+</build>
+```
+
+### Gradle
+```groovy
+apply plugin: 'java'
+
+compileJava {
+    options.compilerArgs << '-parameters' 
+}
+```
