@@ -12,6 +12,7 @@ import eu.okaeri.platform.core.component.creator.ComponentCreator;
 import lombok.Data;
 import lombok.NonNull;
 
+import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
@@ -73,10 +74,23 @@ public class BeanManifest {
         List<BeanManifest> depends = new ArrayList<>();
         manifest.setDepends(depends);
 
-        depends.addAll(Arrays.stream(clazz.getDeclaredFields())
-                .filter(field -> field.getAnnotation(Inject.class) != null)
-                .map(BeanManifest::of)
-                .collect(Collectors.toList()));
+        boolean constructorDepends = false;
+        for (Constructor<?> constructor : clazz.getConstructors()) {
+            if (constructor.getAnnotation(Inject.class) != null) {
+                depends.addAll(Arrays.stream(constructor.getParameters())
+                        .map(BeanManifest::of)
+                        .collect(Collectors.toList()));
+                constructorDepends = true;
+                break;
+            }
+        }
+
+        if (!constructorDepends) {
+            depends.addAll(Arrays.stream(clazz.getDeclaredFields())
+                    .filter(field -> field.getAnnotation(Inject.class) != null)
+                    .map(BeanManifest::of)
+                    .collect(Collectors.toList()));
+        }
 
         depends.addAll(Arrays.stream(clazz.getAnnotationsByType(Register.class))
                 .filter(Objects::nonNull)
