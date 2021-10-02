@@ -27,9 +27,13 @@ public class BeanManifest {
     private static final Logger LOGGER = Logger.getLogger(BeanManifest.class.getName());
 
     public static BeanManifest of(@NonNull Parameter parameter) {
+        return of(parameter, false);
+    }
+
+    public static BeanManifest of(@NonNull Parameter parameter, boolean readParamName) {
 
         Inject inject = parameter.getAnnotation(Inject.class);
-        String name = (inject == null) ? "" : inject.value();
+        String name = (inject == null) ? (readParamName ? parameter.getName() : "") : inject.value();
 
         BeanManifest manifest = new BeanManifest();
         manifest.setType(parameter.getType());
@@ -78,7 +82,7 @@ public class BeanManifest {
         for (Constructor<?> constructor : clazz.getConstructors()) {
             if (constructor.getAnnotation(Inject.class) != null) {
                 depends.addAll(Arrays.stream(constructor.getParameters())
-                        .map(BeanManifest::of)
+                        .map(param -> BeanManifest.of(param, true))
                         .collect(Collectors.toList()));
                 constructorDepends = true;
                 break;
