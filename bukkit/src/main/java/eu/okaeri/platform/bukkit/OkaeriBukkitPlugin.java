@@ -71,7 +71,9 @@ public class OkaeriBukkitPlugin extends JavaPlugin implements OkaeriPlatform {
     @Deprecated
     public void onDisable() {
         // call shutdown hooks
-        this.plan.execute(Arrays.asList(PRE_SHUTDOWN, SHUTDOWN, POST_SHUTDOWN));
+        if (this.plan != null) {
+            this.plan.execute(Arrays.asList(PRE_SHUTDOWN, SHUTDOWN, POST_SHUTDOWN));
+        }
         // compatibility
         this.onPlatformDisable();
     }
