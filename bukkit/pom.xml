@@ -28,7 +28,7 @@
         <dependency>
             <groupId>eu.okaeri</groupId>
             <artifactId>okaeri-tasker-bukkit</artifactId>
-            <version>0.0.3</version>
+            <version>0.0.5</version>
         </dependency>
 
         <!-- configs -->
