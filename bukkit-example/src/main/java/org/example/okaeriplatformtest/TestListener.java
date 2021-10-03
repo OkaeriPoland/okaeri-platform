@@ -6,6 +6,7 @@ import eu.okaeri.commons.bukkit.teleport.QueuedTeleports;
 import eu.okaeri.injector.annotation.Inject;
 import eu.okaeri.platform.bukkit.scheduler.PlatformScheduler;
 import eu.okaeri.platform.core.annotation.Component;
+import eu.okaeri.tasker.core.Tasker;
 import org.bukkit.Location;
 import org.bukkit.Server;
 import org.bukkit.command.CommandSender;
@@ -15,7 +16,6 @@ import org.bukkit.event.player.AsyncPlayerChatEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.inventory.ItemStack;
 import org.example.okaeriplatformtest.config.TestConfig;
-import org.example.okaeriplatformtest.persistence.PlayerProperties;
 import org.example.okaeriplatformtest.persistence.PlayerRepository;
 
 import java.io.PrintWriter;
@@ -31,6 +31,7 @@ public class TestListener implements Listener {
     @Inject private Server server;
     @Inject private PlatformScheduler scheduler;
     @Inject private TestConfig config;
+    @Inject private Tasker tasker;
 
     @Inject private QueuedTeleports queuedTeleports;
     @Inject private PlayerRepository playerPersistence;
@@ -52,19 +53,26 @@ public class TestListener implements Listener {
         // this is especially true for loading and saving
         // failing to do this may cause lag spikes which can
         // range from minor for flat storages and major for databases
-        this.scheduler.runAsync(() -> {
+        // okaeri platform provides easy to use fluent scheduler api
+        this.tasker.newChain()
+                .async(() -> this.playerPersistence.get(event.getPlayer())) // read example
+                .acceptSync(playerProperties -> {
+                    Instant lastJoined = playerProperties.getLastJoined(); // get current value
+                    event.getPlayer().sendMessage("Your last join time: " + lastJoined);
+                    playerProperties.setLastJoined(Instant.now()); // update value
+                    playerProperties.setLastJoinedLocation(event.getPlayer().getLocation()); // bukkit types thanks to SerdesBukkit work too
+                })
+                .acceptAsync(playerProperties -> {
+                    // save player properties
+                    // normally this may not be required if data is not required to be saved immediately, see PlayerPersistence notes
+                    playerProperties.save();
+                    // yes, this is still async!
+                    event.getPlayer().sendMessage("Saved from " + Thread.currentThread().getName());
+                })
+                .execute();
 
-            // read example
-            PlayerProperties playerProperties = this.playerPersistence.get(event.getPlayer());
-            Instant lastJoined = playerProperties.getLastJoined(); // get current value
-            event.getPlayer().sendMessage("Your last join time: " + lastJoined);
-            playerProperties.setLastJoined(Instant.now()); // update value
-            playerProperties.setLastJoinedLocation(event.getPlayer().getLocation()); // bukkit types thanks to SerdesBukkit work too
-
-            // save player properties
-            // normally this may not be required if data is not required to be saved immediately, see PlayerPersistence notes
-            playerProperties.save();
-        });
+        // alternatively more classic scheduler can be used
+        this.scheduler.runAsync(() -> event.getPlayer().sendMessage("Hi again from " + Thread.currentThread().getName()));
     }
 
     @EventHandler

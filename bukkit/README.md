@@ -1,13 +1,18 @@
 # Okaeri Platform (WIP) | Bukkit
 
 
-- **Bukkit Platform Utilities**:
-    - `CommandRunner`: run multiple commands with fields on multiple targets (see example)
-    - `ItemStackBuilder`: easy item creation/manipulation (see example)
+- **Utilities**:
+    - `PlatformScheduler`: alternative to BukkitScheduler with simplified methods and no plugin argument in methods
     - `YamlBukkitPersistence`: an easy way to manage e.g. plugin specific player properties (see example)
-    - `AllWorldsRunnable`/`OnlinePlayersRunnable`: special runnable for iterating over all players/all worlds
-    - `QueuedTeleports`: optimized and elegant way to teleport players (see example)
-    - `MinecraftTimeEquivalent`: get ticks approximation from the real world time
+    - [okaeri-commons](https://github.com/OkaeriPoland/okaeri-commons) (core + bukkit):
+        - `CommandRunner`: run multiple commands with fields on multiple targets (see example)
+        - `ItemStackBuilder`: easy item creation/manipulation (see example)
+        - `AllWorldsRunnable`/`OnlinePlayersRunnable`: special runnable for iterating over all players/all worlds
+        - `QueuedTeleports`: optimized and elegant way to teleport players (see example)
+        - `MinecraftTimeEquivalent`: get ticks approximation from the real world time
+        - `CacheMap`, `Cached`, `Enums`, `Numbers`, `Strings` and others
+    - [okaeri-tasker](https://github.com/OkaeriPoland/okaeri-tasker):
+        - `Tasker`: fluent api for BukkitScheduler `tasker.newChain().async(() -> "hi").acceptSync((msg) -> ...).execute()` (see example)
 - **Dependency Injection**:
     - [okaeri-injector](https://github.com/OkaeriPoland/okaeri-injector): "Probably the most basic and simplest DI possible with just ~13kB in size."
 - **Configs**:
@@ -338,6 +343,7 @@ Generally available common instances, useful in almost every component (e.g. Log
 | `logger` | java.util.logging.`Logger` | injectable version of `JavaPlugin#getLogger()` |
 | `plugin` | org.bukkit.plugin.`Plugin` | injectable instance of platform plugin |
 | `scheduler` | eu.okaeri.platform.bukkit.scheduler.`PlatformScheduler` | custom, simplified BukkitScheduler alternative |
+| `tasker` | eu.okaeri.tasker.core.`Tasker` | chaining runnable/consumer/supplier/function executor abstraction for BukkitScheduler |
 | `pluginManager` | org.bukkit.plugin.`PluginManager` | injectable version of `Server#getPluginManager()` |
 | `scoreboardManager` | org.bukkit.scoreboard.`ScoreboardManager` | injectable version of `Server#getScoreboardManager()` |
 

@@ -9,6 +9,7 @@ import eu.okaeri.platform.bukkit.i18n.PlayerLocaleProvider;
 import eu.okaeri.platform.bukkit.scheduler.PlatformScheduler;
 import eu.okaeri.platform.core.placeholder.SimplePlaceholdersFactory;
 import eu.okaeri.platform.core.plan.ExecutionTask;
+import eu.okaeri.tasker.bukkit.BukkitTasker;
 
 public class BukkitInjectablesSetupTask implements ExecutionTask<OkaeriBukkitPlugin> {
 
@@ -20,6 +21,7 @@ public class BukkitInjectablesSetupTask implements ExecutionTask<OkaeriBukkitPlu
         platform.registerInjectable("logger", platform.getLogger());
         platform.registerInjectable("plugin", platform);
         platform.registerInjectable("scheduler", new PlatformScheduler(platform, platform.getServer().getScheduler()));
+        platform.registerInjectable("tasker", BukkitTasker.newPool(platform));
         platform.registerInjectable("pluginManager", platform.getServer().getPluginManager());
 
         platform.registerInjectable("defaultConfigurerProvider", (ConfigurerProvider) YamlBukkitConfigurer::new);
