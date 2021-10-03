@@ -30,31 +30,54 @@ This approach also allows us to keep examples always up-to-date. You can also as
 ## Recommendations
 It is highly recommended to use `-parameters` compiler flag for better overall feature support.
 
-### Maven
+### Maven (Java)
 ```xml
 <build>
-    <pluginManagement>
-        <plugins>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-compiler-plugin</artifactId>
-                <version>3.8.1</version>
-                <configuration>
-                    <compilerArgs>
-                        <arg>-parameters</arg>
-                    </compilerArgs>
-                </configuration>
-            </plugin>
-        </plugins>
-    </pluginManagement>
+  <plugins>
+    <plugin>
+      <groupId>org.apache.maven.plugins</groupId>
+      <artifactId>maven-compiler-plugin</artifactId>
+      <version>3.8.1</version>
+      <configuration>
+        <compilerArgs>
+          <arg>-parameters</arg>
+        </compilerArgs>
+      </configuration>
+    </plugin>
+  </plugins>
+</build>
+```
+### Maven (Kotlin)
+```xml
+ <build>
+  <plugins>
+    <plugin>
+      <groupId>org.jetbrains.kotlin</groupId>
+      <artifactId>kotlin-maven-plugin</artifactId>
+      <version>${kotlin.version}</version>
+      <!-- ... -->
+      <configuration>
+        <!-- ... -->
+        <args>
+          <arg>-java-parameters</arg>
+        </args>
+      </configuration>
+    </plugin>
+  </plugins>
 </build>
 ```
 
-### Gradle
+### Gradle (Java)
 ```groovy
-apply plugin: 'java'
-
 compileJava {
     options.compilerArgs << '-parameters' 
+}
+```
+### Gradle (Kotlin)
+```groovy
+compileKotlin {
+    kotlinOptions {
+        javaParameters = true
+    }
 }
 ```
