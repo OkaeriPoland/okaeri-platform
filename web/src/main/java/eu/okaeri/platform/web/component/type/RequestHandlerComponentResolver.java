@@ -58,7 +58,7 @@ public class RequestHandlerComponentResolver implements ComponentResolver {
             try {
                 call = this.getCall(prefilledCallCache, handlerMeta, context, injector);
                 method.invoke(parent.getObject(), call);
-                this.flushCall(call, contextIndexes);
+                this.flushCall(call, contextIndexes, handlerMeta);
             }
             catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException exception) {
                 this.logger.error("Handler (" + method + ") failure [" + Arrays.toString(call) + "]", exception);
@@ -84,9 +84,12 @@ public class RequestHandlerComponentResolver implements ComponentResolver {
         return handler;
     }
 
-    private void flushCall(Object[] call, int[] contextIndexes) {
+    private void flushCall(Object[] call, int[] contextIndexes, @NonNull RequestHandlerMeta handlerMeta) {
         for (int contextIndex : contextIndexes) {
             call[contextIndex] = null;
+        }
+        for (int paramIndex : handlerMeta.getPathParams().keySet()) {
+            call[paramIndex] = null;
         }
     }
 
