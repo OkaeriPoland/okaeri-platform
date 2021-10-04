@@ -18,6 +18,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 @RequiredArgsConstructor
@@ -120,12 +121,16 @@ public class BukkitMessageDispatcher implements MessageDispatcher<Message> {
         return this.sendTo(Bukkit.getOnlinePlayers());
     }
 
-    public BukkitMessageDispatcher sendToPlayersThatCanSee(Player player) {
-        return this.sendTo(new ArrayList<>(Bukkit.getOnlinePlayers()).stream().filter(onlinePlayer -> onlinePlayer.canSee(player)));
+    public BukkitMessageDispatcher sendToPlayersThatCanSee(@NonNull Player player) {
+        return this.sendTo(new ArrayList<>(Bukkit.getOnlinePlayers()).stream()
+                .filter(onlinePlayer -> onlinePlayer.canSee(player))
+                .collect(Collectors.toList()));
     }
 
-    public BukkitMessageDispatcher sendToPlayersWithPermission(String permission) {
-        return this.sendTo(new ArrayList<>(Bukkit.getOnlinePlayers()).stream().filter(player -> player.hasPermission(permission)));
+    public BukkitMessageDispatcher sendToPlayersWithPermission(@NonNull String permission) {
+        return this.sendTo(new ArrayList<>(Bukkit.getOnlinePlayers()).stream()
+                .filter(player -> player.hasPermission(permission))
+                .collect(Collectors.toList()));
     }
 
     public BukkitMessageDispatcher sendToConsole() {

@@ -15,7 +15,6 @@ import eu.okaeri.platform.core.plan.task.*;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
-import lombok.SneakyThrows;
 import net.md_5.bungee.api.plugin.Plugin;
 
 import java.util.Arrays;
@@ -53,7 +52,6 @@ public class OkaeriBungeePlugin extends Plugin implements OkaeriPlatform {
 
     @Override
     @Deprecated
-    @SneakyThrows
     public void onEnable() {
         // execute using plan
         this.log("Loading " + this.getClass().getSimpleName());

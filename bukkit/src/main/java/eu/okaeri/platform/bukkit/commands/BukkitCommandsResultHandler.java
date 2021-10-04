@@ -5,6 +5,7 @@ import eu.okaeri.commands.handler.ResultHandler;
 import eu.okaeri.commands.service.CommandContext;
 import eu.okaeri.commands.service.InvocationContext;
 import eu.okaeri.i18n.message.Message;
+import eu.okaeri.platform.core.i18n.message.Audience;
 import lombok.NonNull;
 import org.bukkit.command.CommandSender;
 
@@ -22,6 +23,11 @@ public class BukkitCommandsResultHandler implements ResultHandler {
 
         if (object instanceof Message) {
             sender.sendMessage(((Message) object).apply());
+            return true;
+        }
+
+        if (object instanceof Audience) {
+            ((Audience) object).close();
             return true;
         }
 

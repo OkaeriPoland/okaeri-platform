@@ -15,7 +15,6 @@ import eu.okaeri.platform.core.plan.task.*;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
-import lombok.SneakyThrows;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.util.Arrays;
@@ -56,7 +55,6 @@ public class OkaeriBukkitPlugin extends JavaPlugin implements OkaeriPlatform {
 
     @Override
     @Deprecated
-    @SneakyThrows
     public void onEnable() {
         // execute using plan
         this.log("Loading " + this.getClass().getSimpleName());

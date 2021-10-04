@@ -63,7 +63,6 @@ public class OkaeriWebApplication implements OkaeriPlatform {
         plan.add(SHUTDOWN, new PersistenceShutdownTask());
     }
 
-    @SneakyThrows
     public static <T extends OkaeriWebApplication> T run(@NonNull T app, @NonNull String[] args) {
 
         ExecutionResult result = ExecutionPlan.dispatch(app);
