@@ -20,6 +20,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 @RequiredArgsConstructor
@@ -132,8 +133,10 @@ public class BungeeMessageDispatcher implements MessageDispatcher<Message> {
         return this.sendTo(ProxyServer.getInstance().getPlayers());
     }
 
-    public BungeeMessageDispatcher sendToPlayersWithPermission(String permission) {
-        return this.sendTo(new ArrayList<>(ProxyServer.getInstance().getPlayers()).stream().filter(player -> player.hasPermission(permission)));
+    public BungeeMessageDispatcher sendToPlayersWithPermission(@NonNull String permission) {
+        return this.sendTo(new ArrayList<>(ProxyServer.getInstance().getPlayers()).stream()
+                .filter(player -> player.hasPermission(permission))
+                .collect(Collectors.toList()));
     }
 
     public BungeeMessageDispatcher sendToConsole() {
