@@ -39,6 +39,7 @@ public class ExecutionPlan {
             }
             Planned planned = annotations[0];
             ExecutionPhase phase = planned.value();
+            declaredMethod.setAccessible(true);
             this.add(phase, new PlannedMethodTask(parent, declaredMethod));
         }
     }
