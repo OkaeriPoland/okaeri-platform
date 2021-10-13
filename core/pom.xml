@@ -5,7 +5,7 @@
     <parent>
         <artifactId>okaeri-platform</artifactId>
         <groupId>eu.okaeri</groupId>
-        <version>0.4.0-preview27</version>
+        <version>0.4.0-preview28</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
@@ -16,19 +16,19 @@
         <dependency>
             <groupId>eu.okaeri</groupId>
             <artifactId>okaeri-persistence-core</artifactId>
-            <version>1.5.7</version>
+            <version>${library.okaeri-persistence.version}</version>
         </dependency>
 
         <!-- commands -->
         <dependency>
             <groupId>eu.okaeri</groupId>
             <artifactId>okaeri-commands-core</artifactId>
-            <version>0.5.5</version>
+            <version>${library.okaeri-commands.version}</version>
         </dependency>
         <dependency>
             <groupId>eu.okaeri</groupId>
             <artifactId>okaeri-commands-injector</artifactId>
-            <version>0.5.5</version>
+            <version>${library.okaeri-commands.version}</version>
             <exclusions>
                 <exclusion>
                     <groupId>eu.okaeri</groupId>
@@ -41,38 +41,38 @@
         <dependency>
             <groupId>eu.okaeri</groupId>
             <artifactId>okaeri-commons-core</artifactId>
-            <version>0.1.7</version>
+            <version>${library.okaeri-commons.version}</version>
         </dependency>
 
         <!-- configs -->
         <dependency>
             <groupId>eu.okaeri</groupId>
             <artifactId>okaeri-configs-core</artifactId>
-            <version>3.3.5</version>
+            <version>${library.okaeri-configs.version}</version>
         </dependency>
         <dependency>
             <groupId>eu.okaeri</groupId>
             <artifactId>okaeri-configs-serdes-commons</artifactId>
-            <version>3.3.5</version>
+            <version>${library.okaeri-configs.version}</version>
         </dependency>
         <dependency>
             <groupId>eu.okaeri</groupId>
             <artifactId>okaeri-configs-validator-okaeri</artifactId>
-            <version>3.3.5</version>
+            <version>${library.okaeri-configs.version}</version>
         </dependency>
 
         <!-- i18n -->
         <dependency>
             <groupId>eu.okaeri</groupId>
             <artifactId>okaeri-i18n-configs</artifactId>
-            <version>2.0.1</version>
+            <version>${library.okaeri-i18n.version}</version>
         </dependency>
 
         <!-- injector -->
         <dependency>
             <groupId>eu.okaeri</groupId>
             <artifactId>okaeri-injector</artifactId>
-            <version>1.7.0</version>
+            <version>${library.okaeri-injector.version}</version>
         </dependency>
     </dependencies>
 

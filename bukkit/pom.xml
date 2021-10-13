@@ -5,7 +5,7 @@
     <parent>
         <artifactId>okaeri-platform</artifactId>
         <groupId>eu.okaeri</groupId>
-        <version>0.4.0-preview27</version>
+        <version>0.4.0-preview28</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
@@ -16,45 +16,45 @@
         <dependency>
             <groupId>eu.okaeri</groupId>
             <artifactId>okaeri-platform-minecraft</artifactId>
-            <version>0.4.0-preview27</version>
+            <version>0.4.0-preview28</version>
         </dependency>
 
         <!-- commons -->
         <dependency>
             <groupId>eu.okaeri</groupId>
             <artifactId>okaeri-commons-bukkit</artifactId>
-            <version>0.1.7</version>
+            <version>${library.okaeri-commons.version}</version>
         </dependency>
         <dependency>
             <groupId>eu.okaeri</groupId>
             <artifactId>okaeri-tasker-bukkit</artifactId>
-            <version>0.0.5</version>
+            <version>0.0.6</version>
         </dependency>
 
         <!-- configs -->
         <dependency>
             <groupId>eu.okaeri</groupId>
             <artifactId>okaeri-configs-yaml-bukkit</artifactId>
-            <version>3.3.5</version>
+            <version>${library.okaeri-configs.version}</version>
         </dependency>
         <dependency>
             <groupId>eu.okaeri</groupId>
             <artifactId>okaeri-configs-serdes-bukkit</artifactId>
-            <version>3.3.5</version>
+            <version>${library.okaeri-configs.version}</version>
         </dependency>
 
         <!-- messages -->
         <dependency>
             <groupId>eu.okaeri</groupId>
             <artifactId>okaeri-placeholders-bukkit</artifactId>
-            <version>1.4.7</version>
+            <version>${library.okaeri-placeholders.version}</version>
         </dependency>
 
         <!-- commands -->
         <dependency>
             <groupId>eu.okaeri</groupId>
             <artifactId>okaeri-commands-bukkit</artifactId>
-            <version>0.5.5</version>
+            <version>${library.okaeri-commands.version}</version>
         </dependency>
 
         <!-- spigot -->

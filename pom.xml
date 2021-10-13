@@ -7,7 +7,8 @@
     <groupId>eu.okaeri</groupId>
     <artifactId>okaeri-platform</artifactId>
     <packaging>pom</packaging>
-    <version>0.4.0-preview27</version>
+    <version>0.4.0-preview28</version>
+
     <modules>
         <module>core</module>
         <!-- minecraft -->
@@ -23,6 +24,15 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven.compiler.source>8</maven.compiler.source>
         <maven.compiler.target>8</maven.compiler.target>
+
+        <library.okaeri-commands.version>0.6.0</library.okaeri-commands.version>
+        <library.okaeri-configs.version>3.3.6</library.okaeri-configs.version>
+        <library.okaeri-i18n.version>2.0.1</library.okaeri-i18n.version>
+        <library.okaeri-commons.version>0.1.7</library.okaeri-commons.version>
+        <library.okaeri-injector.version>1.7.0</library.okaeri-injector.version>
+        <library.okaeri-placeholders.version>1.4.7</library.okaeri-placeholders.version>
+        <library.okaeri-persistence.version>1.5.7</library.okaeri-persistence.version>
+        <library.okaeri-tasker.version>0.0.6</library.okaeri-tasker.version>
     </properties>
 
     <dependencies>

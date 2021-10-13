@@ -11,7 +11,7 @@
     - [okaeri-configs-yaml-snakeyaml](https://github.com/OkaeriPoland/okaeri-configs/tree/master/yaml-bukkit): config library built on top of SnakeYAML (see [okaeri-configs](https://github.com/OkaeriPoland/okaeri-configs))
     - [okaeri-configs-validator-okaeri](https://github.com/OkaeriPoland/okaeri-configs/tree/master/validator-okaeri): simple bean validator (see [okaeri-validator](https://github.com/OkaeriPoland/okaeri-validator))
 - **Commands**:
-    - [okaeri-commands-cli](https://github.com/OkaeriPoland/okaeri-commands/tree/master/bukkit): annotation based command framework (see [okaeri-commands](https://github.com/OkaeriPoland/okaeri-commands))
+    - [okaeri-commands-core](https://github.com/OkaeriPoland/okaeri-commands/tree/master/bukkit): annotation based command framework (see [okaeri-commands](https://github.com/OkaeriPoland/okaeri-commands))
     - [okaeri-commands-injector](https://github.com/OkaeriPoland/okaeri-commands/tree/master/injector): okaeri-injector integration for the best ecosystem experience
 - **Messages (i18n)**
     - [okaeri-i18n](https://github.com/OkaeriPoland/okaeri-i18n): translation library with compile time key checking (getters possible instead of string keys),
