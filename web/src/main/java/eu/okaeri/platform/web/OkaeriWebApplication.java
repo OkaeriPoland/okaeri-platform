@@ -32,7 +32,7 @@ public class OkaeriWebApplication implements OkaeriPlatform {
 
     @Getter private final Logger logger = LoggerFactory.getLogger(this.getClass());
     @Getter private final File dataFolder = new File(".");
-    @Getter private final File jarFile = ComponentHelper.getJarFile(OkaeriWebApplication.class);
+    @Getter private final File file = ComponentHelper.getJarFile(OkaeriWebApplication.class);
 
     @Getter private final Javalin javalin = Javalin.create();
 

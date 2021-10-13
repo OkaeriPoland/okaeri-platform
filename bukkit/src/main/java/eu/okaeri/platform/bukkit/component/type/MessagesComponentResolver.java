@@ -23,7 +23,6 @@ import lombok.NonNull;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.io.*;
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -53,6 +52,7 @@ public class MessagesComponentResolver implements ComponentResolver {
     @Inject private Class<? extends OkaeriSerdesPack>[] defaultConfigurerSerdes;
     @Inject private LocaleProvider<?> i18nLocaleProvider;
     @Inject private JavaPlugin plugin;
+    @Inject private File jarFile;
 
     @Override
     @SuppressWarnings({"unchecked", "ResultOfMethodCallIgnored"})
@@ -85,10 +85,7 @@ public class MessagesComponentResolver implements ComponentResolver {
 
         // unpack files from the resources
         try {
-            Method getFile = JavaPlugin.class.getDeclaredMethod("getFile");
-            getFile.setAccessible(true);
-            File jar = (File) getFile.invoke(this.plugin);
-            JarFile jarFile = new JarFile(jar);
+            JarFile jarFile = new JarFile(this.jarFile);
             Enumeration<JarEntry> entries = jarFile.entries();
 
             while (entries.hasMoreElements()) {
@@ -126,7 +123,7 @@ public class MessagesComponentResolver implements ComponentResolver {
                 Locale locale = Locale.forLanguageTag(localeName);
                 packedLocales.put(locale, new String(baos.toByteArray(), StandardCharsets.UTF_8));
             }
-        } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException | IOException exception) {
+        } catch (IOException exception) {
             this.plugin.getLogger().log(Level.SEVERE, "Failed to unpack resources", exception);
             exception.printStackTrace();
         }

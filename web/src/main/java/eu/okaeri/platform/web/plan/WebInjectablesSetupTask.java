@@ -18,7 +18,7 @@ public class WebInjectablesSetupTask implements ExecutionTask<OkaeriWebApplicati
     public void execute(OkaeriWebApplication platform) {
 
         platform.registerInjectable("dataFolder", platform.getDataFolder());
-        platform.registerInjectable("jarFile", platform.getJarFile());
+        platform.registerInjectable("jarFile", platform.getFile());
         platform.registerInjectable("logger", platform.getLogger());
         platform.registerInjectable("app", platform);
 

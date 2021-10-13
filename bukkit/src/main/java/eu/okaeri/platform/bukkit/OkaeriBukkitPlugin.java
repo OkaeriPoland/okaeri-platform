@@ -8,6 +8,7 @@ import eu.okaeri.platform.bukkit.component.BukkitComponentCreator;
 import eu.okaeri.platform.bukkit.component.BukkitCreatorRegistry;
 import eu.okaeri.platform.bukkit.plan.*;
 import eu.okaeri.platform.core.OkaeriPlatform;
+import eu.okaeri.platform.core.component.ComponentHelper;
 import eu.okaeri.platform.core.component.creator.ComponentCreator;
 import eu.okaeri.platform.core.plan.ExecutionPlan;
 import eu.okaeri.platform.core.plan.ExecutionResult;
@@ -17,6 +18,7 @@ import lombok.NonNull;
 import lombok.Setter;
 import org.bukkit.plugin.java.JavaPlugin;
 
+import java.io.File;
 import java.util.Arrays;
 import java.util.Collections;
 
@@ -25,6 +27,7 @@ import static eu.okaeri.platform.core.plan.ExecutionPhase.*;
 
 public class OkaeriBukkitPlugin extends JavaPlugin implements OkaeriPlatform {
 
+    @Getter private final File file = ComponentHelper.getJarFile(OkaeriBukkitPlugin.class);
     @Getter @Setter private Injector injector;
     @Getter @Setter private ComponentCreator creator;
 

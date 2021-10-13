@@ -17,6 +17,7 @@ public class BungeeInjectablesSetupTask implements ExecutionTask<OkaeriBungeePlu
 
         platform.registerInjectable("proxy", platform.getProxy());
         platform.registerInjectable("dataFolder", platform.getDataFolder());
+        platform.registerInjectable("jarFile", platform.getFile());
         platform.registerInjectable("logger", platform.getLogger());
         platform.registerInjectable("plugin", platform);
         platform.registerInjectable("scheduler", new PlatformScheduler(platform, platform.getProxy().getScheduler()));
