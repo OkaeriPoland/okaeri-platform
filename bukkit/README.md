@@ -153,7 +153,7 @@ public class ExamplePlugin extends OkaeriBukkitPlugin {
 ```
 
 ```java
-@ServiceDescriptor(label = "testcmd", aliases = "testing")
+@Command(label = "testcmd", aliases = "testing")
 public class TestCommand implements CommandService {
 
   @Inject("testString") private String test;

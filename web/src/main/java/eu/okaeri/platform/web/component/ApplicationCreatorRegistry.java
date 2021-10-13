@@ -18,7 +18,7 @@ public class ApplicationCreatorRegistry extends ComponentCreatorRegistry {
         this.register(ConfigurationComponentResolver.class);
         this.register(DocumentCollectionComponentResolver.class);
         this.register(MessagesComponentResolver.class);
-        this.register(ServiceDescriptorComponentResolver.class);
+        this.register(CommandComponentResolver.class);
         // web
         this.register(RequestHandlerComponentResolver.class);
         this.registerDynamicType(Context.class);

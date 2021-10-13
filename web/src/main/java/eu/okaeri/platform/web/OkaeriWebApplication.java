@@ -1,6 +1,6 @@
 package eu.okaeri.platform.web;
 
-import eu.okaeri.commands.cli.CommandsCli;
+import eu.okaeri.commands.adapter.CommandsAdapter;
 import eu.okaeri.injector.Injector;
 import eu.okaeri.platform.core.OkaeriPlatform;
 import eu.okaeri.platform.core.component.ComponentHelper;
@@ -49,7 +49,7 @@ public class OkaeriWebApplication implements OkaeriPlatform {
 
         plan.add(PRE_SETUP, new InjectorSetupTask());
         plan.add(PRE_SETUP, new WebInjectablesSetupTask());
-        plan.add(PRE_SETUP, new CommandsSetupTask(new CommandsCli()));
+        plan.add(PRE_SETUP, new CommandsSetupTask(new CommandsAdapter()));
         plan.add(PRE_SETUP, new CreatorSetupTask(ApplicationComponentCreator.class, ApplicationCreatorRegistry.class));
 
         plan.add(POST_SETUP, new BeanManifestCreateTask());

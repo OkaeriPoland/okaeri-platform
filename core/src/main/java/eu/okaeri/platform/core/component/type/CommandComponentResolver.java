@@ -1,7 +1,7 @@
 package eu.okaeri.platform.core.component.type;
 
 import eu.okaeri.commands.Commands;
-import eu.okaeri.commands.annotation.ServiceDescriptor;
+import eu.okaeri.commands.annotation.Command;
 import eu.okaeri.commands.meta.ServiceMeta;
 import eu.okaeri.commands.service.CommandService;
 import eu.okaeri.injector.Injector;
@@ -14,11 +14,11 @@ import lombok.NonNull;
 
 import java.lang.reflect.Method;
 
-public class ServiceDescriptorComponentResolver implements ComponentResolver {
+public class CommandComponentResolver implements ComponentResolver {
 
     @Override
     public boolean supports(@NonNull Class<?> type) {
-        return type.getAnnotation(ServiceDescriptor.class) != null;
+        return type.getAnnotation(Command.class) != null;
     }
 
     @Override
@@ -33,12 +33,12 @@ public class ServiceDescriptorComponentResolver implements ComponentResolver {
     public Object make(@NonNull ComponentCreator creator, @NonNull BeanManifest manifest, @NonNull Injector injector) {
 
         if (!CommandService.class.isAssignableFrom(manifest.getType())) {
-            throw new IllegalArgumentException("Component of @ServiceDescriptor on type requires class to be a CommandService: " + manifest);
+            throw new IllegalArgumentException("Component of @Command on type requires class to be a CommandService: " + manifest);
         }
 
         long start = System.currentTimeMillis();
         CommandService commandService = (CommandService) injector.createInstance(manifest.getType());
-        ServiceMeta serviceMeta = ServiceMeta.of(commandService);
+        ServiceMeta serviceMeta = ServiceMeta.of(null, commandService);
         this.commands.getRegistry().register(commandService);
 
         long took = System.currentTimeMillis() - start;

@@ -3,7 +3,7 @@ package org.example.okaeriplatformtest.command;
 import eu.okaeri.commands.annotation.Arg;
 import eu.okaeri.commands.annotation.Executor;
 import eu.okaeri.commands.annotation.RawArgs;
-import eu.okaeri.commands.annotation.ServiceDescriptor;
+import eu.okaeri.commands.annotation.Command;
 import eu.okaeri.commands.bukkit.response.BukkitResponse;
 import eu.okaeri.commands.bukkit.response.RawResponse;
 import eu.okaeri.commands.service.CommandService;
@@ -22,7 +22,7 @@ import java.util.logging.Logger;
 
 // this command can be preloaded thanks to limited dependencies
 // see async mark (~) visible in the startup messages
-@ServiceDescriptor(label = "testpcmd", aliases = "testing")
+@Command(label = "testpcmd", aliases = "testing")
 public class TestPreloadedCommand implements CommandService {
 
     @Inject private TestConfig config;

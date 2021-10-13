@@ -20,7 +20,7 @@ public class BukkitCreatorRegistry extends ComponentCreatorRegistry {
         this.register(DocumentCollectionComponentResolver.class);
         this.register(ListenerComponentResolver.class);
         this.register(MessagesComponentResolver.class);
-        this.register(ServiceDescriptorComponentResolver.class);
+        this.register(CommandComponentResolver.class);
         this.register(ScheduledComponentResolver.class);
         // generic last
         this.register(BeanComponentResolver.class);

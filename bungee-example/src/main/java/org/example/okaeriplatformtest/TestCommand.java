@@ -32,7 +32,7 @@
 //import java.util.logging.Logger;
 //import java.util.stream.Collectors;
 //
-//@ServiceDescriptor(label = "testcmd", aliases = "testing")
+//@Command(label = "testcmd", aliases = "testing")
 //public class TestCommand implements CommandService {
 //
 //    @Inject("testString") private String test;
