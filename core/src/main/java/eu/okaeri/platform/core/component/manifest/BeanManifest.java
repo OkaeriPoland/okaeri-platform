@@ -78,6 +78,21 @@ public class BeanManifest {
         List<BeanManifest> depends = new ArrayList<>();
         manifest.setDepends(depends);
 
+        depends.addAll(Arrays.stream(clazz.getAnnotationsByType(Register.class))
+                .filter(Objects::nonNull)
+                .map(reg -> BeanManifest.of(reg, creator))
+                .collect(Collectors.toList()));
+
+        depends.addAll(Arrays.stream(clazz.getAnnotationsByType(DependsOn.class))
+                .filter(Objects::nonNull)
+                .map(dependency -> BeanManifest.ofRequirement(dependency.type(), dependency.name()))
+                .collect(Collectors.toList()));
+
+        depends.addAll(Arrays.stream(clazz.getDeclaredMethods())
+                .filter(creator::isComponentMethod)
+                .map(method -> BeanManifest.of(manifest, method, creator))
+                .collect(Collectors.toList()));
+
         boolean constructorDepends = false;
         for (Constructor<?> constructor : clazz.getConstructors()) {
             if (constructor.getAnnotation(Inject.class) != null) {
@@ -95,21 +110,6 @@ public class BeanManifest {
                     .map(BeanManifest::of)
                     .collect(Collectors.toList()));
         }
-
-        depends.addAll(Arrays.stream(clazz.getAnnotationsByType(Register.class))
-                .filter(Objects::nonNull)
-                .map(reg -> BeanManifest.of(reg, creator))
-                .collect(Collectors.toList()));
-
-        depends.addAll(Arrays.stream(clazz.getAnnotationsByType(DependsOn.class))
-                .filter(Objects::nonNull)
-                .map(dependency -> BeanManifest.ofRequirement(dependency.type(), dependency.name()))
-                .collect(Collectors.toList()));
-
-        depends.addAll(Arrays.stream(clazz.getDeclaredMethods())
-                .filter(creator::isComponentMethod)
-                .map(method -> BeanManifest.of(manifest, method, creator))
-                .collect(Collectors.toList()));
 
         return manifest;
     }

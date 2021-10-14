@@ -15,7 +15,9 @@ import eu.okaeri.platform.core.plan.task.*;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
+import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.plugin.Plugin;
+import net.md_5.bungee.api.plugin.PluginDescription;
 
 import java.util.Arrays;
 
@@ -26,6 +28,14 @@ public class OkaeriBungeePlugin extends Plugin implements OkaeriPlatform {
 
     @Getter @Setter private Injector injector;
     @Getter @Setter private ComponentCreator creator;
+
+    public OkaeriBungeePlugin() {
+        super();
+    }
+
+    public OkaeriBungeePlugin(ProxyServer proxy, PluginDescription description) {
+        super(proxy, description);
+    }
 
     @Override
     public void log(@NonNull String message) {

@@ -16,7 +16,9 @@ import eu.okaeri.platform.core.plan.task.*;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
+import org.bukkit.plugin.PluginDescriptionFile;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.bukkit.plugin.java.JavaPluginLoader;
 
 import java.io.File;
 import java.util.Arrays;
@@ -30,6 +32,14 @@ public class OkaeriBukkitPlugin extends JavaPlugin implements OkaeriPlatform {
     @Getter private final File file = ComponentHelper.getJarFile(OkaeriBukkitPlugin.class);
     @Getter @Setter private Injector injector;
     @Getter @Setter private ComponentCreator creator;
+
+    public OkaeriBukkitPlugin() {
+        super();
+    }
+
+    protected OkaeriBukkitPlugin(JavaPluginLoader loader, PluginDescriptionFile description, File dataFolder, File file) {
+        super(loader, description, dataFolder, file);
+    }
 
     @Override
     public void log(@NonNull String message) {
