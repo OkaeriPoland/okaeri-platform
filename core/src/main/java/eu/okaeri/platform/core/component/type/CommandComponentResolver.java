@@ -39,7 +39,7 @@ public class CommandComponentResolver implements ComponentResolver {
         long start = System.currentTimeMillis();
         CommandService commandService = (CommandService) injector.createInstance(manifest.getType());
         ServiceMeta serviceMeta = ServiceMeta.of(null, commandService);
-        this.commands.getRegistry().register(commandService);
+        this.commands.registerCommand(commandService);
 
         long took = System.currentTimeMillis() - start;
         creator.log(ComponentHelper.buildComponentMessage()

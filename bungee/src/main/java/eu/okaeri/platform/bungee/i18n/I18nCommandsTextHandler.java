@@ -1,6 +1,6 @@
 package eu.okaeri.platform.bungee.i18n;
 
-import eu.okaeri.commands.handler.TextHandler;
+import eu.okaeri.commands.handler.text.TextHandler;
 import eu.okaeri.commands.service.CommandContext;
 import eu.okaeri.commands.service.InvocationContext;
 import eu.okaeri.i18n.message.Message;
