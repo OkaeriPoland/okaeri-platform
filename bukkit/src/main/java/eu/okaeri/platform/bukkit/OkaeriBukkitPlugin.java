@@ -12,6 +12,7 @@ import eu.okaeri.platform.core.component.creator.ComponentCreator;
 import eu.okaeri.platform.core.plan.ExecutionPlan;
 import eu.okaeri.platform.core.plan.ExecutionResult;
 import eu.okaeri.platform.core.plan.task.*;
+import eu.okaeri.platform.minecraft.task.CommandsI18nSetupTask;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
@@ -57,7 +58,7 @@ public class OkaeriBukkitPlugin extends JavaPlugin implements OkaeriPlatform {
         plan.add(POST_SETUP, new BeanManifestCreateTask());
         plan.add(POST_SETUP, new BukkitCommandsI18nManifestTask());
         plan.add(POST_SETUP, new BeanManifestExecuteTask());
-        plan.add(POST_SETUP, new BukkitCommandsI18nSetupTask());
+        plan.add(POST_SETUP, new CommandsI18nSetupTask());
 
         plan.add(SHUTDOWN, new PersistenceShutdownTask());
     }

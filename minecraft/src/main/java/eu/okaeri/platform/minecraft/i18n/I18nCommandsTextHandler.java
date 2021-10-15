@@ -1,29 +1,22 @@
-package eu.okaeri.platform.bungee.i18n;
+package eu.okaeri.platform.minecraft.i18n;
 
 import eu.okaeri.commands.handler.text.TextHandler;
 import eu.okaeri.commands.service.CommandContext;
 import eu.okaeri.commands.service.InvocationContext;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
-import net.md_5.bungee.api.CommandSender;
 
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 @RequiredArgsConstructor
 public class I18nCommandsTextHandler implements TextHandler {
 
-    private static final Pattern CONTEXT_KEY_PATTERN = Pattern.compile("\\$\\{([a-zA-Z0-9-.]+)}");
-    private static final Pattern STATIC_KEY_PATTERN = Pattern.compile("#\\{([a-zA-Z0-9-.]+)}");
+    private static final Pattern CONTEXT_KEY_PATTERN = Pattern.compile("\\$\\{([^}]+)}");
+    private static final Pattern STATIC_KEY_PATTERN = Pattern.compile("#\\{([^}]+)}");
 
-    private final Set<BI18n> i18n;
-
-    public I18nCommandsTextHandler(@NonNull BI18n i18n) {
-        this(new HashSet<>(Collections.singletonList(i18n)));
-    }
+    private final Map<String, MI18n> i18n;
 
     @Override
     public String resolve(@NonNull String text) {
@@ -34,13 +27,34 @@ public class I18nCommandsTextHandler implements TextHandler {
     public String resolve(@NonNull CommandContext commandContext, @NonNull InvocationContext invocationContext, @NonNull String text) {
 
         Set<String> contextKeys = findKeys(CONTEXT_KEY_PATTERN, text);
-        if (!contextKeys.isEmpty()) {
+        if (contextKeys.isEmpty()) {
             return text;
         }
 
-        CommandSender sender = commandContext.get("sender", CommandSender.class);
+        Object sender = commandContext.get("sender");
+        if (sender == null) {
+            return text;
+        }
+
         for (String key : contextKeys) {
-            for (BI18n i18n : this.i18n) {
+
+            List<MI18n> sources = new ArrayList<>();
+            if (key.contains(":")) {
+
+                String[] i18nParts = key.split(":", 2);
+                String i18nName = i18nParts[0];
+
+                if (this.i18n.containsKey(i18nName)) {
+                    sources.add(this.i18n.get(i18nName));
+                    key = i18nParts[1];
+                } else {
+                    throw new IllegalArgumentException("Unknown i18n specified: " + key);
+                }
+            } else {
+                sources.addAll(this.i18n.values());
+            }
+
+            for (MI18n i18n : sources) {
                 String value = i18n.get(sender, key).raw();
                 if (this.isValid(value, key)) {
                     text = text.replace("${" + key + "}", value);
