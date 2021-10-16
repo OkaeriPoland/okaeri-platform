@@ -40,11 +40,11 @@ public class OkaeriCliApplication implements OkaeriPlatform {
 
     @Getter @Setter private Injector injector;
     @Getter @Setter private ComponentCreator creator;
-    @Getter @Setter private boolean enableLogging = true;
+    @Getter @Setter private boolean verbose = true;
 
     @Override
     public void log(@NonNull String message) {
-        if (!DEBUG && !this.isEnableLogging()) {
+        if (!DEBUG && !this.isVerbose()) {
             return;
         }
         this.getLogger().info(message);

@@ -21,7 +21,7 @@ public class ExampleCliApplication extends OkaeriCliApplication {
     // for applications like bots, etc.
     @Planned(ExecutionPhase.PRE_SETUP)
     public void setup() {
-        // this.setEnableLogging(false);
+        // this.setVerbose(false);
     }
 
     // run the app - for advanced platform usage see
