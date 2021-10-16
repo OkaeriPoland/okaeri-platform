@@ -22,7 +22,7 @@ Whole ecosystems built on top of the best okaeri packages.
   - [bungee](https://github.com/OkaeriPoland/okaeri-platform/tree/master/bungee): your platform of choice for best BungeeCord development experience (*alpha - missing features, possible breaking changes*)
 - **Standalone**
   - [web](https://github.com/OkaeriPoland/okaeri-platform/tree/master/web): best used as web side of other platforms but can be used fully standalone (*beta - basic features, possible breaking changes*)
-  - [cli](https://github.com/OkaeriPoland/okaeri-platform/tree/master/web): best used for any standalone task that is not covered by other modules (*beta - possible breaking changes*)
+  - [cli](https://github.com/OkaeriPoland/okaeri-platform/tree/master/cli): best used for any standalone task that is not covered by other modules (*beta - possible breaking changes*)
 
 ## Documentation
 We believe Okaeri Platform is best learned by examples, so feel free to explore README files of supported platforms and linked example projects. 
