@@ -1,7 +1,9 @@
 package org.example.okaeriplatformtest.command;
 
 import eu.okaeri.commands.annotation.*;
+import eu.okaeri.commands.bukkit.annotation.Async;
 import eu.okaeri.commands.bukkit.annotation.Sender;
+import eu.okaeri.commands.bukkit.annotation.Sync;
 import eu.okaeri.commands.bukkit.response.BukkitResponse;
 import eu.okaeri.commands.bukkit.response.ErrorResponse;
 import eu.okaeri.commands.bukkit.response.RawResponse;
@@ -33,6 +35,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
+@Async
 @Command(label = "testcmd", aliases = "testing")
 public class TestCommand implements CommandService {
 
@@ -47,6 +50,7 @@ public class TestCommand implements CommandService {
     @Inject private PlayerRepository playerPersistence;
 
     // testcmd|testing example
+    @Sync
     @Executor
     public BukkitResponse example(@Label String label) {
         return SuccessResponse.of("It works! {label} [{test}]")
@@ -55,7 +59,7 @@ public class TestCommand implements CommandService {
     }
 
     // testcmd|testing complex
-    @Executor(async = true, description = "wow async execution, db calls go brrr")
+    @Executor(description = "wow async execution, db calls go brrr")
     public BukkitResponse complex() {
         return RawResponse.of(this.complexContent, Thread.currentThread().getName());
     }
@@ -125,7 +129,7 @@ public class TestCommand implements CommandService {
     }
 
     // testcmd|testing write1000players
-    @Executor(pattern = "writeplayers *", async = true)
+    @Executor(pattern = "writeplayers *")
     public void writeplayers(CommandSender sender, @Arg("num") long num) {
         long start = System.currentTimeMillis();
         for (int i = 0; i < num; i++) {
@@ -146,7 +150,7 @@ public class TestCommand implements CommandService {
     }
 
     // testcmd|testing visittest
-    @Executor(async = true)
+    @Executor
     public String visittest() {
         return this.playerPersistence.streamAll()
                 .filter(entity -> entity.getLastJoinedLocation().getY() > 250)
@@ -156,7 +160,7 @@ public class TestCommand implements CommandService {
     }
 
     // testcmd|testing findplayer <name>
-    @Executor(pattern = "findplayer *", async = true)
+    @Executor(pattern = "findplayer *")
     public String findplayer(@Arg("name") String name) {
         long start = System.currentTimeMillis();
         String data = this.playerPersistence.findByName(name)
@@ -168,7 +172,7 @@ public class TestCommand implements CommandService {
     }
 
     // testcmd|testing findbyworld <world>
-    @Executor(pattern = "findbyworld *", async = true)
+    @Executor(pattern = "findbyworld *")
     public String findbyworld(@Arg("world") String worldName) {
         long start = System.currentTimeMillis();
         String data = this.playerPersistence.findByLastJoinedLocationWorld(worldName)
@@ -181,7 +185,7 @@ public class TestCommand implements CommandService {
     }
 
     // testcmd|testing findbyworld <world>
-    @Executor(pattern = "findbyy *", async = true)
+    @Executor(pattern = "findbyy *")
     public String findbyy(@Arg("world") int y) {
         long start = System.currentTimeMillis();
         String data = this.playerPersistence.findByLastJoinedLocationY(y)
@@ -194,13 +198,13 @@ public class TestCommand implements CommandService {
     }
 
     // testcmd|testing currentthread
-    @Executor(async = true)
+    @Executor
     public String currentthread() {
         return Thread.currentThread().getName();
     }
 
     // testcmd|testing readallplayers
-    @Executor(async = true)
+    @Executor
     public void readallplayers(CommandSender sender) {
         long start = System.currentTimeMillis();
         Collection<PlayerProperties> all = this.playerPersistence.findAll();
@@ -213,7 +217,7 @@ public class TestCommand implements CommandService {
     }
 
     // testcmd|testing deleteallplayers
-    @Executor(async = true)
+    @Executor
     public void deleteallplayers(CommandSender sender) {
         long start = System.currentTimeMillis();
         sender.sendMessage("state: " + this.playerPersistence.deleteAll());
@@ -222,7 +226,7 @@ public class TestCommand implements CommandService {
     }
 
     // testcmd|testing deleteme
-    @Executor(async = true)
+    @Executor
     public void deleteme(@Sender Player player) {
         long start = System.currentTimeMillis();
         player.sendMessage("state: " + this.playerPersistence.deleteByPath(player.getUniqueId()));
@@ -248,7 +252,7 @@ public class TestCommand implements CommandService {
     }
 
     // testcmd|testing tphereall
-    @Executor(async = true)
+    @Executor
     public BukkitResponse tphereall(CommandSender sender) {
 
         /* waiting for okaeri-commands to use @Sender Player directly - not funny */

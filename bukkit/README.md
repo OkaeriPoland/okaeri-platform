@@ -153,6 +153,8 @@ public class ExamplePlugin extends OkaeriBukkitPlugin {
 ```
 
 ```java
+// @Async
+// @Permission("testcmd.admin")
 @Command(label = "testcmd", aliases = "testing")
 public class TestCommand implements CommandService {
 
@@ -169,7 +171,8 @@ public class TestCommand implements CommandService {
   }
 
   // testcmd|testing complex
-  @Executor(async = true, description = "wow async execution, db calls go brrr")
+  @Async // or @Async on class and @Sync on methods
+  @Executor(description = "wow async execution, db calls go brrr")
   public BukkitResponse complex() {
     return RawResponse.of(this.complexContent, Thread.currentThread().getName());
   }

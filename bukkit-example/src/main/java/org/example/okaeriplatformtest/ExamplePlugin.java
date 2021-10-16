@@ -31,7 +31,6 @@ import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.Plugin;
 import org.example.okaeriplatformtest.command.TestCommand;
-import org.example.okaeriplatformtest.command.TestPreloadedCommand;
 import org.example.okaeriplatformtest.config.TestConfig;
 import org.example.okaeriplatformtest.config.TestLocaleConfig;
 import org.example.okaeriplatformtest.persistence.PlayerRepository;
@@ -54,7 +53,6 @@ import java.util.concurrent.atomic.AtomicInteger;
 @Register(TestLocaleConfig.class)
 @Register(PlayerRepository.class)
 @Register(TestCommand.class)
-@Register(TestPreloadedCommand.class)
 @Register(TestListener.class)
 @Register(TestTask.class)
 public class ExamplePlugin extends OkaeriBukkitPlugin {
