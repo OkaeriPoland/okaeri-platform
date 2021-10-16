@@ -1,4 +1,4 @@
-package eu.okaeri.platform.web;
+package eu.okaeri.platform.cli;
 
 import eu.okaeri.commands.OkaeriCommands;
 import eu.okaeri.configs.serdes.commons.SerdesCommons;
@@ -15,40 +15,38 @@ import eu.okaeri.platform.core.plan.ExecutionResult;
 import eu.okaeri.platform.core.plan.ExecutionTask;
 import eu.okaeri.platform.core.plan.task.*;
 import eu.okaeri.platform.standalone.component.ApplicationComponentCreator;
+import eu.okaeri.platform.standalone.component.ApplicationCreatorRegistry;
 import eu.okaeri.platform.standalone.i18n.SystemLocaleProvider;
-import eu.okaeri.platform.web.component.WebCreatorRegistry;
-import eu.okaeri.platform.web.meta.serdes.SerdesWeb;
-import eu.okaeri.platform.web.plan.JavalinSetupTask;
-import eu.okaeri.platform.web.plan.JavalinShutdownTask;
-import eu.okaeri.platform.web.plan.JavalinStartTask;
-import io.javalin.Javalin;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
 import lombok.SneakyThrows;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.util.Arrays;
-import java.util.Objects;
+import java.util.logging.Logger;
 
 import static eu.okaeri.platform.core.plan.ExecutionPhase.*;
 
 
-public class OkaeriWebApplication implements OkaeriPlatform {
+public class OkaeriCliApplication implements OkaeriPlatform {
 
-    @Getter private final Logger logger = LoggerFactory.getLogger(this.getClass());
+    private static final boolean DEBUG = Boolean.parseBoolean(System.getProperty("okaeri.platform.debug", "false"));
+    private static String[] args;
+
+    @Getter private final Logger logger = Logger.getLogger(OkaeriCliApplication.class.getName());
     @Getter private final File dataFolder = new File(".");
-    @Getter private final File file = ComponentHelper.getJarFile(OkaeriWebApplication.class);
-
-    @Getter private final Javalin javalin = Javalin.create();
+    @Getter private final File file = ComponentHelper.getJarFile(OkaeriCliApplication.class);
 
     @Getter @Setter private Injector injector;
     @Getter @Setter private ComponentCreator creator;
+    @Getter @Setter private boolean enableLogging = true;
 
     @Override
     public void log(@NonNull String message) {
+        if (!DEBUG && !this.isEnableLogging()) {
+            return;
+        }
         this.getLogger().info(message);
     }
 
@@ -56,36 +54,32 @@ public class OkaeriWebApplication implements OkaeriPlatform {
     public void plan(@NonNull ExecutionPlan plan) {
 
         plan.add(PRE_SETUP, new InjectorSetupTask());
-        plan.add(PRE_SETUP, (ExecutionTask<OkaeriWebApplication>) platform -> {
+        plan.add(PRE_SETUP, (ExecutionTask<OkaeriCliApplication>) platform -> {
             platform.registerInjectable("dataFolder", platform.getDataFolder());
             platform.registerInjectable("jarFile", platform.getFile());
             platform.registerInjectable("logger", platform.getLogger());
             platform.registerInjectable("app", platform);
-            platform.registerInjectable("javalin", platform.getJavalin());
-            platform.registerInjectable("jetty", Objects.requireNonNull(platform.getJavalin().jettyServer()));
             platform.registerInjectable("placeholders", Placeholders.create(true));
             platform.registerInjectable("defaultConfigurerProvider", (ConfigurerProvider) YamlSnakeYamlConfigurer::new);
-            platform.registerInjectable("defaultConfigurerSerdes", new Class[]{SerdesCommons.class, SerdesWeb.class});
+            platform.registerInjectable("defaultConfigurerSerdes", new Class[]{SerdesCommons.class});
             platform.registerInjectable("defaultPlaceholdersFactory", new SimplePlaceholdersFactory());
             platform.registerInjectable("i18nLocaleProvider", new SystemLocaleProvider());
         });
 
+        plan.add(PRE_SETUP, platform -> platform.registerInjectable("args", args));
         plan.add(PRE_SETUP, new CommandsSetupTask(new OkaeriCommands()));
-        plan.add(PRE_SETUP, new CreatorSetupTask(ApplicationComponentCreator.class, WebCreatorRegistry.class));
+        plan.add(PRE_SETUP, new CreatorSetupTask(ApplicationComponentCreator.class, ApplicationCreatorRegistry.class));
 
         plan.add(POST_SETUP, new BeanManifestCreateTask());
         plan.add(POST_SETUP, new BeanManifestExecuteTask());
-        plan.add(POST_SETUP, new JavalinSetupTask());
         plan.add(POST_SETUP, new PlatformBannerStartupTask());
 
-        plan.add(STARTUP, new JavalinStartTask());
-
-        plan.add(SHUTDOWN, new JavalinShutdownTask());
         plan.add(SHUTDOWN, new PersistenceShutdownTask());
     }
 
-    public static <T extends OkaeriWebApplication> T run(@NonNull T app, @NonNull String[] args) {
+    public static <T extends OkaeriCliApplication> T run(@NonNull T app, @NonNull String[] args) {
 
+        OkaeriCliApplication.args = args;
         ExecutionResult result = ExecutionPlan.dispatch(app);
         app.log(app.getCreator().getSummaryText(result.getTotalMillis()));
 
@@ -96,7 +90,7 @@ public class OkaeriWebApplication implements OkaeriPlatform {
     }
 
     @SneakyThrows
-    public static <T extends OkaeriWebApplication> T run(@NonNull Class<? extends T> type, @NonNull String[] args) {
+    public static <T extends OkaeriCliApplication> T run(@NonNull Class<? extends T> type, @NonNull String[] args) {
         return run(type.newInstance(), args);
     }
 }

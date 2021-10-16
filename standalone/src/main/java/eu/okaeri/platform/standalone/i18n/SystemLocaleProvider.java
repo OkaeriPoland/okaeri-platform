@@ -1,4 +1,4 @@
-package eu.okaeri.platform.web.i18n;
+package eu.okaeri.platform.standalone.i18n;
 
 import eu.okaeri.i18n.provider.LocaleProvider;
 

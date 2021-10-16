@@ -1,16 +1,23 @@
 package eu.okaeri.platform.bungee;
 
+import eu.okaeri.configs.serdes.commons.SerdesCommons;
+import eu.okaeri.configs.yaml.bukkit.serdes.SerdesBungee;
+import eu.okaeri.configs.yaml.bungee.YamlBungeeConfigurer;
 import eu.okaeri.injector.Injector;
+import eu.okaeri.persistence.document.ConfigurerProvider;
+import eu.okaeri.placeholders.bungee.BungeePlaceholders;
 import eu.okaeri.platform.bungee.component.BungeeComponentCreator;
 import eu.okaeri.platform.bungee.component.BungeeCreatorRegistry;
+import eu.okaeri.platform.bungee.i18n.ProxiedPlayerLocaleProvider;
 import eu.okaeri.platform.bungee.plan.BungeeExternalResourceProviderSetupTask;
-import eu.okaeri.platform.bungee.plan.BungeeInjectablesSetupTask;
-import eu.okaeri.platform.bungee.plan.BungeePlaceholdersSetupTask;
 import eu.okaeri.platform.bungee.plan.BungeeSchedulerShutdownTask;
+import eu.okaeri.platform.bungee.scheduler.PlatformScheduler;
 import eu.okaeri.platform.core.OkaeriPlatform;
 import eu.okaeri.platform.core.component.creator.ComponentCreator;
+import eu.okaeri.platform.core.placeholder.SimplePlaceholdersFactory;
 import eu.okaeri.platform.core.plan.ExecutionPlan;
 import eu.okaeri.platform.core.plan.ExecutionResult;
+import eu.okaeri.platform.core.plan.ExecutionTask;
 import eu.okaeri.platform.core.plan.task.*;
 import lombok.Getter;
 import lombok.NonNull;
@@ -46,8 +53,22 @@ public class OkaeriBungeePlugin extends Plugin implements OkaeriPlatform {
     public void plan(@NonNull ExecutionPlan plan) {
 
         plan.add(PRE_SETUP, new InjectorSetupTask());
-        plan.add(PRE_SETUP, new BungeePlaceholdersSetupTask());
-        plan.add(PRE_SETUP, new BungeeInjectablesSetupTask());
+        plan.add(PRE_SETUP, (ExecutionTask<OkaeriBungeePlugin>) platform -> {
+            platform.registerInjectable("proxy", platform.getProxy());
+            platform.registerInjectable("dataFolder", platform.getDataFolder());
+            platform.registerInjectable("jarFile", platform.getFile());
+            platform.registerInjectable("logger", platform.getLogger());
+            platform.registerInjectable("plugin", platform);
+            platform.registerInjectable("placeholders", BungeePlaceholders.create(true));
+            platform.registerInjectable("scheduler", new PlatformScheduler(platform, platform.getProxy().getScheduler()));
+            platform.registerInjectable("pluginManager", platform.getProxy().getPluginManager());
+            platform.registerInjectable("defaultConfigurerProvider", (ConfigurerProvider) YamlBungeeConfigurer::new);
+            platform.registerInjectable("defaultConfigurerSerdes", new Class[]{SerdesBungee.class, SerdesCommons.class});
+            platform.registerInjectable("defaultPlaceholdersFactory", new SimplePlaceholdersFactory());
+            platform.registerInjectable("i18nLocaleProvider", new ProxiedPlayerLocaleProvider());
+        });
+
+        // plan.add(PRE_SETUP, new BungeeCommandsSetupTask()); TODO
         plan.add(PRE_SETUP, new CreatorSetupTask(BungeeComponentCreator.class, BungeeCreatorRegistry.class), "creator");
 
         plan.add(POST_SETUP, new BungeeExternalResourceProviderSetupTask());

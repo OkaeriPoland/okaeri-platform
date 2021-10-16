@@ -9,21 +9,14 @@
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>okaeri-platform-minecraft</artifactId>
+    <artifactId>okaeri-platform-cli</artifactId>
 
     <dependencies>
-        <!-- core -->
+        <!-- standalone -->
         <dependency>
             <groupId>eu.okaeri</groupId>
-            <artifactId>okaeri-platform-core</artifactId>
+            <artifactId>okaeri-platform-standalone</artifactId>
             <version>0.4.0-preview41</version>
-        </dependency>
-
-        <!-- persistence -->
-        <dependency>
-            <groupId>eu.okaeri</groupId>
-            <artifactId>okaeri-persistence-flat</artifactId>
-            <version>${library.okaeri-persistence.version}</version>
         </dependency>
     </dependencies>
 

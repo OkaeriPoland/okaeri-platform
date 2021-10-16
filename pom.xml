@@ -7,7 +7,7 @@
     <groupId>eu.okaeri</groupId>
     <artifactId>okaeri-platform</artifactId>
     <packaging>pom</packaging>
-    <version>0.4.0-preview40</version>
+    <version>0.4.0-preview41</version>
 
     <modules>
         <module>core</module>
@@ -18,6 +18,7 @@
         <!-- standalone -->
         <module>standalone</module>
         <module>web</module>
+        <module>cli</module>
     </modules>
 
     <properties>
@@ -25,7 +26,7 @@
         <maven.compiler.source>8</maven.compiler.source>
         <maven.compiler.target>8</maven.compiler.target>
 
-        <library.okaeri-commands.version>0.7.5</library.okaeri-commands.version>
+        <library.okaeri-commands.version>0.7.6</library.okaeri-commands.version>
         <library.okaeri-configs.version>3.3.6</library.okaeri-configs.version>
         <library.okaeri-i18n.version>2.0.1</library.okaeri-i18n.version>
         <library.okaeri-commons.version>0.1.7</library.okaeri-commons.version>

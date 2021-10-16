@@ -5,7 +5,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>org.example</groupId>
-    <artifactId>web-test</artifactId>
+    <artifactId>cli-test</artifactId>
     <version>1.0-SNAPSHOT</version>
 
     <properties>
@@ -18,46 +18,12 @@
         <!-- base platform -->
         <dependency>
             <groupId>eu.okaeri</groupId>
-            <artifactId>okaeri-platform-web</artifactId>
+            <artifactId>okaeri-platform-cli</artifactId>
             <version>0.4.0-preview41</version>
             <scope>compile</scope>
         </dependency>
 
-        <!-- json configurer for redis/jdbc backends -->
-        <dependency>
-            <groupId>eu.okaeri</groupId>
-            <artifactId>okaeri-configs-json-simple</artifactId>
-            <version>3.3.5</version>
-            <scope>compile</scope>
-        </dependency>
-
-        <!-- additional redis backend -->
-        <dependency>
-            <groupId>eu.okaeri</groupId>
-            <artifactId>okaeri-persistence-redis</artifactId>
-            <version>1.5.7</version>
-            <scope>compile</scope>
-        </dependency>
-
-        <!-- additional jdbc backend with the clients of choice (mariadb/mysql here) -->
-        <dependency>
-            <groupId>eu.okaeri</groupId>
-            <artifactId>okaeri-persistence-jdbc</artifactId>
-            <version>1.5.7</version>
-            <scope>compile</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.mariadb.jdbc</groupId>
-            <artifactId>mariadb-java-client</artifactId>
-            <version>2.7.2</version>
-            <scope>compile</scope>
-        </dependency>
-        <dependency>
-            <groupId>com.h2database</groupId>
-            <artifactId>h2</artifactId>
-            <version>1.4.200</version>
-            <scope>compile</scope>
-        </dependency>
+        <!-- other dependencies: see web-example -->
 
         <!-- lombok for cleaner examples -->
         <dependency>
@@ -69,7 +35,7 @@
     </dependencies>
 
     <build>
-        <finalName>okaeriplatformtest-web-${project.version}</finalName>
+        <finalName>okaeriplatformtest-cli-${project.version}</finalName>
         <defaultGoal>clean package</defaultGoal>
         <resources>
             <resource>
@@ -77,7 +43,6 @@
                 <filtering>true</filtering>
             </resource>
         </resources>
-
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -116,12 +81,6 @@
                 <configuration>
                     <minimizeJar>false</minimizeJar>
                     <createDependencyReducedPom>false</createDependencyReducedPom>
-                    <transformers>
-                        <!-- support for multiple jdbc drivers -->
-                        <transformer implementation="org.apache.maven.plugins.shade.resource.AppendingTransformer">
-                            <resource>META-INF/services/java.sql.Driver</resource>
-                        </transformer>
-                    </transformers>
                 </configuration>
             </plugin>
         </plugins>

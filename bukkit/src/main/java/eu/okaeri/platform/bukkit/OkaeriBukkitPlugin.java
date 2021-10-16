@@ -1,16 +1,28 @@
 package eu.okaeri.platform.bukkit;
 
+import eu.okaeri.configs.serdes.commons.SerdesCommons;
+import eu.okaeri.configs.yaml.bukkit.YamlBukkitConfigurer;
+import eu.okaeri.configs.yaml.bukkit.serdes.SerdesBukkit;
 import eu.okaeri.injector.Injector;
+import eu.okaeri.persistence.document.ConfigurerProvider;
+import eu.okaeri.placeholders.bukkit.BukkitPlaceholders;
 import eu.okaeri.platform.bukkit.component.BukkitComponentCreator;
 import eu.okaeri.platform.bukkit.component.BukkitCreatorRegistry;
-import eu.okaeri.platform.bukkit.plan.*;
+import eu.okaeri.platform.bukkit.i18n.PlayerLocaleProvider;
+import eu.okaeri.platform.bukkit.plan.BukkitCommandsI18nManifestTask;
+import eu.okaeri.platform.bukkit.plan.BukkitCommandsSetupTask;
+import eu.okaeri.platform.bukkit.plan.BukkitExternalResourceProviderSetupTask;
+import eu.okaeri.platform.bukkit.scheduler.PlatformScheduler;
 import eu.okaeri.platform.core.OkaeriPlatform;
 import eu.okaeri.platform.core.component.ComponentHelper;
 import eu.okaeri.platform.core.component.creator.ComponentCreator;
+import eu.okaeri.platform.core.placeholder.SimplePlaceholdersFactory;
 import eu.okaeri.platform.core.plan.ExecutionPlan;
 import eu.okaeri.platform.core.plan.ExecutionResult;
+import eu.okaeri.platform.core.plan.ExecutionTask;
 import eu.okaeri.platform.core.plan.task.*;
 import eu.okaeri.platform.minecraft.task.CommandsI18nSetupTask;
+import eu.okaeri.tasker.bukkit.BukkitTasker;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
@@ -47,8 +59,22 @@ public class OkaeriBukkitPlugin extends JavaPlugin implements OkaeriPlatform {
     public void plan(@NonNull ExecutionPlan plan) {
 
         plan.add(PRE_SETUP, new InjectorSetupTask());
-        plan.add(PRE_SETUP, new BukkitPlaceholdersSetupTask());
-        plan.add(PRE_SETUP, new BukkitInjectablesSetupTask());
+        plan.add(PRE_SETUP, (ExecutionTask<OkaeriBukkitPlugin>) platform -> {
+            platform.registerInjectable("server", platform.getServer());
+            platform.registerInjectable("dataFolder", platform.getDataFolder());
+            platform.registerInjectable("jarFile", platform.getFile());
+            platform.registerInjectable("logger", platform.getLogger());
+            platform.registerInjectable("plugin", platform);
+            platform.registerInjectable("placeholders", BukkitPlaceholders.create(true));
+            platform.registerInjectable("scheduler", new PlatformScheduler(platform, platform.getServer().getScheduler()));
+            platform.registerInjectable("tasker", BukkitTasker.newPool(platform));
+            platform.registerInjectable("pluginManager", platform.getServer().getPluginManager());
+            platform.registerInjectable("defaultConfigurerProvider", (ConfigurerProvider) YamlBukkitConfigurer::new);
+            platform.registerInjectable("defaultConfigurerSerdes", new Class[]{SerdesBukkit.class, SerdesCommons.class});
+            platform.registerInjectable("defaultPlaceholdersFactory", new SimplePlaceholdersFactory());
+            platform.registerInjectable("i18nLocaleProvider", new PlayerLocaleProvider());
+        });
+
         plan.add(PRE_SETUP, new BukkitCommandsSetupTask());
         plan.add(PRE_SETUP, new CreatorSetupTask(BukkitComponentCreator.class, BukkitCreatorRegistry.class));
 
