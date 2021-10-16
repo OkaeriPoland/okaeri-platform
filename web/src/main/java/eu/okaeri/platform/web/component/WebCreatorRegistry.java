@@ -1,6 +1,7 @@
 package eu.okaeri.platform.web.component;
 
 import eu.okaeri.injector.Injector;
+import eu.okaeri.injector.annotation.Inject;
 import eu.okaeri.platform.standalone.component.ApplicationCreatorRegistry;
 import eu.okaeri.platform.web.annotation.PathParam;
 import eu.okaeri.platform.web.component.type.RequestHandlerComponentResolver;
@@ -8,6 +9,7 @@ import io.javalin.http.Context;
 
 public class WebCreatorRegistry extends ApplicationCreatorRegistry {
 
+    @Inject
     public WebCreatorRegistry(Injector injector) {
         super(injector);
     }
