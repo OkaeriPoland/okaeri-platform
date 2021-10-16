@@ -1,8 +1,6 @@
 package eu.okaeri.platform.bukkit;
 
-import eu.okaeri.commands.bukkit.CommandsBukkit;
 import eu.okaeri.injector.Injector;
-import eu.okaeri.platform.bukkit.commands.BukkitCommandsResultHandler;
 import eu.okaeri.platform.bukkit.component.BukkitComponentCreator;
 import eu.okaeri.platform.bukkit.component.BukkitCreatorRegistry;
 import eu.okaeri.platform.bukkit.plan.*;
@@ -51,7 +49,7 @@ public class OkaeriBukkitPlugin extends JavaPlugin implements OkaeriPlatform {
         plan.add(PRE_SETUP, new InjectorSetupTask());
         plan.add(PRE_SETUP, new BukkitPlaceholdersSetupTask());
         plan.add(PRE_SETUP, new BukkitInjectablesSetupTask());
-        plan.add(PRE_SETUP, new CommandsSetupTask(CommandsBukkit.of(this).resultHandler(new BukkitCommandsResultHandler())));
+        plan.add(PRE_SETUP, new BukkitCommandsSetupTask());
         plan.add(PRE_SETUP, new CreatorSetupTask(BukkitComponentCreator.class, BukkitCreatorRegistry.class));
 
         plan.add(POST_SETUP, new BukkitExternalResourceProviderSetupTask());

@@ -12,7 +12,7 @@ public class I18nCommandsMessages extends LocaleConfig {
     String commandsSystemUsageTemplate;
     String commandsSystemUsageEntry;
     String commandsSystemUsageEntryDescription;
-    String commandsSystemPermissionError;
+    String commandsSystemPermissionsError;
     String commandsSystemCommandError;
     String commandsSystemUnknownError;
     String commandsSystemConsoleOnlyError;
