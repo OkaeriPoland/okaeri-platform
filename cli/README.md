@@ -21,6 +21,9 @@
 
 ### Example
 
+See [cli-example](https://github.com/OkaeriPoland/okaeri-platform/tree/master/cli-example) for the repository/dependency.
+Note the code below does not represent full source code of the example. See [web-example](https://github.com/OkaeriPoland/okaeri-platform/tree/master/cli-example) for at least basic usage of every component.
+
 ```java
 public class ExampleCliApplication extends OkaeriCliApplication {
 
