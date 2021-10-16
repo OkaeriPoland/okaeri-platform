@@ -14,8 +14,10 @@ import eu.okaeri.configs.OkaeriConfig;
 import eu.okaeri.i18n.message.Message;
 import eu.okaeri.injector.annotation.Inject;
 import eu.okaeri.placeholders.message.CompiledMessage;
+import eu.okaeri.platform.bukkit.annotation.Chain;
 import eu.okaeri.platform.bukkit.i18n.BI18n;
 import eu.okaeri.platform.core.annotation.Bean;
+import eu.okaeri.tasker.core.chain.TaskerChain;
 import org.apache.commons.lang.RandomStringUtils;
 import org.bukkit.*;
 import org.bukkit.command.CommandSender;
@@ -62,6 +64,26 @@ public class TestCommand implements CommandService {
     @Executor(description = "wow async execution, db calls go brrr")
     public BukkitResponse complex() {
         return RawResponse.of(this.complexContent, Thread.currentThread().getName());
+    }
+
+    // testcmd|testing chains
+    //
+    // @Chain annotation is available
+    // in the command methods only
+    //
+    // for other places use @Inject Tasker
+    // and create chain manually
+    //
+    public TaskerChain<?> chains(@Chain("name"/* or empty if not queued */) TaskerChain<?> chain) {
+        return chain
+                .async(() -> {
+                    String threadName = Thread.currentThread().getName();
+                    return "some async data from " + threadName;
+                })
+                .acceptSync((data) -> {
+                    String threadName = Thread.currentThread().getName();
+                    Bukkit.broadcastMessage("received: " + data + " in " + threadName);
+                }); // do not execute if returning, will be executed by platform
     }
 
     // testcmd|testing greet|greeting

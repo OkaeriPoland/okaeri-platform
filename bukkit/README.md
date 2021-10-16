@@ -177,6 +177,26 @@ public class TestCommand implements CommandService {
     return RawResponse.of(this.complexContent, Thread.currentThread().getName());
   }
 
+  // testcmd|testing chains
+  //
+  // @Chain annotation is available
+  // in the command methods only
+  //
+  // for other places use @Inject Tasker
+  // and create chain manually
+  //
+  public TaskerChain<?> chains(@Chain("name"/* or empty if not queued */) TaskerChain<?> chain) {
+    return chain
+      .async(() -> {
+        String threadName = Thread.currentThread().getName();
+        return "some async data from " + threadName;
+      })
+      .acceptSync((data) -> {
+        String threadName = Thread.currentThread().getName();
+        Bukkit.broadcastMessage("received: " + data + " in " + threadName);
+      }); // do not #execute() if returning, will be executed by platform
+  }
+
   // testcmd|testing greet|greeting
   @Executor(pattern = {"greet", "greeting"}, description = "greets you :O")
   public BukkitResponse greet(ExamplePlugin diExample, @Inject("testString") String namedDiExample) {
