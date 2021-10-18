@@ -1,9 +1,9 @@
-package eu.okaeri.platform.core.serdes;
+package eu.okaeri.platform.core.serdes.range.inline;
 
 import eu.okaeri.configs.serdes.OkaeriSerdesPack;
 import eu.okaeri.configs.serdes.SerdesRegistry;
 
-public class SerdesPlatform implements OkaeriSerdesPack {
+public class SerdesRangesInline implements OkaeriSerdesPack {
 
     @Override
     public void register(SerdesRegistry registry) {

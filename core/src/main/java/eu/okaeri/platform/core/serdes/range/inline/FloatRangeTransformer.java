@@ -1,4 +1,4 @@
-package eu.okaeri.platform.core.serdes;
+package eu.okaeri.platform.core.serdes.range.inline;
 
 import eu.okaeri.commons.range.FloatRange;
 import eu.okaeri.configs.schema.GenericsPair;
