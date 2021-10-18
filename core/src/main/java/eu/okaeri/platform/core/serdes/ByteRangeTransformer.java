@@ -1,0 +1,28 @@
+package eu.okaeri.platform.core.serdes;
+
+import eu.okaeri.commons.range.ByteRange;
+import eu.okaeri.configs.schema.GenericsPair;
+import eu.okaeri.configs.serdes.BidirectionalTransformer;
+import eu.okaeri.configs.serdes.SerdesContext;
+
+public class ByteRangeTransformer extends BidirectionalTransformer<String, ByteRange> {
+
+    @Override
+    public GenericsPair<String, ByteRange> getPair() {
+        return this.genericsPair(String.class, ByteRange.class);
+    }
+
+    @Override
+    public ByteRange leftToRight(String data, SerdesContext serdesContext) {
+        ByteRange range = ByteRange.valueOf(data);
+        if (range == null) {
+            throw new RuntimeException("Invalid range: " + data);
+        }
+        return range;
+    }
+
+    @Override
+    public String rightToLeft(ByteRange range, SerdesContext serdesContext) {
+        return range.getMin() + " - " + range.getMax();
+    }
+}

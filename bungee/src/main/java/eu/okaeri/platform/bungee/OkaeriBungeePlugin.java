@@ -19,6 +19,7 @@ import eu.okaeri.platform.core.plan.ExecutionPlan;
 import eu.okaeri.platform.core.plan.ExecutionResult;
 import eu.okaeri.platform.core.plan.ExecutionTask;
 import eu.okaeri.platform.core.plan.task.*;
+import eu.okaeri.platform.core.serdes.SerdesPlatform;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
@@ -63,7 +64,7 @@ public class OkaeriBungeePlugin extends Plugin implements OkaeriPlatform {
             platform.registerInjectable("scheduler", new PlatformScheduler(platform, platform.getProxy().getScheduler()));
             platform.registerInjectable("pluginManager", platform.getProxy().getPluginManager());
             platform.registerInjectable("defaultConfigurerProvider", (ConfigurerProvider) YamlBungeeConfigurer::new);
-            platform.registerInjectable("defaultConfigurerSerdes", new Class[]{SerdesBungee.class, SerdesCommons.class});
+            platform.registerInjectable("defaultConfigurerSerdes", new Class[]{SerdesPlatform.class, SerdesCommons.class, SerdesBungee.class});
             platform.registerInjectable("defaultPlaceholdersFactory", new SimplePlaceholdersFactory());
             platform.registerInjectable("i18nLocaleProvider", new ProxiedPlayerLocaleProvider());
         });

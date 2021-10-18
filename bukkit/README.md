@@ -144,7 +144,7 @@ public class ExamplePlugin extends OkaeriBukkitPlugin {
   @Bean("cachedDbData")
   public Cached<String> loadDataFromDbWithCache(TestConfig config) {
     // resolves only once at the beginning and then only after ttl expires (using 2nd arg supplier)
-    // it is possible to use Cached.of(supplier) to disable ttl completely
+    // it is possible to use Cached.of(supplier) to disable ttl completely (or preferably Lazy.of(supplier)
     // getting value is done using #get(), it is possible to force update using #update()
     // remember however that if supplier is blocking it would affect your current thread
     return Cached.of(Duration.ofMinutes(1), () -> config.getGreeting() + " [" + Instant.now() + "]");
