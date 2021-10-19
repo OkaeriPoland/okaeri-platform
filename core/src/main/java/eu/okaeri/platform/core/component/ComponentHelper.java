@@ -13,7 +13,6 @@ import lombok.ToString;
 
 import java.io.Closeable;
 import java.io.File;
-import java.io.IOException;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -130,7 +129,7 @@ public final class ComponentHelper {
                 .forEach(closeable -> {
                     try {
                         closeable.close();
-                    } catch (IOException ignored) {
+                    } catch (Throwable ignored) {
                     }
                 });
     }
