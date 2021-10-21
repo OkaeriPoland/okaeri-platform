@@ -33,7 +33,7 @@
         <library.okaeri-injector.version>2.0.0</library.okaeri-injector.version>
         <library.okaeri-placeholders.version>1.4.10</library.okaeri-placeholders.version>
         <library.okaeri-persistence.version>1.5.10</library.okaeri-persistence.version>
-        <library.okaeri-tasker.version>0.0.6</library.okaeri-tasker.version>
+        <library.okaeri-tasker.version>1.0.0</library.okaeri-tasker.version>
     </properties>
 
     <dependencies>
