@@ -1,7 +1,6 @@
 package eu.okaeri.platform.minecraft.task;
 
 import eu.okaeri.commands.Commands;
-import eu.okaeri.injector.Injectable;
 import eu.okaeri.platform.core.OkaeriPlatform;
 import eu.okaeri.platform.core.plan.ExecutionTask;
 import eu.okaeri.platform.minecraft.i18n.I18nCommandsTextHandler;
@@ -25,20 +24,17 @@ public class CommandsI18nSetupTask implements ExecutionTask<OkaeriPlatform> {
                 .forEach(injectable -> i18nCommandsProviders.put(injectable.getName(), injectable.getObject()));
 
         // get main i18n and resolve prefixProvider
-        platform.getInjector().getInjectable("i18n", MI18n.class)
-                .map(Injectable::getObject)
+        platform.getInjector().get("i18n", MI18n.class)
                 .ifPresent(i18n -> prefixProvider.set(i18n.getPrefixProvider()));
 
         // update prefix provider of commands to the main one
         if (prefixProvider.get() != null) {
-            platform.getInjector().getInjectable("i18n-platform-commands", MI18n.class)
-                    .map(Injectable::getObject)
+            platform.getInjector().get("i18n-platform-commands", MI18n.class)
                     .ifPresent(i18n -> i18n.setPrefixProvider(prefixProvider.get()));
         }
 
         // inject all i18n into commands to allow ${key} access
-        platform.getInjector().getInjectable("commands", Commands.class)
-                .map(Injectable::getObject)
+        platform.getInjector().get("commands", Commands.class)
                 .ifPresent(commands -> commands.textHandler(new I18nCommandsTextHandler(i18nCommandsProviders)));
     }
 }

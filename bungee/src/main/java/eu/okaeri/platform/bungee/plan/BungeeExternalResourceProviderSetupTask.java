@@ -1,6 +1,5 @@
 package eu.okaeri.platform.bungee.plan;
 
-import eu.okaeri.injector.Injectable;
 import eu.okaeri.injector.Injector;
 import eu.okaeri.platform.bungee.OkaeriBungeePlugin;
 import eu.okaeri.platform.core.component.ExternalResourceProvider;
@@ -25,19 +24,19 @@ public class BungeeExternalResourceProviderSetupTask implements ExecutionTask<Ok
         }
 
         Injector externalInjector = ((OkaeriBungeePlugin) plugin).getInjector();
-        Optional<? extends Injectable<?>> injectable = externalInjector.getInjectable(name, type);
+        Optional<?> injectable = externalInjector.get(name, type);
 
         if (!injectable.isPresent()) {
             throw new BreakException("Cannot provide external resource: " + name + ", " + type + " from " + source + ": cannot find injectable");
         }
 
-        return injectable.get().getObject();
+        return injectable.get();
     };
 
     @Override
     public void execute(OkaeriBungeePlugin platform) {
 
-        if (platform.getInjector().getInjectable("externalResourceProvider", ExternalResourceProvider.class).isPresent()) {
+        if (platform.getInjector().get("externalResourceProvider", ExternalResourceProvider.class).isPresent()) {
             return;
         }
 

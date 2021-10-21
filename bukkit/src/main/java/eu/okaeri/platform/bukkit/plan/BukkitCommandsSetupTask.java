@@ -4,7 +4,6 @@ import eu.okaeri.commands.Commands;
 import eu.okaeri.commands.brigadier.CommandsBrigadierPaper;
 import eu.okaeri.commands.bukkit.CommandsBukkit;
 import eu.okaeri.commands.injector.CommandsInjector;
-import eu.okaeri.injector.Injectable;
 import eu.okaeri.platform.bukkit.OkaeriBukkitPlugin;
 import eu.okaeri.platform.bukkit.commands.BukkitCommandsResultHandler;
 import eu.okaeri.platform.bukkit.commands.BukkitCommandsTasker;
@@ -35,8 +34,7 @@ public class BukkitCommandsSetupTask implements ExecutionTask<OkaeriBukkitPlugin
         }
 
         // allow @Chain in commands
-        platform.getInjector().getInjectable("tasker", Tasker.class)
-                .map(Injectable::getObject)
+        platform.getInjector().get("tasker", Tasker.class)
                 .ifPresent(tasker -> commands.registerExtension(new BukkitCommandsTasker(tasker)));
 
         // register commands injectable

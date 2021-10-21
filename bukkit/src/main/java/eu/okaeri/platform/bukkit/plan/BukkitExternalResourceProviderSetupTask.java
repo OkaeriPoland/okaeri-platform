@@ -1,6 +1,5 @@
 package eu.okaeri.platform.bukkit.plan;
 
-import eu.okaeri.injector.Injectable;
 import eu.okaeri.injector.Injector;
 import eu.okaeri.platform.bukkit.OkaeriBukkitPlugin;
 import eu.okaeri.platform.core.component.ExternalResourceProvider;
@@ -22,19 +21,19 @@ public class BukkitExternalResourceProviderSetupTask implements ExecutionTask<Ok
         }
 
         Injector externalInjector = ((OkaeriBukkitPlugin) plugin).getInjector();
-        Optional<? extends Injectable<?>> injectable = externalInjector.getInjectable(name, type);
+        Optional<?> injectable = externalInjector.get(name, type);
 
         if (!injectable.isPresent()) {
             throw new BreakException("Cannot provide external resource: " + name + ", " + type + " from " + source + ": cannot find injectable");
         }
 
-        return injectable.get().getObject();
+        return injectable.get();
     };
 
     @Override
     public void execute(OkaeriBukkitPlugin platform) {
 
-        if (platform.getInjector().getInjectable("externalResourceProvider", ExternalResourceProvider.class).isPresent()) {
+        if (platform.getInjector().get("externalResourceProvider", ExternalResourceProvider.class).isPresent()) {
             return;
         }
 

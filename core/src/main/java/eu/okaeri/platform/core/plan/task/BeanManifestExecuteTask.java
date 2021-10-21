@@ -1,6 +1,5 @@
 package eu.okaeri.platform.core.plan.task;
 
-import eu.okaeri.injector.Injectable;
 import eu.okaeri.platform.core.OkaeriPlatform;
 import eu.okaeri.platform.core.component.ComponentHelper;
 import eu.okaeri.platform.core.component.ExternalResourceProvider;
@@ -15,13 +14,11 @@ public class BeanManifestExecuteTask implements ExecutionTask<OkaeriPlatform> {
     public void execute(OkaeriPlatform platform) {
 
         // find manifest
-        BeanManifest beanManifest = platform.getInjector().getInjectable("manifest", BeanManifest.class)
-                .map(Injectable::getObject)
+        BeanManifest beanManifest = platform.getInjector().get("manifest", BeanManifest.class)
                 .orElseThrow(() -> new RuntimeException("Cannot execute manifest without manifest being present!"));
 
         // resolve resource provider
-        ExternalResourceProvider resourceProvider = platform.getInjector().getInjectable("externalResourceProvider", ExternalResourceProvider.class)
-                .map(Injectable::getObject)
+        ExternalResourceProvider resourceProvider = platform.getInjector().get("externalResourceProvider", ExternalResourceProvider.class)
                 .orElse(NULL_RESOURCE_PROVIDER);
 
         // execute component tree and register everything

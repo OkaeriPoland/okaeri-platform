@@ -1,6 +1,5 @@
 package eu.okaeri.platform.core.component.type;
 
-import eu.okaeri.injector.Injectable;
 import eu.okaeri.injector.Injector;
 import eu.okaeri.persistence.PersistenceCollection;
 import eu.okaeri.persistence.document.DocumentPersistence;
@@ -44,10 +43,9 @@ public class DocumentCollectionComponentResolver implements ComponentResolver {
                 .findAny()
                 .orElseThrow(() -> new IllegalArgumentException("No @DependsOn for DocumentPersistence found on " + manifestType));
 
-        Injectable<?> injectable = injector.getExact(dependsOnPersistence.name(), dependsOnPersistence.type())
+        DocumentPersistence persistence = (DocumentPersistence) injector.getExact(dependsOnPersistence.name(), dependsOnPersistence.type())
                 .orElseThrow(() -> new IllegalArgumentException("No " + dependsOnPersistence.name() + " of " + dependsOnPersistence.type() + " found to create " + manifestType));
 
-        DocumentPersistence persistence = (DocumentPersistence) injectable.getObject();
         PersistenceCollection collection = PersistenceCollection.of(manifestType);
         persistence.registerCollection(collection);
 

@@ -1,6 +1,5 @@
 package eu.okaeri.platform.core.component.manifest;
 
-import eu.okaeri.injector.Injectable;
 import eu.okaeri.injector.Injector;
 import eu.okaeri.injector.annotation.Inject;
 import eu.okaeri.platform.core.annotation.Bean;
@@ -185,9 +184,9 @@ public class BeanManifest {
     public BeanManifest update(@NonNull ComponentCreator creator, @NonNull Injector injector) {
 
         if (this.object == null) {
-            Optional<? extends Injectable<?>> injectable = injector.getExact(this.name, this.type);
+            Optional<?> injectable = injector.getExact(this.name, this.type);
             if (injectable.isPresent()) {
-                this.object = injectable.get().getObject();
+                this.object = injectable.get();
             } else if (this.ready(creator, injector) && creator.isComponent(this.type) && (this.source != BeanSource.INJECT)) {
                 this.object = creator.make(this, injector);
                 injector.registerInjectable(this.name, this.object);
@@ -238,11 +237,11 @@ public class BeanManifest {
             if ((depend.getSource() != BeanSource.INJECT) || (depend.getObject() != null)) {
                 continue;
             }
-            Optional<? extends Injectable<?>> injectable = injector.getExact(depend.getName(), depend.getType());
+            Optional<?> injectable = injector.getExact(depend.getName(), depend.getType());
             if (!injectable.isPresent()) {
                 continue;
             }
-            depend.setObject(injectable.get().getObject());
+            depend.setObject(injectable.get());
         }
     }
 
@@ -274,7 +273,7 @@ public class BeanManifest {
 
             if ((depend.getObject() == null) && (depend.getSource() == BeanSource.INJECT)) {
 
-                Optional<? extends Injectable<?>> injectable = injector.getExact(depend.getName(), depend.getType());
+                Optional<?> injectable = injector.getExact(depend.getName(), depend.getType());
 
                 if (!injectable.isPresent()) {
 
@@ -299,7 +298,7 @@ public class BeanManifest {
                     return false;
                 }
 
-                Object injectObject = injectable.get().getObject();
+                Object injectObject = injectable.get();
                 depend.setObject(injectObject);
             }
         }

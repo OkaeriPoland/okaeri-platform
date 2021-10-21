@@ -63,8 +63,7 @@ public class MessagesComponentResolver implements ComponentResolver {
         }
 
         Placeholders defaultPlaceholders = injector.getExact("placeholders", Placeholders.class)
-                .orElseThrow(() -> new IllegalArgumentException("cannot find placeholders required for @Messages"))
-                .getObject();
+                .orElseThrow(() -> new IllegalArgumentException("cannot find placeholders required for @Messages"));
 
         long start = System.currentTimeMillis();
         Class<? extends LocaleConfig> beanClazz = (Class<? extends LocaleConfig>) manifest.getType();

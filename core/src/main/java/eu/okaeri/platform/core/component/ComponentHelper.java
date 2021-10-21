@@ -44,12 +44,12 @@ public final class ComponentHelper {
             Class<?> paramType = param.getType();
             String name = (param.getAnnotation(Inject.class) != null) ? param.getAnnotation(Inject.class).value() : "";
 
-            Optional<? extends Injectable<?>> injectable = injector.getInjectable(name, paramType);
+            Optional<?> injectable = injector.get(name, paramType);
             if (!injectable.isPresent()) {
                 throw new RuntimeException("Cannot invoke " + displayMethod(method) + ", no injectable of type " + paramType + " [" + name + "] found");
             }
 
-            call[i] = paramType.cast(injectable.get().getObject());
+            call[i] = paramType.cast(injectable.get());
         }
 
         // let's make a call :dab:
@@ -83,14 +83,13 @@ public final class ComponentHelper {
                 continue;
             }
 
-            Optional<? extends Injectable<?>> injectable = injector.getInjectable(inject.value(), field.getType());
+            Optional<?> injectable = injector.get(inject.value(), field.getType());
             if (!injectable.isPresent()) {
                 continue;
             }
 
-            Injectable<?> injectObject = injectable.get();
             field.setAccessible(true);
-            field.set(component, injectObject.getObject());
+            field.set(component, injectable.get());
         }
     }
 
