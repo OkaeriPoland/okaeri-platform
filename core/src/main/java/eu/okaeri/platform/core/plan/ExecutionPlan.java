@@ -14,8 +14,6 @@ public class ExecutionPlan {
 
     private final OkaeriPlatform platform;
     private final Map<ExecutionPhase, List<ExecutionTask<?>>> tasks = new ConcurrentHashMap<>();
-    private final Map<ExecutionTask<?>, List<String>> taskDependencies = new ConcurrentHashMap<>();
-    private final Map<ExecutionTask<?>, String> taskNames = new ConcurrentHashMap<>();
 
     public void add(@NonNull ExecutionPhase phase, @NonNull ExecutionTask<?> task) {
         this.add(phase, task, task.getClass().getName(), Collections.emptyList());
@@ -27,8 +25,6 @@ public class ExecutionPlan {
 
     public void add(@NonNull ExecutionPhase phase, @NonNull ExecutionTask<?> task, @NonNull String taskName, @NonNull List<String> taskDependencies) {
         this.tasks.computeIfAbsent(phase, (t) -> new ArrayList<>()).add(task);
-        this.taskDependencies.put(task, taskDependencies);
-        this.taskNames.put(task, taskName);
     }
 
     public void addMethods(@NonNull Object parent) {
@@ -49,7 +45,7 @@ public class ExecutionPlan {
     }
 
     public ExecutionResult execute(long startTime) {
-        return this.execute(System.currentTimeMillis(), ExecutionPhase.PRE_SHUTDOWN, ExecutionPhase.SHUTDOWN, ExecutionPhase.POST_SHUTDOWN);
+        return this.execute(startTime, ExecutionPhase.PRE_SHUTDOWN, ExecutionPhase.SHUTDOWN, ExecutionPhase.POST_SHUTDOWN);
     }
 
     public ExecutionResult execute(long startTime, @NonNull ExecutionPhase... blacklistedPhases) {

@@ -23,6 +23,6 @@ public class ByteRangeTransformer extends BidirectionalTransformer<String, ByteR
 
     @Override
     public String rightToLeft(ByteRange range, SerdesContext serdesContext) {
-        return range.getMin() + " - " + range.getMax();
+        return range.getMin() + ":" + range.getMax();
     }
 }

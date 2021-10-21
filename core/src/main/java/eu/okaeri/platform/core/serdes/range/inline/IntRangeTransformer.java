@@ -23,6 +23,6 @@ public class IntRangeTransformer extends BidirectionalTransformer<String, IntRan
 
     @Override
     public String rightToLeft(IntRange range, SerdesContext serdesContext) {
-        return range.getMin() + " - " + range.getMax();
+        return range.getMin() + ":" + range.getMax();
     }
 }

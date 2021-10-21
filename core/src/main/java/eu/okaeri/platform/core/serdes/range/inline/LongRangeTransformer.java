@@ -23,6 +23,6 @@ public class LongRangeTransformer extends BidirectionalTransformer<String, LongR
 
     @Override
     public String rightToLeft(LongRange range, SerdesContext serdesContext) {
-        return range.getMin() + " - " + range.getMax();
+        return range.getMin() + ":" + range.getMax();
     }
 }

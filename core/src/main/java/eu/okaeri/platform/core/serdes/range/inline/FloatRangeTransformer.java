@@ -23,6 +23,6 @@ public class FloatRangeTransformer extends BidirectionalTransformer<String, Floa
 
     @Override
     public String rightToLeft(FloatRange range, SerdesContext serdesContext) {
-        return range.getMin() + " - " + range.getMax();
+        return range.getMin() + ":" + range.getMax();
     }
 }
