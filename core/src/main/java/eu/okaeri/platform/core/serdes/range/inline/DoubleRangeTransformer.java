@@ -23,6 +23,6 @@ public class DoubleRangeTransformer extends BidirectionalTransformer<String, Dou
 
     @Override
     public String rightToLeft(DoubleRange range, SerdesContext serdesContext) {
-        return range.getMin() + ":" + range.getMax();
+        return range.getMin() + "-" + range.getMax();
     }
 }

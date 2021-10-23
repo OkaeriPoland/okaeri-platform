@@ -23,6 +23,6 @@ public class ShortRangeTransformer extends BidirectionalTransformer<String, Shor
 
     @Override
     public String rightToLeft(ShortRange range, SerdesContext serdesContext) {
-        return range.getMin() + ":" + range.getMax();
+        return range.getMin() + "-" + range.getMax();
     }
 }
