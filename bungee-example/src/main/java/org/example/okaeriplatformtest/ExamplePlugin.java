@@ -1,10 +1,10 @@
 package org.example.okaeriplatformtest;
 
 import com.zaxxer.hikari.HikariConfig;
+import eu.okaeri.commons.cache.Cached;
 import eu.okaeri.configs.json.simple.JsonSimpleConfigurer;
 import eu.okaeri.injector.annotation.Inject;
 import eu.okaeri.persistence.PersistencePath;
-import eu.okaeri.persistence.cache.Cached;
 import eu.okaeri.persistence.document.DocumentPersistence;
 import eu.okaeri.persistence.jdbc.H2Persistence;
 import eu.okaeri.persistence.jdbc.MariaDbPersistence;

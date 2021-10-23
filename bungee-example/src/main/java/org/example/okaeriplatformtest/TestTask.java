@@ -1,7 +1,7 @@
 package org.example.okaeriplatformtest;
 
+import eu.okaeri.commons.cache.Cached;
 import eu.okaeri.injector.annotation.Inject;
-import eu.okaeri.persistence.cache.Cached;
 import eu.okaeri.platform.bungee.annotation.Scheduled;
 import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.chat.TextComponent;
