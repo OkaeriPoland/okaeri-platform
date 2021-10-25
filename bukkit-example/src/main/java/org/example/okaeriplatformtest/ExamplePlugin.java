@@ -160,7 +160,7 @@ public class ExamplePlugin extends OkaeriBukkitPlugin {
     // see more in the TestListener for usage
     @Bean("teleportsQueue")
     public QueuedTeleports configureQueuedTeleports() {
-        return new QueuedTeleports();
+        return new QueuedTeleports(this);
     }
 
     // QueuedTeleports requires a task to be registered manually for fine control
