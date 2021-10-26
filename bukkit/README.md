@@ -43,7 +43,6 @@ Note the code below does not represent full source code of the example. Project 
 // - okaeri-configs configs' (@Configuration required)
 // - Runnables (@Scheduled required)
 // - any beans located in class with @Component
-// skip registration using register=false
 @Register(TestConfig.class)
 @Register(TestLocaleConfig.class)
 @Register(TestCommand.class)

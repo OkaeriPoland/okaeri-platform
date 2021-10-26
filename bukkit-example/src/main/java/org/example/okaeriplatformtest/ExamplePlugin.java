@@ -19,7 +19,7 @@ import eu.okaeri.platform.bukkit.annotation.Delayed;
 import eu.okaeri.platform.bukkit.annotation.Scheduled;
 import eu.okaeri.platform.bukkit.persistence.YamlBukkitPersistence;
 import eu.okaeri.platform.core.annotation.Bean;
-import eu.okaeri.platform.core.annotation.Register;
+import eu.okaeri.platform.core.annotation.Scan;
 import eu.okaeri.platform.core.plan.ExecutionPhase;
 import eu.okaeri.platform.core.plan.Planned;
 import io.lettuce.core.RedisClient;
@@ -30,10 +30,7 @@ import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.Plugin;
-import org.example.okaeriplatformtest.command.TestCommand;
 import org.example.okaeriplatformtest.config.TestConfig;
-import org.example.okaeriplatformtest.config.TestLocaleConfig;
-import org.example.okaeriplatformtest.persistence.PlayerRepository;
 
 import java.io.File;
 import java.time.Duration;
@@ -48,13 +45,11 @@ import java.util.concurrent.atomic.AtomicInteger;
 // - okaeri-configs configs' (@Configuration required)
 // - Runnables (@Scheduled required)
 // - any beans located in class with @Component
-// skip registration using register=false
-@Register(TestConfig.class)
-@Register(TestLocaleConfig.class)
-@Register(PlayerRepository.class)
-@Register(TestCommand.class)
-@Register(TestListener.class)
-@Register(TestTask.class)
+@Scan(
+        value = "org.example.okaeriplatformtest",
+        exclusions = "org.example.okaeriplatformtest.libs",
+        deep = true
+)
 public class ExamplePlugin extends OkaeriBukkitPlugin {
 
     @Planned(ExecutionPhase.STARTUP) // do not use onEnable (especially without calling super)

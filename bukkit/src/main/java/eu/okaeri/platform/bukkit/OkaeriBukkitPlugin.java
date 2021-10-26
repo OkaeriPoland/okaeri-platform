@@ -14,7 +14,6 @@ import eu.okaeri.platform.bukkit.plan.BukkitCommandsSetupTask;
 import eu.okaeri.platform.bukkit.plan.BukkitExternalResourceProviderSetupTask;
 import eu.okaeri.platform.bukkit.scheduler.PlatformScheduler;
 import eu.okaeri.platform.core.OkaeriPlatform;
-import eu.okaeri.platform.core.component.ComponentHelper;
 import eu.okaeri.platform.core.component.creator.ComponentCreator;
 import eu.okaeri.platform.core.placeholder.SimplePlaceholdersFactory;
 import eu.okaeri.platform.core.plan.ExecutionPlan;
@@ -38,7 +37,7 @@ import static eu.okaeri.platform.core.plan.ExecutionPhase.*;
 
 public class OkaeriBukkitPlugin extends JavaPlugin implements OkaeriPlatform {
 
-    @Getter private final File file = ComponentHelper.getJarFile(OkaeriBukkitPlugin.class);
+    @Getter private final File file = super.getFile();
     @Getter @Setter private Injector injector;
     @Getter @Setter private ComponentCreator creator;
 

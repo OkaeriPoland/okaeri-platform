@@ -10,7 +10,8 @@ public class BeanManifestCreateTask implements ExecutionTask<OkaeriPlatform> {
     public void execute(OkaeriPlatform platform) {
 
         // create manifest of the platform
-        BeanManifest beanManifest = BeanManifest.of(platform.getClass(), platform.getCreator(), true);
+        ClassLoader classLoader = platform.getClass().getClassLoader();
+        BeanManifest beanManifest = BeanManifest.of(classLoader, platform.getClass(), platform.getCreator(), true);
         beanManifest.setObject(platform);
 
         // register injectable

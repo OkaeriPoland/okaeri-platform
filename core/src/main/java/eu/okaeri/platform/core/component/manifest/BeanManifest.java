@@ -1,11 +1,11 @@
 package eu.okaeri.platform.core.component.manifest;
 
+import eu.okaeri.commons.classpath.ClasspathResourceType;
+import eu.okaeri.commons.classpath.ClasspathScanner;
 import eu.okaeri.injector.Injector;
 import eu.okaeri.injector.annotation.Inject;
-import eu.okaeri.platform.core.annotation.Bean;
-import eu.okaeri.platform.core.annotation.DependsOn;
-import eu.okaeri.platform.core.annotation.External;
-import eu.okaeri.platform.core.annotation.Register;
+import eu.okaeri.platform.core.OkaeriPlatform;
+import eu.okaeri.platform.core.annotation.*;
 import eu.okaeri.platform.core.component.ExternalResourceProvider;
 import eu.okaeri.platform.core.component.creator.ComponentCreator;
 import lombok.Data;
@@ -23,6 +23,7 @@ import java.util.stream.Collectors;
 @Data
 public class BeanManifest {
 
+    private static final boolean DEBUG = Boolean.parseBoolean(System.getProperty("okaeri.platform.debug", "false"));
     private static final Logger LOGGER = Logger.getLogger(BeanManifest.class.getName());
 
     public static BeanManifest of(@NonNull Parameter parameter) {
@@ -59,7 +60,7 @@ public class BeanManifest {
         return manifest;
     }
 
-    public static BeanManifest of(@NonNull Class<?> clazz, @NonNull ComponentCreator creator, boolean fullLoad) {
+    public static BeanManifest of(@NonNull ClassLoader classLoader, @NonNull Class<?> clazz, @NonNull ComponentCreator creator, boolean fullLoad) {
 
         if (!creator.isComponent(clazz)) {
             throw new IllegalArgumentException("Cannot create manifest of non-component " + clazz);
@@ -79,7 +80,12 @@ public class BeanManifest {
 
         depends.addAll(Arrays.stream(clazz.getAnnotationsByType(Register.class))
                 .filter(Objects::nonNull)
-                .map(reg -> BeanManifest.of(reg, creator))
+                .map(reg -> BeanManifest.of(classLoader, reg, creator))
+                .collect(Collectors.toList()));
+
+        depends.addAll(Arrays.stream(clazz.getAnnotationsByType(Scan.class))
+                .filter(Objects::nonNull)
+                .flatMap(scan -> BeanManifest.of(classLoader, scan, creator).stream())
                 .collect(Collectors.toList()));
 
         depends.addAll(Arrays.stream(clazz.getAnnotationsByType(DependsOn.class))
@@ -150,8 +156,38 @@ public class BeanManifest {
         return manifest;
     }
 
-    public static BeanManifest of(@NonNull Register register, @NonNull ComponentCreator creator) {
-        return of(register.value(), creator, false);
+    public static BeanManifest of(@NonNull ClassLoader classLoader, @NonNull Register register, @NonNull ComponentCreator creator) {
+        return of(classLoader, register.value(), creator, false);
+    }
+
+    public static List<BeanManifest> of(@NonNull ClassLoader classLoader, @NonNull Scan scan, @NonNull ComponentCreator creator) {
+        List<String> exclusions = Arrays.asList(scan.exclusions());
+        List<BeanManifest> results = ClasspathScanner.of(classLoader)
+                .findResources(scan.value(), scan.deep())
+                .filter(resource -> resource.getType() == ClasspathResourceType.CLASS)
+                .map(resource -> {
+                    String name = resource.getQualifiedName();
+                    if (exclusions.stream().anyMatch(name::startsWith)) {
+                        return null;
+                    }
+                    Class<?> clazz;
+                    try {
+                        clazz = classLoader.loadClass(name);
+                    } catch (ClassNotFoundException exception) {
+                        throw new RuntimeException("Failed to resolve: " + resource);
+                    }
+                    if (creator.isComponent(clazz) && !OkaeriPlatform.class.isAssignableFrom(clazz)) {
+                        if (DEBUG) creator.log("Scanned: " + clazz);
+                        return of(classLoader, clazz, creator, false);
+                    }
+                    return null;
+                })
+                .filter(Objects::nonNull)
+                .collect(Collectors.toList());
+        if (results.isEmpty()) {
+            throw new IllegalArgumentException("Scan returned 0 results: " + scan);
+        }
+        return results;
     }
 
     private String name;

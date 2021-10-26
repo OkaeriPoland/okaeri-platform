@@ -12,7 +12,7 @@ import eu.okaeri.persistence.jdbc.H2Persistence;
 import eu.okaeri.persistence.jdbc.MariaDbPersistence;
 import eu.okaeri.persistence.redis.RedisPersistence;
 import eu.okaeri.platform.core.annotation.Bean;
-import eu.okaeri.platform.core.annotation.Register;
+import eu.okaeri.platform.core.annotation.Scan;
 import eu.okaeri.platform.core.plan.ExecutionPhase;
 import eu.okaeri.platform.core.plan.Planned;
 import eu.okaeri.platform.web.OkaeriWebApplication;
@@ -28,9 +28,6 @@ import io.lettuce.core.RedisURI;
 import org.example.okaeriplatformtest.config.TestConfig;
 import org.example.okaeriplatformtest.persistence.Access;
 import org.example.okaeriplatformtest.persistence.AccessRepository;
-import org.example.okaeriplatformtest.persistence.UserRepository;
-import org.example.okaeriplatformtest.route.IndexController;
-import org.example.okaeriplatformtest.route.UserController;
 
 import java.io.File;
 import java.util.Optional;
@@ -38,11 +35,7 @@ import java.util.Set;
 import java.util.UUID;
 
 
-@Register(TestConfig.class)
-@Register(AccessRepository.class)
-@Register(UserRepository.class)
-@Register(IndexController.class)
-@Register(UserController.class)
+@Scan(value = "org.example.okaeriplatformtest", deep = true)
 public class ExampleWebApplication extends OkaeriWebApplication {
 
     // basic entrypoint inspired by Spring Boot
