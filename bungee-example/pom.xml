@@ -19,7 +19,7 @@
         <dependency>
             <groupId>eu.okaeri</groupId>
             <artifactId>okaeri-platform-bungee</artifactId>
-            <version>0.4.0-preview52</version>
+            <version>0.4.0-preview53</version>
             <scope>compile</scope>
         </dependency>
 
@@ -128,10 +128,10 @@
                     </transformers>
                     <relocations>
                         <!-- platform -->
-<!--                        <relocation>-->
-<!--                            <pattern>eu.okaeri.</pattern>-->
-<!--                            <shadedPattern>org.example.okaeriplatformtest.platform.</shadedPattern>-->
-<!--                        </relocation>-->
+                        <relocation>
+                            <pattern>eu.okaeri.</pattern>
+                            <shadedPattern>org.example.okaeriplatformtest.libs.platform.</shadedPattern>
+                        </relocation>
                         <!-- redis dependencies -->
                         <relocation>
                             <pattern>io.lettuce.core.</pattern>

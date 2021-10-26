@@ -7,7 +7,7 @@ import java.lang.annotation.*;
 @Repeatable(Scan.List.class)
 public @interface Scan {
 
-    String value();
+    String value() default "";
     String[] exclusions() default {};
     boolean deep() default false;
 

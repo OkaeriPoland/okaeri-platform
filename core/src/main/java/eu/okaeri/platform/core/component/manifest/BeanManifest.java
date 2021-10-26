@@ -85,7 +85,7 @@ public class BeanManifest {
 
         depends.addAll(Arrays.stream(clazz.getAnnotationsByType(Scan.class))
                 .filter(Objects::nonNull)
-                .flatMap(scan -> BeanManifest.of(classLoader, scan, creator).stream())
+                .flatMap(scan -> BeanManifest.of(classLoader, clazz, scan, creator).stream())
                 .collect(Collectors.toList()));
 
         depends.addAll(Arrays.stream(clazz.getAnnotationsByType(DependsOn.class))
@@ -160,21 +160,25 @@ public class BeanManifest {
         return of(classLoader, register.value(), creator, false);
     }
 
-    public static List<BeanManifest> of(@NonNull ClassLoader classLoader, @NonNull Scan scan, @NonNull ComponentCreator creator) {
+    public static List<BeanManifest> of(@NonNull ClassLoader classLoader, @NonNull Class<?> parent, @NonNull Scan scan, @NonNull ComponentCreator creator) {
+
         List<String> exclusions = Arrays.asList(scan.exclusions());
+        String value = scan.value();
+
+        if (value.isEmpty()) {
+            value = parent.getPackage().getName();
+        }
+
         List<BeanManifest> results = ClasspathScanner.of(classLoader)
-                .findResources(scan.value(), scan.deep())
+                .findResources(value, scan.deep())
                 .filter(resource -> resource.getType() == ClasspathResourceType.CLASS)
+                .filter(resource -> exclusions.stream().noneMatch(exclusion -> resource.getQualifiedName().startsWith(exclusion)))
                 .map(resource -> {
-                    String name = resource.getQualifiedName();
-                    if (exclusions.stream().anyMatch(name::startsWith)) {
-                        return null;
-                    }
                     Class<?> clazz;
                     try {
-                        clazz = classLoader.loadClass(name);
-                    } catch (ClassNotFoundException exception) {
-                        throw new RuntimeException("Failed to resolve: " + resource);
+                        clazz = classLoader.loadClass(resource.getQualifiedName());
+                    } catch (Throwable throwable) {
+                        throw new RuntimeException("Class failed to load (use 'exclusions = \"my.package.libs\"' for shaded dependencies?): " + resource, throwable);
                     }
                     if (creator.isComponent(clazz) && !OkaeriPlatform.class.isAssignableFrom(clazz)) {
                         if (DEBUG) creator.log("Scanned: " + clazz);
@@ -184,9 +188,11 @@ public class BeanManifest {
                 })
                 .filter(Objects::nonNull)
                 .collect(Collectors.toList());
+
         if (results.isEmpty()) {
             throw new IllegalArgumentException("Scan returned 0 results: " + scan);
         }
+
         return results;
     }
 
