@@ -380,7 +380,7 @@ Overridable defaults used in various components:
 
 ```java
 // example of i18nLocaleProvider override (in plugin's main class)
-@Planned(ExecutionPhase.SETUP)
+@Planned(ExecutionPhase.PRE_SETUP)
 public void setup(Injector injector) {
     injector.registerExclusive("i18nLocaleProvider", new MyLocaleProvider());
 }
