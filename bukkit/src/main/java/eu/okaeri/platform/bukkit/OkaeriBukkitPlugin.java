@@ -74,8 +74,8 @@ public class OkaeriBukkitPlugin extends JavaPlugin implements OkaeriPlatform {
             platform.registerInjectable("i18nLocaleProvider", new PlayerLocaleProvider());
         });
 
-        plan.add(PRE_SETUP, new BukkitCommandsSetupTask());
-        plan.add(PRE_SETUP, new CreatorSetupTask(BukkitComponentCreator.class, BukkitCreatorRegistry.class));
+        plan.add(SETUP, new BukkitCommandsSetupTask());
+        plan.add(SETUP, new CreatorSetupTask(BukkitComponentCreator.class, BukkitCreatorRegistry.class));
 
         plan.add(POST_SETUP, new BukkitExternalResourceProviderSetupTask());
         plan.add(POST_SETUP, new BeanManifestCreateTask());

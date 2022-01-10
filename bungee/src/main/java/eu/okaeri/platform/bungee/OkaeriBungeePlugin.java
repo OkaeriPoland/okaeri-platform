@@ -69,7 +69,7 @@ public class OkaeriBungeePlugin extends Plugin implements OkaeriPlatform {
         });
 
         // plan.add(PRE_SETUP, new BungeeCommandsSetupTask()); TODO
-        plan.add(PRE_SETUP, new CreatorSetupTask(BungeeComponentCreator.class, BungeeCreatorRegistry.class), "creator");
+        plan.add(SETUP, new CreatorSetupTask(BungeeComponentCreator.class, BungeeCreatorRegistry.class), "creator");
 
         plan.add(POST_SETUP, new BungeeExternalResourceProviderSetupTask());
         plan.add(POST_SETUP, new BeanManifestCreateTask());
