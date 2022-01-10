@@ -70,8 +70,8 @@ public class OkaeriWebApplication implements OkaeriPlatform {
             platform.registerInjectable("i18nLocaleProvider", new SystemLocaleProvider());
         });
 
-        plan.add(PRE_SETUP, new CommandsSetupTask(new OkaeriCommands()));
-        plan.add(PRE_SETUP, new CreatorSetupTask(ApplicationComponentCreator.class, WebCreatorRegistry.class));
+        plan.add(SETUP, new CommandsSetupTask(new OkaeriCommands()));
+        plan.add(SETUP, new CreatorSetupTask(ApplicationComponentCreator.class, WebCreatorRegistry.class));
 
         plan.add(POST_SETUP, new BeanManifestCreateTask());
         plan.add(POST_SETUP, new BeanManifestExecuteTask());

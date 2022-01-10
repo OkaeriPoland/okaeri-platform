@@ -1,11 +1,12 @@
 package eu.okaeri.platform.web.meta.serdes;
 
 import eu.okaeri.configs.schema.GenericsPair;
+import eu.okaeri.configs.serdes.BidirectionalTransformer;
 import eu.okaeri.configs.serdes.SerdesContext;
-import eu.okaeri.configs.serdes.TwoSideObjectTransformer;
 import eu.okaeri.platform.web.meta.role.SimpleRouteRole;
+import lombok.NonNull;
 
-public class RouteRoleTransformer extends TwoSideObjectTransformer<String, SimpleRouteRole> {
+public class RouteRoleTransformer extends BidirectionalTransformer<String, SimpleRouteRole> {
 
     @Override
     public GenericsPair<String, SimpleRouteRole> getPair() {
@@ -13,12 +14,12 @@ public class RouteRoleTransformer extends TwoSideObjectTransformer<String, Simpl
     }
 
     @Override
-    public SimpleRouteRole leftToRight(String roleName, SerdesContext serdesContext) {
+    public SimpleRouteRole leftToRight(@NonNull String roleName, @NonNull SerdesContext serdesContext) {
         return new SimpleRouteRole(roleName);
     }
 
     @Override
-    public String rightToLeft(SimpleRouteRole routeRole, SerdesContext serdesContext) {
+    public String rightToLeft(@NonNull SimpleRouteRole routeRole, @NonNull SerdesContext serdesContext) {
         return routeRole.getName();
     }
 }

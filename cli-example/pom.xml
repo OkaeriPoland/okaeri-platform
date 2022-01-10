@@ -19,7 +19,7 @@
         <dependency>
             <groupId>eu.okaeri</groupId>
             <artifactId>okaeri-platform-cli</artifactId>
-            <version>0.4.0-preview53</version>
+            <version>0.4.0-preview54</version>
             <scope>compile</scope>
         </dependency>
 
