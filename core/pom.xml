@@ -5,7 +5,7 @@
     <parent>
         <artifactId>okaeri-platform</artifactId>
         <groupId>eu.okaeri</groupId>
-        <version>0.4.0-preview54</version>
+        <version>0.4.0-preview55</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
@@ -36,6 +36,17 @@
                 </exclusion>
             </exclusions>
         </dependency>
+        <dependency>
+            <groupId>eu.okaeri</groupId>
+            <artifactId>okaeri-commands-validator</artifactId>
+            <version>${library.okaeri-commands.version}</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>eu.okaeri</groupId>
+                    <artifactId>okaeri-validator</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
 
         <!-- commons -->
         <dependency>
@@ -59,6 +70,12 @@
             <groupId>eu.okaeri</groupId>
             <artifactId>okaeri-configs-validator-okaeri</artifactId>
             <version>${library.okaeri-configs.version}</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>eu.okaeri</groupId>
+                    <artifactId>okaeri-validator</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
 
         <!-- i18n -->
@@ -73,6 +90,13 @@
             <groupId>eu.okaeri</groupId>
             <artifactId>okaeri-injector</artifactId>
             <version>${library.okaeri-injector.version}</version>
+        </dependency>
+
+        <!-- validator -->
+        <dependency>
+            <groupId>eu.okaeri</groupId>
+            <artifactId>okaeri-validator</artifactId>
+            <version>${library.okaeri-validator.version}</version>
         </dependency>
     </dependencies>
 

@@ -19,7 +19,7 @@
         <dependency>
             <groupId>eu.okaeri</groupId>
             <artifactId>okaeri-platform-bungee</artifactId>
-            <version>0.4.0-preview54</version>
+            <version>0.4.0-preview55</version>
             <scope>compile</scope>
         </dependency>
 
@@ -27,7 +27,7 @@
         <dependency>
             <groupId>eu.okaeri</groupId>
             <artifactId>okaeri-configs-json-simple</artifactId>
-            <version>4.0.0-beta3</version>
+            <version>4.0.0-beta5</version>
             <scope>compile</scope>
         </dependency>
 
