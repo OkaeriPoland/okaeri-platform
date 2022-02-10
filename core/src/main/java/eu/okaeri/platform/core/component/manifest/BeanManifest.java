@@ -16,7 +16,6 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
 import java.util.*;
-import java.util.concurrent.TimeUnit;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
@@ -354,16 +353,9 @@ public class BeanManifest {
 
     public BeanManifest execute(@NonNull ComponentCreator creator, @NonNull Injector injector, @NonNull ExternalResourceProvider resourceProvider) {
 
-        long start = System.currentTimeMillis();
         this.injectExternals(injector, resourceProvider);
 
         while (!this.ready(creator, injector) || (this.fullLoad && !this.fullLoadReady(injector))) {
-
-            // emergency break
-            if ((System.currentTimeMillis() - start) > TimeUnit.SECONDS.toMillis(60)) {
-                throw new RuntimeException("#execute() timed out after 60 seconds: \n\n" + this + "\n\n");
-            }
-
             this.update(creator, injector);
         }
 
