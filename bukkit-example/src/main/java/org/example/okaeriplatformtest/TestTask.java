@@ -18,9 +18,9 @@ import java.util.Arrays;
 @Scheduled(rate = MinecraftTimeEquivalent.MINUTE * 5, async = true)
 public class TestTask implements Runnable {
 
-    @Inject private TestConfig config;
-    @Inject private Server server;
-    @Inject private Plugin plugin;
+    private @Inject TestConfig config;
+    private @Inject Server server;
+    private @Inject Plugin plugin;
 
     @Inject("cachedDbData")
     private Cached<String> cachedData;

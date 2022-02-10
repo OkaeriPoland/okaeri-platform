@@ -13,8 +13,8 @@ import java.util.concurrent.TimeUnit;
 @Scheduled(rate = 5, timeUnit = TimeUnit.MINUTES)
 public class TestTask implements Runnable {
 
-    @Inject private ProxyServer proxy;
-    @Inject("cachedDbData") private Cached<String> cachedData;
+    private @Inject ProxyServer proxy;
+    private @Inject("cachedDbData") Cached<String> cachedData;
 
     @Override
     public void run() {

@@ -47,12 +47,12 @@ public class MessagesComponentResolver implements ComponentResolver {
         return false;
     }
 
-    @Inject private PlaceholdersFactory defaultPlaceholdersFactory;
-    @Inject private ConfigurerProvider defaultConfigurerProvider;
-    @Inject private Class<? extends OkaeriSerdesPack>[] defaultConfigurerSerdes;
-    @Inject private LocaleProvider<?> i18nLocaleProvider;
-    @Inject private JavaPlugin plugin;
-    @Inject private File jarFile;
+    private @Inject PlaceholdersFactory defaultPlaceholdersFactory;
+    private @Inject ConfigurerProvider defaultConfigurerProvider;
+    private @Inject Class<? extends OkaeriSerdesPack>[] defaultConfigurerSerdes;
+    private @Inject LocaleProvider<?> i18nLocaleProvider;
+    private @Inject JavaPlugin plugin;
+    private @Inject File jarFile;
 
     @Override
     @SuppressWarnings({"unchecked", "ResultOfMethodCallIgnored"})

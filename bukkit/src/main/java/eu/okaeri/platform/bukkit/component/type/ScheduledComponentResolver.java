@@ -26,8 +26,8 @@ public class ScheduledComponentResolver implements ComponentResolver {
         return method.getAnnotation(Scheduled.class) != null;
     }
 
-    @Inject private JavaPlugin plugin;
-    @Inject private PlatformScheduler scheduler;
+    private @Inject JavaPlugin plugin;
+    private @Inject PlatformScheduler scheduler;
 
     @Override
     public Object make(@NonNull ComponentCreator creator, @NonNull BeanManifest manifest, @NonNull Injector injector) {

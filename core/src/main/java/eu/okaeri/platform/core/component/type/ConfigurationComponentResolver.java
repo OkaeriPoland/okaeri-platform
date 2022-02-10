@@ -37,9 +37,9 @@ public class ConfigurationComponentResolver implements ComponentResolver {
         return false;
     }
 
-    @Inject private ConfigurerProvider defaultConfigurerProvider;
-    @Inject private Class<? extends OkaeriSerdesPack>[] defaultConfigurerSerdes;
-    @Inject private File dataFolder;
+    private @Inject ConfigurerProvider defaultConfigurerProvider;
+    private @Inject Class<? extends OkaeriSerdesPack>[] defaultConfigurerSerdes;
+    private @Inject File dataFolder;
 
     @Override
     @SuppressWarnings("unchecked")

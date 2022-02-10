@@ -41,15 +41,15 @@ import java.util.stream.Collectors;
 @Command(label = "testcmd", aliases = "testing")
 public class TestCommand implements CommandService {
 
-    @Inject("testString") private String test;
-    @Inject("exampleComplexBean") private String complexContent;
-    @Inject private TestConfig config;
-    @Inject private Server server;
-    @Inject private QueuedTeleports teleports;
-    @Inject private BI18n i18n;
-    @Inject private TestLocaleConfig messages;
-    @Inject private Logger logger;
-    @Inject private PlayerRepository playerPersistence;
+    private @Inject("testString") String test;
+    private @Inject("exampleComplexBean") String complexContent;
+    private @Inject TestConfig config;
+    private @Inject Server server;
+    private @Inject QueuedTeleports teleports;
+    private @Inject BI18n i18n;
+    private @Inject TestLocaleConfig messages;
+    private @Inject Logger logger;
+    private @Inject PlayerRepository playerPersistence;
 
     // testcmd|testing example
     @Sync

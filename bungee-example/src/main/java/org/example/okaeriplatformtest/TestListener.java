@@ -19,15 +19,15 @@ import java.util.logging.Logger;
 @Component
 public class TestListener implements Listener {
 
-    @Inject private ExamplePlugin plugin;
-    @Inject private Logger logger; // plugin's logger (name=logger)
-    @Inject private Proxy server;
-    @Inject private PlatformScheduler scheduler;
-    @Inject private TestConfig config;
+    private @Inject ExamplePlugin plugin;
+    private @Inject Logger logger; // plugin's logger (name=logger)
+    private @Inject Proxy server;
+    private @Inject PlatformScheduler scheduler;
+    private @Inject TestConfig config;
 
-    @Inject private PlayerRepository playerPersistence;
+    private @Inject PlayerRepository playerPersistence;
 
-//    @Inject("subbean") private String subbeanString;
+//    private @Inject("subbean") String subbeanString;
 
     @EventHandler
     public void onJoin(ServerConnectEvent event) {

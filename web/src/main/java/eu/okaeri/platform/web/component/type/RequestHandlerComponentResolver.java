@@ -28,8 +28,8 @@ import java.util.stream.Collectors;
 
 public class RequestHandlerComponentResolver implements ComponentResolver {
 
-    @Inject private Javalin javalin;
-    @Inject private Logger logger;
+    private @Inject Javalin javalin;
+    private @Inject Logger logger;
 
     @Override
     public boolean supports(@NonNull Class<?> type) {

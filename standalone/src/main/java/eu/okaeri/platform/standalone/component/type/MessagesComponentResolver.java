@@ -40,13 +40,13 @@ public class MessagesComponentResolver implements ComponentResolver {
         return false;
     }
 
-    @Inject private PlaceholdersFactory defaultPlaceholdersFactory; // TODO: make use of this
-    @Inject private ConfigurerProvider defaultConfigurerProvider;
-    @Inject private Class<? extends OkaeriSerdesPack>[] defaultConfigurerSerdes;
-    @Inject private LocaleProvider<?> i18nLocaleProvider;
+    private @Inject PlaceholdersFactory defaultPlaceholdersFactory; // TODO: make use of this
+    private @Inject ConfigurerProvider defaultConfigurerProvider;
+    private @Inject Class<? extends OkaeriSerdesPack>[] defaultConfigurerSerdes;
+    private @Inject LocaleProvider<?> i18nLocaleProvider;
 
-    @Inject("dataFolder") private File dataFolder;
-    @Inject("jarFile") private File jarFile;
+    private @Inject("dataFolder") File dataFolder;
+    private @Inject("jarFile") File jarFile;
 
     @Override
     @SuppressWarnings({"unchecked", "ResultOfMethodCallIgnored"})

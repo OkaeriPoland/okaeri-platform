@@ -157,9 +157,9 @@ public class ExamplePlugin extends OkaeriBukkitPlugin {
 @Command(label = "testcmd", aliases = "testing")
 public class TestCommand implements CommandService {
 
-  @Inject("testString") private String test;
-  @Inject("exampleComplexBean") private String complexContent;
-  @Inject private TestConfig config;
+  private @Inject("testString") String test;
+  private @Inject("exampleComplexBean") String complexContent;
+  private @Inject TestConfig config;
 
   // testcmd|testing example
   @Executor
@@ -213,11 +213,11 @@ public class TestCommand implements CommandService {
 @Component
 public class TestListener implements Listener {
 
-  @Inject private ExamplePlugin plugin;
-  @Inject private Logger logger; // plugin's logger (name=logger)
-  @Inject private Server server;
-  @Inject private QueuedTeleports queuedTeleports;
-  @Inject("subbean") private String subbeanString;
+  private @Inject ExamplePlugin plugin;
+  private @Inject Logger logger; // plugin's logger (name=logger)
+  private @Inject Server server;
+  private @Inject QueuedTeleports queuedTeleports;
+  private @Inject("subbean") String subbeanString;
   @Inject("joinReward") ItemStack rewardItem;
 
   @EventHandler
@@ -256,9 +256,9 @@ public class TestListener implements Listener {
 @Scheduled(rate = MinecraftTimeEquivalent.MINUTES * 5, async = true)
 public class TestTask implements Runnable {
 
-  @Inject private TestConfig config;
-  @Inject private Server server;
-  @Inject private Plugin plugin;
+  private @Inject TestConfig config;
+  private @Inject Server server;
+  private @Inject Plugin plugin;
 
   @Inject("cachedDbData")
   private Cached<String> cachedData;

@@ -26,18 +26,18 @@ import java.util.logging.Logger;
 @Component
 public class TestListener implements Listener {
 
-    @Inject private ExamplePlugin plugin;
-    @Inject private Logger logger; // plugin's logger (name=logger)
-    @Inject private Server server;
-    @Inject private PlatformScheduler scheduler;
-    @Inject private TestConfig config;
-    @Inject private Tasker tasker;
+    private @Inject ExamplePlugin plugin;
+    private @Inject Logger logger; // plugin's logger (name=logger)
+    private @Inject Server server;
+    private @Inject PlatformScheduler scheduler;
+    private @Inject TestConfig config;
+    private @Inject Tasker tasker;
 
-    @Inject private QueuedTeleports queuedTeleports;
-    @Inject private PlayerRepository playerPersistence;
+    private @Inject QueuedTeleports queuedTeleports;
+    private @Inject PlayerRepository playerPersistence;
 
-    @Inject("subbean") private String subbeanString;
-    @Inject("joinReward") ItemStack rewardItem;
+    private @Inject("subbean") String subbeanString;
+    private @Inject("joinReward") ItemStack rewardItem;
 
     @EventHandler
     public void onJoin(PlayerJoinEvent event) {
