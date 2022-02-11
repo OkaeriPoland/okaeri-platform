@@ -18,9 +18,9 @@ public class BI18n extends MI18n {
 
     private static final Pattern ALT_COLOR_PATTERN = Pattern.compile("&[0-9A-Fa-fK-Ok-oRXrx]");
 
-    @Getter private final Map<Locale, LocaleConfig> configs = new HashMap<>();
-    @Getter private final I18nColorsConfig colorsConfig;
-    @Getter private final PlaceholdersFactory placeholdersFactory;
+    private final @Getter Map<Locale, LocaleConfig> configs = new HashMap<>();
+    private final @Getter I18nColorsConfig colorsConfig;
+    private final @Getter PlaceholdersFactory placeholdersFactory;
 
     public BI18n(@NonNull I18nColorsConfig colorsConfig, @NonNull String prefixField, @NonNull String prefixMarker, @NonNull PlaceholdersFactory placeholdersFactory) {
         super(prefixField, prefixMarker);

@@ -38,14 +38,14 @@ import static eu.okaeri.platform.core.plan.ExecutionPhase.*;
 
 public class OkaeriWebApplication implements OkaeriPlatform {
 
-    @Getter private final Logger logger = LoggerFactory.getLogger(this.getClass());
-    @Getter private final File dataFolder = new File(".");
-    @Getter private final File file = ComponentHelper.getJarFile(OkaeriWebApplication.class);
+    private final @Getter Logger logger = LoggerFactory.getLogger(this.getClass());
+    private final @Getter File dataFolder = new File(".");
+    private final @Getter File file = ComponentHelper.getJarFile(OkaeriWebApplication.class);
 
-    @Getter private final Javalin javalin = Javalin.create();
+    private final @Getter Javalin javalin = Javalin.create();
 
-    @Getter @Setter private Injector injector;
-    @Getter @Setter private ComponentCreator creator;
+    private @Getter @Setter Injector injector;
+    private @Getter @Setter ComponentCreator creator;
 
     @Override
     public void log(@NonNull String message) {

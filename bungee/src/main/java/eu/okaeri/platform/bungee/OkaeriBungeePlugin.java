@@ -33,8 +33,8 @@ import static eu.okaeri.platform.core.plan.ExecutionPhase.*;
 
 public class OkaeriBungeePlugin extends Plugin implements OkaeriPlatform {
 
-    @Getter @Setter private Injector injector;
-    @Getter @Setter private ComponentCreator creator;
+    private @Getter @Setter Injector injector;
+    private @Getter @Setter ComponentCreator creator;
 
     public OkaeriBungeePlugin() {
         super();

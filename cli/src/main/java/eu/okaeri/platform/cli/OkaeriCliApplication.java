@@ -34,13 +34,13 @@ public class OkaeriCliApplication implements OkaeriPlatform {
     private static final boolean DEBUG = Boolean.parseBoolean(System.getProperty("okaeri.platform.debug", "false"));
     private static String[] args;
 
-    @Getter private final Logger logger = Logger.getLogger(OkaeriCliApplication.class.getName());
-    @Getter private final File dataFolder = new File(".");
-    @Getter private final File file = ComponentHelper.getJarFile(OkaeriCliApplication.class);
+    private final @Getter Logger logger = Logger.getLogger(OkaeriCliApplication.class.getName());
+    private final @Getter File dataFolder = new File(".");
+    private final @Getter File file = ComponentHelper.getJarFile(OkaeriCliApplication.class);
 
-    @Getter @Setter private Injector injector;
-    @Getter @Setter private ComponentCreator creator;
-    @Getter @Setter private boolean verbose = true;
+    private @Getter @Setter Injector injector;
+    private @Getter @Setter ComponentCreator creator;
+    private @Getter @Setter boolean verbose = true;
 
     @Override
     public void log(@NonNull String message) {

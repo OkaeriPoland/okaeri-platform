@@ -22,9 +22,9 @@ public abstract class MI18n extends MOCI18n {
 
     private static final Pattern MESSAGE_FIELD_PATTERN = Pattern.compile("\\{[^{]+}");
 
-    @Getter private final Map<Locale, LocaleConfig> configs = new HashMap<>();
-    @Getter private final String prefixField;
-    @Getter private final String prefixMarker;
+    private final @Getter Map<Locale, LocaleConfig> configs = new HashMap<>();
+    private final @Getter String prefixField;
+    private final @Getter String prefixMarker;
 
     @Getter @Setter
     private I18nPrefixProvider prefixProvider;
