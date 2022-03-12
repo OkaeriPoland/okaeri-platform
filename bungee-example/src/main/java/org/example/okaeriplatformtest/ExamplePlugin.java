@@ -1,5 +1,7 @@
 package org.example.okaeriplatformtest;
 
+import com.mongodb.MongoClient;
+import com.mongodb.MongoClientURI;
 import com.zaxxer.hikari.HikariConfig;
 import eu.okaeri.commons.cache.Cached;
 import eu.okaeri.configs.json.simple.JsonSimpleConfigurer;
@@ -8,6 +10,7 @@ import eu.okaeri.persistence.PersistencePath;
 import eu.okaeri.persistence.document.DocumentPersistence;
 import eu.okaeri.persistence.jdbc.H2Persistence;
 import eu.okaeri.persistence.jdbc.MariaDbPersistence;
+import eu.okaeri.persistence.mongo.MongoPersistence;
 import eu.okaeri.persistence.redis.RedisPersistence;
 import eu.okaeri.platform.bungee.OkaeriBungeePlugin;
 import eu.okaeri.platform.bungee.annotation.Delayed;
@@ -81,6 +84,16 @@ public class ExamplePlugin extends OkaeriBungeePlugin {
                 // other formats may not be supported in the future, json has native support
                 // on the redis side thanks to cjson available in lua scripting
                 return new DocumentPersistence(new RedisPersistence(basePath, redisClient), JsonSimpleConfigurer::new);
+            case MONGO:
+                // construct mongo client based on your needs, e.g. using config
+                MongoClientURI mongoUri = new MongoClientURI(config.getStorage().getUri());
+                MongoClient mongoClient = new MongoClient(mongoUri);
+                // validate if uri contains database
+                if (mongoUri.getDatabase() == null) {
+                    throw new IllegalArgumentException("Mongo URI needs to specify the database: " + mongoUri.getURI());
+                }
+                // it is REQUIRED to use json configurer for the mongo backend
+                return new MongoPersistence(basePath, mongoClient, mongoUri.getDatabase(), JsonSimpleConfigurer::new);
             case MYSQL:
                 // setup hikari based on your needs, e.g. using config
                 HikariConfig mariadbHikari = new HikariConfig();

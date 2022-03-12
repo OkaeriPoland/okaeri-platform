@@ -18,7 +18,6 @@ public class BI18n extends MI18n {
 
     private static final Pattern ALT_COLOR_PATTERN = Pattern.compile("&[0-9A-Fa-fK-Ok-oRXrx]");
 
-    private final @Getter Map<Locale, LocaleConfig> configs = new HashMap<>();
     private final @Getter I18nColorsConfig colorsConfig;
     private final @Getter PlaceholdersFactory placeholdersFactory;
 

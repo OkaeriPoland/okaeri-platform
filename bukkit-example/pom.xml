@@ -19,11 +19,11 @@
         <dependency>
             <groupId>eu.okaeri</groupId>
             <artifactId>okaeri-platform-bukkit</artifactId>
-            <version>0.4.0-preview57</version>
+            <version>0.4.0-preview58</version>
             <scope>compile</scope>
         </dependency>
 
-        <!-- json configurer for redis/jdbc backends -->
+        <!-- json configurer for redis/mongo/jdbc backends -->
         <dependency>
             <groupId>eu.okaeri</groupId>
             <artifactId>okaeri-configs-json-simple</artifactId>
@@ -35,7 +35,15 @@
         <dependency>
             <groupId>eu.okaeri</groupId>
             <artifactId>okaeri-persistence-redis</artifactId>
-            <version>1.5.9</version>
+            <version>1.5.11-beta7</version>
+            <scope>compile</scope>
+        </dependency>
+
+        <!-- additional mongo backend -->
+        <dependency>
+            <groupId>eu.okaeri</groupId>
+            <artifactId>okaeri-persistence-mongo</artifactId>
+            <version>1.5.11-beta7</version>
             <scope>compile</scope>
         </dependency>
 
@@ -43,7 +51,7 @@
         <dependency>
             <groupId>eu.okaeri</groupId>
             <artifactId>okaeri-persistence-jdbc</artifactId>
-            <version>1.5.9</version>
+            <version>1.5.11-beta7</version>
             <scope>compile</scope>
         </dependency>
         <dependency>
@@ -120,10 +128,10 @@
                     </transformers>
                     <relocations>
                         <!-- platform -->
-                        <relocation>
-                            <pattern>eu.okaeri.</pattern>
-                            <shadedPattern>org.example.okaeriplatformtest.libs.platform.</shadedPattern>
-                        </relocation>
+<!--                        <relocation>-->
+<!--                            <pattern>eu.okaeri.</pattern>-->
+<!--                            <shadedPattern>org.example.okaeriplatformtest.libs.platform.</shadedPattern>-->
+<!--                        </relocation>-->
                         <!-- redis dependencies -->
                         <relocation>
                             <pattern>io.lettuce.core.</pattern>
@@ -140,6 +148,15 @@
                         <relocation>
                             <pattern>org.reactivestreams.</pattern>
                             <shadedPattern>org.example.okaeriplatformtest.libs.org.reactivestreams.</shadedPattern>
+                        </relocation>
+                        <!-- mongo dependencies -->
+                        <relocation>
+                            <pattern>org.bson.</pattern>
+                            <shadedPattern>org.example.okaeriplatformtest.libs.org.bson.</shadedPattern>
+                        </relocation>
+                        <relocation>
+                            <pattern>com.mongodb.</pattern>
+                            <shadedPattern>org.example.okaeriplatformtest.libs.com.mongodb.</shadedPattern>
                         </relocation>
                         <!-- jdbc dependencies -->
                         <relocation>
