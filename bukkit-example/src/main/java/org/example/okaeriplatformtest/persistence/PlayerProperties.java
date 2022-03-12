@@ -1,7 +1,8 @@
 package org.example.okaeriplatformtest.persistence;
 
 import eu.okaeri.persistence.document.Document;
-import lombok.*;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
 import org.bukkit.Location;
 
 import java.time.Instant;
@@ -14,11 +15,11 @@ import java.util.UUID;
 // getters/setters instead of raw values and string keys
 public class PlayerProperties extends Document {
 
-    // recommended defaults
-    private UUID uuid;
     private String name;
-
-    // custom values
     private Instant lastJoined;
     private Location lastJoinedLocation;
+
+    public UUID getUniqueId() {
+        return this.getPath().toUUID();
+    }
 }

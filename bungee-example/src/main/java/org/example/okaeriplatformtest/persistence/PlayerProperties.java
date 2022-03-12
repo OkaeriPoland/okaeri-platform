@@ -14,10 +14,10 @@ import java.util.UUID;
 // getters/setters instead of raw values and string keys
 public class PlayerProperties extends Document {
 
-    // recommended defaults
-    private UUID uuid;
     private String name;
-
-    // custom values
     private Instant lastJoined;
+
+    public UUID getUniqueId() {
+        return this.getPath().toUUID();
+    }
 }

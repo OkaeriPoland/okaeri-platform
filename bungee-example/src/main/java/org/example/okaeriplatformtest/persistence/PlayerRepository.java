@@ -51,8 +51,9 @@ public interface PlayerRepository extends DocumentRepository<UUID, PlayerPropert
 
         // update basic properties
         // name is the most important here as it can be changed
-        properties.setUuid(player.getUniqueId());
-        if (player.getName() != null) properties.setName(player.getName());
+        if (player.getName() != null) {
+            properties.setName(player.getName());
+        }
 
         // ready to use object, remember to read all the notes here
         return properties;
