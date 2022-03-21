@@ -7,7 +7,7 @@
     <groupId>eu.okaeri</groupId>
     <artifactId>okaeri-platform</artifactId>
     <packaging>pom</packaging>
-    <version>0.4.0-preview58</version>
+    <version>0.4.0-preview59</version>
 
     <modules>
         <module>core</module>
