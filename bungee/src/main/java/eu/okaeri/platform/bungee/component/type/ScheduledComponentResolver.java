@@ -34,7 +34,7 @@ public class ScheduledComponentResolver implements ComponentResolver {
     public Object make(@NonNull ComponentCreator creator, @NonNull BeanManifest manifest, @NonNull Injector injector) {
 
         long start = System.currentTimeMillis();
-        Runnable runnable = ComponentHelper.manifestToRunnableWithRegister(manifest, injector);
+        Runnable runnable = ComponentHelper.manifestToRunnable(manifest, injector);
 
         Scheduled scheduled = manifest.getSource() == BeanSource.METHOD
                 ? manifest.getMethod().getAnnotation(Scheduled.class)

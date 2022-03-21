@@ -1,6 +1,5 @@
 package eu.okaeri.platform.core.component;
 
-import eu.okaeri.commons.cache.Cached;
 import eu.okaeri.injector.Injectable;
 import eu.okaeri.injector.Injector;
 import eu.okaeri.injector.annotation.Inject;
@@ -146,24 +145,17 @@ public final class ComponentHelper {
         }
     }
 
-    public static Runnable manifestToRunnableWithRegister(BeanManifest manifest, Injector injector) {
+    public static Runnable manifestToRunnable(BeanManifest manifest, Injector injector) {
         Runnable runnable;
         if (manifest.getSource() == BeanSource.METHOD) {
-            String name = (manifest.getName() == null || manifest.getName().isEmpty())
-                ? manifest.getMethod().getName()
-                : manifest.getName();
-            if (Cached.class.isAssignableFrom(manifest.getType())) {
-                Cached<?> cached = (Cached<?>) invokeMethod(manifest, injector);
-                runnable = cached::update;
-                injector.registerInjectable(name, cached);
-            } else if (Runnable.class.isAssignableFrom(manifest.getType())) {
+            if (Runnable.class.isAssignableFrom(manifest.getType())) {
                 runnable = (Runnable) invokeMethod(manifest, injector);
             } else if (manifest.getType() == void.class) {
                 runnable = () -> invokeMethod(manifest, injector);
             } else {
                 throw new IllegalArgumentException("Scheduled/Delayed method should return java.lang.Runnable or void: " + manifest);
             }
-            manifest.setName(name);
+            manifest.setName(manifest.getMethod().getName());
         } else {
             if (!Runnable.class.isAssignableFrom(manifest.getType())) {
                 throw new IllegalArgumentException("Scheduled/Delayed component requires class to be a java.lang.Runnable: " + manifest);
