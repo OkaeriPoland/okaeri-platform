@@ -7,7 +7,7 @@
     <groupId>eu.okaeri</groupId>
     <artifactId>okaeri-platform</artifactId>
     <packaging>pom</packaging>
-    <version>0.4.0-preview59</version>
+    <version>0.4.0-preview60</version>
 
     <modules>
         <module>core</module>
@@ -33,7 +33,7 @@
         <library.okaeri-injector.version>2.0.1</library.okaeri-injector.version>
         <library.okaeri-validator.version>2.0.1</library.okaeri-validator.version>
         <library.okaeri-placeholders.version>2.0.1</library.okaeri-placeholders.version>
-        <library.okaeri-persistence.version>1.5.11-beta7</library.okaeri-persistence.version>
+        <library.okaeri-persistence.version>1.5.11-beta8</library.okaeri-persistence.version>
         <library.okaeri-tasker.version>1.1.1</library.okaeri-tasker.version>
     </properties>
 

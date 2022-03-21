@@ -93,7 +93,7 @@ public class ExamplePlugin extends OkaeriBungeePlugin {
                     throw new IllegalArgumentException("Mongo URI needs to specify the database: " + mongoUri.getURI());
                 }
                 // it is REQUIRED to use json configurer for the mongo backend
-                return new MongoPersistence(basePath, mongoClient, mongoUri.getDatabase(), JsonSimpleConfigurer::new);
+                return new DocumentPersistence(new MongoPersistence(basePath, mongoClient, mongoUri.getDatabase()), JsonSimpleConfigurer::new);
             case MYSQL:
                 // setup hikari based on your needs, e.g. using config
                 HikariConfig mariadbHikari = new HikariConfig();

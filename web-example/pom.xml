@@ -19,7 +19,7 @@
         <dependency>
             <groupId>eu.okaeri</groupId>
             <artifactId>okaeri-platform-web</artifactId>
-            <version>0.4.0-preview59</version>
+            <version>0.4.0-preview60</version>
             <scope>compile</scope>
         </dependency>
 
@@ -35,7 +35,7 @@
         <dependency>
             <groupId>eu.okaeri</groupId>
             <artifactId>okaeri-persistence-redis</artifactId>
-            <version>1.5.11-beta7</version>
+            <version>1.5.11-beta8</version>
             <scope>compile</scope>
         </dependency>
 
@@ -43,7 +43,7 @@
         <dependency>
             <groupId>eu.okaeri</groupId>
             <artifactId>okaeri-persistence-mongo</artifactId>
-            <version>1.5.11-beta7</version>
+            <version>1.5.11-beta8</version>
             <scope>compile</scope>
         </dependency>
 
@@ -51,7 +51,7 @@
         <dependency>
             <groupId>eu.okaeri</groupId>
             <artifactId>okaeri-persistence-jdbc</artifactId>
-            <version>1.5.11-beta7</version>
+            <version>1.5.11-beta8</version>
             <scope>compile</scope>
         </dependency>
         <dependency>
