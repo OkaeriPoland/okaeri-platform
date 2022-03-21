@@ -29,7 +29,7 @@
         <library.okaeri-commands.version>0.8.3</library.okaeri-commands.version>
         <library.okaeri-configs.version>4.0.0-beta10</library.okaeri-configs.version>
         <library.okaeri-i18n.version>3.0.1</library.okaeri-i18n.version>
-        <library.okaeri-commons.version>0.2.4</library.okaeri-commons.version>
+        <library.okaeri-commons.version>0.2.8</library.okaeri-commons.version>
         <library.okaeri-injector.version>2.0.1</library.okaeri-injector.version>
         <library.okaeri-validator.version>2.0.1</library.okaeri-validator.version>
         <library.okaeri-placeholders.version>2.0.1</library.okaeri-placeholders.version>
