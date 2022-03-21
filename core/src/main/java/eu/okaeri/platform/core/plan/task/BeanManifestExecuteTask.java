@@ -15,11 +15,11 @@ public class BeanManifestExecuteTask implements ExecutionTask<OkaeriPlatform> {
 
         // find manifest
         BeanManifest beanManifest = platform.getInjector().get("manifest", BeanManifest.class)
-                .orElseThrow(() -> new RuntimeException("Cannot execute manifest without manifest being present!"));
+            .orElseThrow(() -> new RuntimeException("Cannot execute manifest without manifest being present!"));
 
         // resolve resource provider
         ExternalResourceProvider resourceProvider = platform.getInjector().get("externalResourceProvider", ExternalResourceProvider.class)
-                .orElse(NULL_RESOURCE_PROVIDER);
+            .orElse(NULL_RESOURCE_PROVIDER);
 
         // execute component tree and register everything
         beanManifest.execute(platform.getCreator(), platform.getInjector(), resourceProvider);

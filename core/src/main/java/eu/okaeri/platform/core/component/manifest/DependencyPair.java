@@ -7,6 +7,6 @@ import lombok.NonNull;
 @Data
 @AllArgsConstructor
 public class DependencyPair {
-    @NonNull private String name;
-    @NonNull private Class<?> type;
+    private @NonNull String name;
+    private @NonNull Class<?> type;
 }

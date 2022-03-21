@@ -64,13 +64,13 @@ public class ConfigurationComponentResolver implements ComponentResolver {
 
         try {
             Configurer configurer = (provider == Configuration.DEFAULT.class)
-                    ? this.defaultConfigurerProvider.get()
-                    : injector.createInstance(provider);
+                ? this.defaultConfigurerProvider.get()
+                : injector.createInstance(provider);
 
             OkaeriSerdesPack[] serdesPacks = Stream.concat(Stream.of(this.defaultConfigurerSerdes), Arrays.stream(configuration.serdes()))
-                    .map(injector::createInstance)
-                    .distinct()
-                    .toArray(OkaeriSerdesPack[]::new);
+                .map(injector::createInstance)
+                .distinct()
+                .toArray(OkaeriSerdesPack[]::new);
 
             OkaeriConfig config = ConfigManager.create(configType, (it) -> {
                 it.withBindFile(new File(this.dataFolder, path));
@@ -81,17 +81,16 @@ public class ConfigurationComponentResolver implements ComponentResolver {
 
             long took = System.currentTimeMillis() - start;
             creator.log(ComponentHelper.buildComponentMessage()
-                    .type("Loaded configuration")
-                    .name(configType.getSimpleName())
-                    .took(took)
-                    .meta("path", path)
-                    .meta("provider", provider.getSimpleName())
-                    .build());
+                .type("Loaded configuration")
+                .name(configType.getSimpleName())
+                .took(took)
+                .meta("path", path)
+                .meta("provider", provider.getSimpleName())
+                .build());
             creator.increaseStatistics("configs", 1);
 
             return config;
-        }
-        catch (Exception exception) {
+        } catch (Exception exception) {
             throw new RuntimeException("Configuration load failure", exception);
         }
     }

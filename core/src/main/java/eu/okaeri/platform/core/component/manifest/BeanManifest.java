@@ -78,31 +78,31 @@ public class BeanManifest {
         manifest.setDepends(depends);
 
         depends.addAll(Arrays.stream(clazz.getAnnotationsByType(Register.class))
-                .filter(Objects::nonNull)
-                .map(reg -> BeanManifest.of(classLoader, reg, creator))
-                .collect(Collectors.toList()));
+            .filter(Objects::nonNull)
+            .map(reg -> BeanManifest.of(classLoader, reg, creator))
+            .collect(Collectors.toList()));
 
         depends.addAll(Arrays.stream(clazz.getAnnotationsByType(Scan.class))
-                .filter(Objects::nonNull)
-                .flatMap(scan -> BeanManifest.of(classLoader, clazz, scan, creator).stream())
-                .collect(Collectors.toList()));
+            .filter(Objects::nonNull)
+            .flatMap(scan -> BeanManifest.of(classLoader, clazz, scan, creator).stream())
+            .collect(Collectors.toList()));
 
         depends.addAll(Arrays.stream(clazz.getAnnotationsByType(DependsOn.class))
-                .filter(Objects::nonNull)
-                .map(dependency -> BeanManifest.ofRequirement(dependency.type(), dependency.name()))
-                .collect(Collectors.toList()));
+            .filter(Objects::nonNull)
+            .map(dependency -> BeanManifest.ofRequirement(dependency.type(), dependency.name()))
+            .collect(Collectors.toList()));
 
         depends.addAll(Arrays.stream(clazz.getDeclaredMethods())
-                .filter(creator::isComponentMethod)
-                .map(method -> BeanManifest.of(manifest, method, creator))
-                .collect(Collectors.toList()));
+            .filter(creator::isComponentMethod)
+            .map(method -> BeanManifest.of(manifest, method, creator))
+            .collect(Collectors.toList()));
 
         boolean constructorDepends = false;
         for (Constructor<?> constructor : clazz.getConstructors()) {
             if (constructor.getAnnotation(Inject.class) != null) {
                 depends.addAll(Arrays.stream(constructor.getParameters())
-                        .map(param -> BeanManifest.of(param, true))
-                        .collect(Collectors.toList()));
+                    .map(param -> BeanManifest.of(param, true))
+                    .collect(Collectors.toList()));
                 constructorDepends = true;
                 break;
             }
@@ -110,9 +110,9 @@ public class BeanManifest {
 
         if (!constructorDepends) {
             depends.addAll(Arrays.stream(clazz.getDeclaredFields())
-                    .filter(field -> field.getAnnotation(Inject.class) != null)
-                    .map(BeanManifest::of)
-                    .collect(Collectors.toList()));
+                .filter(field -> field.getAnnotation(Inject.class) != null)
+                .map(BeanManifest::of)
+                .collect(Collectors.toList()));
         }
 
         return manifest;
@@ -143,9 +143,9 @@ public class BeanManifest {
         manifest.setPreload(annotation != null && annotation.preload());
 
         manifest.setDepends(Arrays.stream(method.getParameters())
-                .filter(parameter -> !creator.getRegistry().isDynamicParameter(parameter))
-                .map(BeanManifest::of)
-                .collect(Collectors.toList()));
+            .filter(parameter -> !creator.getRegistry().isDynamicParameter(parameter))
+            .map(BeanManifest::of)
+            .collect(Collectors.toList()));
         manifest.setExternals(Collections.emptyList());
 
         manifest.setSource(BeanSource.METHOD);
@@ -169,24 +169,24 @@ public class BeanManifest {
         }
 
         List<BeanManifest> results = ClasspathScanner.of(classLoader)
-                .findResources(value, scan.deep())
-                .filter(resource -> resource.getType() == ClasspathResourceType.CLASS)
-                .filter(resource -> exclusions.stream().noneMatch(exclusion -> resource.getQualifiedName().startsWith(exclusion)))
-                .map(resource -> {
-                    Class<?> clazz;
-                    try {
-                        clazz = classLoader.loadClass(resource.getQualifiedName());
-                    } catch (Throwable throwable) {
-                        throw new RuntimeException("Class failed to load (use 'exclusions = \"my.package.libs\"' for shaded dependencies?): " + resource, throwable);
-                    }
-                    if (creator.isComponent(clazz) && !OkaeriPlatform.class.isAssignableFrom(clazz)) {
-                        if (DEBUG) creator.log("Scanned: " + clazz);
-                        return of(classLoader, clazz, creator, false);
-                    }
-                    return null;
-                })
-                .filter(Objects::nonNull)
-                .collect(Collectors.toList());
+            .findResources(value, scan.deep())
+            .filter(resource -> resource.getType() == ClasspathResourceType.CLASS)
+            .filter(resource -> exclusions.stream().noneMatch(exclusion -> resource.getQualifiedName().startsWith(exclusion)))
+            .map(resource -> {
+                Class<?> clazz;
+                try {
+                    clazz = classLoader.loadClass(resource.getQualifiedName());
+                } catch (Throwable throwable) {
+                    throw new RuntimeException("Class failed to load (use 'exclusions = \"my.package.libs\"' for shaded dependencies?): " + resource, throwable);
+                }
+                if (creator.isComponent(clazz) && !OkaeriPlatform.class.isAssignableFrom(clazz)) {
+                    if (DEBUG) creator.log("Scanned: " + clazz);
+                    return of(classLoader, clazz, creator, false);
+                }
+                return null;
+            })
+            .filter(Objects::nonNull)
+            .collect(Collectors.toList());
 
         if (results.isEmpty()) {
             throw new IllegalArgumentException("Scan returned 0 results: " + scan);
@@ -329,11 +329,11 @@ public class BeanManifest {
 
                     if (newValue > 100) {
                         this.failCounter.entrySet().stream()
-                                .sorted(Collections.reverseOrder(Map.Entry.comparingByValue()))
-                                .filter(entry -> entry.getValue() > 10)
-                                .forEach((entry) -> LOGGER.severe(entry.getKey() + " - " + entry.getValue() + " fails"));
+                            .sorted(Collections.reverseOrder(Map.Entry.comparingByValue()))
+                            .filter(entry -> entry.getValue() > 10)
+                            .forEach((entry) -> LOGGER.severe(entry.getKey() + " - " + entry.getValue() + " fails"));
                         throw new RuntimeException("Failed to resolve component/bean " + dependClass + " (" + depend.getName() + "=" + depend.getSource() + ") in " + this.getType() + ":\n"
-                                + injector.all().stream().map(i -> "- '" + i.getName() + "' -> " + i.getType()).collect(Collectors.joining("\n")));
+                            + injector.all().stream().map(i -> "- '" + i.getName() + "' -> " + i.getType()).collect(Collectors.joining("\n")));
                     }
 
                     return false;

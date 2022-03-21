@@ -34,10 +34,10 @@ public final class RequestHandlerHelper {
 
     public static Annotation[] findHandlers(@NonNull Method method) {
         return Stream.of(AfterHandler.class, BeforeHandler.class, DeleteHandler.class, GetHandler.class, HeadHandler.class,
-                        PatchHandler.class, PostHandler.class, PutHandler.class, RequestHandler.class)
-                .map(method::getAnnotation)
-                .filter(Objects::nonNull)
-                .toArray(Annotation[]::new);
+                PatchHandler.class, PostHandler.class, PutHandler.class, RequestHandler.class)
+            .map(method::getAnnotation)
+            .filter(Objects::nonNull)
+            .toArray(Annotation[]::new);
     }
 
     public static String readHandlerPath(@NonNull Annotation annotation) {

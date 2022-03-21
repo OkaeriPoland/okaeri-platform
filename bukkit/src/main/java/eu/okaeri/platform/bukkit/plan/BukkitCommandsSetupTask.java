@@ -41,7 +41,7 @@ public class BukkitCommandsSetupTask implements ExecutionTask<OkaeriBukkitPlugin
 
         // allow @Chain in commands
         platform.getInjector().get("tasker", Tasker.class)
-                .ifPresent(tasker -> commands.registerExtension(new BukkitCommandsTasker(tasker)));
+            .ifPresent(tasker -> commands.registerExtension(new BukkitCommandsTasker(tasker)));
 
         // register commands injectable
         platform.registerInjectable("commands", commands);

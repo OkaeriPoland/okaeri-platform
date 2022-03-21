@@ -11,7 +11,9 @@ import lombok.NonNull;
 import org.bukkit.ChatColor;
 
 import java.nio.file.Files;
-import java.util.*;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Optional;
 import java.util.regex.Pattern;
 
 public class BI18n extends MI18n {
@@ -66,8 +68,8 @@ public class BI18n extends MI18n {
     @Override
     protected Optional<I18nMessageColors> matchColors(String fieldName) {
         return this.getColorsConfig().getMatchers().stream()
-                .filter(matcher -> matcher.getPattern().matcher(fieldName).matches())
-                .map(matcher -> I18nMessageColors.of(String.valueOf(matcher.getMessageColor()), String.valueOf(matcher.getFieldsColor())))
-                .findAny();
+            .filter(matcher -> matcher.getPattern().matcher(fieldName).matches())
+            .map(matcher -> I18nMessageColors.of(String.valueOf(matcher.getMessageColor()), String.valueOf(matcher.getFieldsColor())))
+            .findAny();
     }
 }

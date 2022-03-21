@@ -10,7 +10,6 @@ import eu.okaeri.platform.core.component.creator.ComponentResolver;
 import eu.okaeri.platform.core.component.manifest.BeanManifest;
 import eu.okaeri.platform.core.component.manifest.BeanSource;
 import lombok.NonNull;
-import net.md_5.bungee.api.plugin.Plugin;
 
 import java.lang.reflect.Method;
 import java.util.concurrent.TimeUnit;
@@ -27,7 +26,6 @@ public class DelayedComponentResolver implements ComponentResolver {
         return method.getAnnotation(Delayed.class) != null;
     }
 
-    private @Inject Plugin plugin;
     private @Inject PlatformScheduler scheduler;
 
     @Override
@@ -37,8 +35,8 @@ public class DelayedComponentResolver implements ComponentResolver {
         Runnable runnable = ComponentHelper.manifestToRunnable(manifest, injector);
 
         Delayed delayed = manifest.getSource() == BeanSource.METHOD
-                ? manifest.getMethod().getAnnotation(Delayed.class)
-                : manifest.getType().getAnnotation(Delayed.class);
+            ? manifest.getMethod().getAnnotation(Delayed.class)
+            : manifest.getType().getAnnotation(Delayed.class);
 
         if (!delayed.name().isEmpty()) {
             manifest.setName(delayed.name());
@@ -51,12 +49,12 @@ public class DelayedComponentResolver implements ComponentResolver {
 
         long took = System.currentTimeMillis() - start;
         creator.log(ComponentHelper.buildComponentMessage()
-                .type("Added delayed")
-                .name(manifest.getSource() == BeanSource.METHOD ? manifest.getName() : manifest.getType().getSimpleName())
-                .took(took)
-                .meta("time", delay)
-                .meta("timeUnit", timeUnit)
-                .build());
+            .type("Added delayed")
+            .name(manifest.getSource() == BeanSource.METHOD ? manifest.getName() : manifest.getType().getSimpleName())
+            .took(took)
+            .meta("time", delay)
+            .meta("timeUnit", timeUnit)
+            .build());
         creator.increaseStatistics("delayed", 1);
 
         return runnable;

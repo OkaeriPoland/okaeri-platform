@@ -21,20 +21,20 @@ public class CommandsI18nSetupTask implements ExecutionTask<OkaeriPlatform> {
 
         // read all available i18n
         platform.getInjector().allOf(MI18n.class)
-                .forEach(injectable -> i18nCommandsProviders.put(injectable.getName(), injectable.getObject()));
+            .forEach(injectable -> i18nCommandsProviders.put(injectable.getName(), injectable.getObject()));
 
         // get main i18n and resolve prefixProvider
         platform.getInjector().get("i18n", MI18n.class)
-                .ifPresent(i18n -> prefixProvider.set(i18n.getPrefixProvider()));
+            .ifPresent(i18n -> prefixProvider.set(i18n.getPrefixProvider()));
 
         // update prefix provider of commands to the main one
         if (prefixProvider.get() != null) {
             platform.getInjector().get("i18n-platform-commands", MI18n.class)
-                    .ifPresent(i18n -> i18n.setPrefixProvider(prefixProvider.get()));
+                .ifPresent(i18n -> i18n.setPrefixProvider(prefixProvider.get()));
         }
 
         // inject all i18n into commands to allow ${key} access
         platform.getInjector().get("commands", Commands.class)
-                .ifPresent(commands -> commands.textHandler(new I18nCommandsTextHandler(i18nCommandsProviders)));
+            .ifPresent(commands -> commands.textHandler(new I18nCommandsTextHandler(i18nCommandsProviders)));
     }
 }

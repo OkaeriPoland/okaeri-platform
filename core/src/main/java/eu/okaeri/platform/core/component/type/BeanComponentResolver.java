@@ -38,10 +38,10 @@ public class BeanComponentResolver implements ComponentResolver {
         long took = System.currentTimeMillis() - start;
         if (took > 1) {
             creator.log(ComponentHelper.buildComponentMessage()
-                    .type("Added generic bean")
-                    .name(manifest.getName().isEmpty() ? manifest.getMethod().getName() : manifest.getName())
-                    .took(took)
-                    .build());
+                .type("Added generic bean")
+                .name(manifest.getName().isEmpty() ? manifest.getMethod().getName() : manifest.getName())
+                .took(took)
+                .build());
         }
         creator.increaseStatistics("beans", 1);
 

@@ -95,9 +95,9 @@ public final class ComponentHelper {
 
     public static String displayMethod(@NonNull Method method) {
         return method.getReturnType().getSimpleName() + "->" + method.getName()
-                + "(" + Arrays.stream(method.getParameters())
-                .map(parameter -> parameter.getType().getSimpleName())
-                .collect(Collectors.joining(", ")) + ")";
+            + "(" + Arrays.stream(method.getParameters())
+            .map(parameter -> parameter.getType().getSimpleName())
+            .collect(Collectors.joining(", ")) + ")";
     }
 
     public static void invokePostConstruct(Object object, @NonNull Injector injector) {
@@ -107,9 +107,9 @@ public final class ComponentHelper {
         }
 
         List<Method> postConstructs = Arrays.stream(object.getClass().getDeclaredMethods())
-                .filter(method -> method.getAnnotation(PostConstruct.class) != null)
-                .sorted(Comparator.comparingInt(method -> method.getAnnotation(PostConstruct.class).order()))
-                .collect(Collectors.toList());
+            .filter(method -> method.getAnnotation(PostConstruct.class) != null)
+            .sorted(Comparator.comparingInt(method -> method.getAnnotation(PostConstruct.class).order()))
+            .collect(Collectors.toList());
 
         for (Method postConstruct : postConstructs) {
 
@@ -124,13 +124,13 @@ public final class ComponentHelper {
 
     public static void closeAllOfType(@NonNull Class<? extends Closeable> type, @NonNull Injector injector) {
         injector.allOf(type).stream()
-                .map(Injectable::getObject)
-                .forEach(closeable -> {
-                    try {
-                        closeable.close();
-                    } catch (Throwable ignored) {
-                    }
-                });
+            .map(Injectable::getObject)
+            .forEach(closeable -> {
+                try {
+                    closeable.close();
+                } catch (Throwable ignored) {
+                }
+            });
     }
 
     public static ComponentMessageBuilder buildComponentMessage() {
@@ -214,14 +214,14 @@ public final class ComponentHelper {
             if (!this.meta.isEmpty()) {
                 metaBuilder.append(" { ");
                 metaBuilder.append(this.meta.entrySet().stream()
-                        .map(entry -> {
-                            Object rendered = entry.getValue();
-                            if (rendered instanceof String) {
-                                rendered = "'" + rendered + "'";
-                            }
-                            return entry.getKey() + " = " + rendered;
-                        })
-                        .collect(Collectors.joining(", ")));
+                    .map(entry -> {
+                        Object rendered = entry.getValue();
+                        if (rendered instanceof String) {
+                            rendered = "'" + rendered + "'";
+                        }
+                        return entry.getKey() + " = " + rendered;
+                    })
+                    .collect(Collectors.joining(", ")));
                 metaBuilder.append(" }");
             }
 

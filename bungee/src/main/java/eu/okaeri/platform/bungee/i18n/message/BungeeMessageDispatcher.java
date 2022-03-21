@@ -117,11 +117,11 @@ public class BungeeMessageDispatcher implements MessageDispatcher<Message> {
 
             ProxiedPlayer player = (ProxiedPlayer) receiver;
             Title bungeeTitle = ProxyServer.getInstance().createTitle()
-                    .title(TextComponent.fromLegacyText(title))
-                    .subTitle(TextComponent.fromLegacyText(subtitle))
-                    .fadeIn(this.titleFadeIn)
-                    .stay(this.titleStay)
-                    .fadeOut(this.titleFadeOut);
+                .title(TextComponent.fromLegacyText(title))
+                .subTitle(TextComponent.fromLegacyText(subtitle))
+                .fadeIn(this.titleFadeIn)
+                .stay(this.titleStay)
+                .fadeOut(this.titleFadeOut);
             player.sendTitle(bungeeTitle);
             return this;
         }
@@ -135,8 +135,8 @@ public class BungeeMessageDispatcher implements MessageDispatcher<Message> {
 
     public BungeeMessageDispatcher sendToPlayersWithPermission(@NonNull String permission) {
         return this.sendTo(new ArrayList<>(ProxyServer.getInstance().getPlayers()).stream()
-                .filter(player -> player.hasPermission(permission))
-                .collect(Collectors.toList()));
+            .filter(player -> player.hasPermission(permission))
+            .collect(Collectors.toList()));
     }
 
     public BungeeMessageDispatcher sendToConsole() {

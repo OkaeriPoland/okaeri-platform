@@ -15,9 +15,9 @@ public class BungeeExternalResourceProviderSetupTask implements ExecutionTask<Ok
     private static final ExternalResourceProvider EXTERNAL_RESOURCE_PROVIDER = (name, type, source) -> {
 
         Plugin plugin = ProxyServer.getInstance().getPluginManager().getPlugins().stream()
-                .filter(proxyPlugin -> proxyPlugin.getClass() == source)
-                .findAny()
-                .orElse(null);
+            .filter(proxyPlugin -> proxyPlugin.getClass() == source)
+            .findAny()
+            .orElse(null);
 
         if (plugin == null) {
             throw new BreakException("Cannot provide external resource: " + name + ", " + type + " from " + source + ": cannot find source");

@@ -22,8 +22,8 @@ public class BukkitAudience extends Audience {
 
     public static BukkitAudience of(@NonNull Object... targets) {
         return (targets.length == 0)
-                ? new BukkitAudience()
-                : new BukkitAudience(new ArrayList<>(Arrays.asList(targets)));
+            ? new BukkitAudience()
+            : new BukkitAudience(new ArrayList<>(Arrays.asList(targets)));
     }
 
     public static BukkitAudience of(@NonNull Collection<Object> targets) {
@@ -57,8 +57,8 @@ public class BukkitAudience extends Audience {
 
     public BukkitAudience andOffPlayersThatCanSee(@NonNull Player player) {
         this.targets.addAll(new ArrayList<>(Bukkit.getOnlinePlayers()).stream()
-                .filter(onlinePlayer -> onlinePlayer.canSee(player))
-                .collect(Collectors.toList()));
+            .filter(onlinePlayer -> onlinePlayer.canSee(player))
+            .collect(Collectors.toList()));
         return this;
     }
 
@@ -68,8 +68,8 @@ public class BukkitAudience extends Audience {
 
     public BukkitAudience andOfPlayersWithPermission(@NonNull String permission) {
         this.targets.addAll(new ArrayList<>(Bukkit.getOnlinePlayers()).stream()
-                .filter(player -> player.hasPermission(permission))
-                .collect(Collectors.toList()));
+            .filter(player -> player.hasPermission(permission))
+            .collect(Collectors.toList()));
         return this;
     }
 

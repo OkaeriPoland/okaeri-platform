@@ -43,13 +43,13 @@ public class CommandComponentResolver implements ComponentResolver {
 
         long took = System.currentTimeMillis() - start;
         creator.log(ComponentHelper.buildComponentMessage()
-                .type("Added command")
-                .name(commandService.getClass().getSimpleName())
-                .took(took)
-                .meta("label", serviceMeta.getLabel())
-                .meta("aliases", serviceMeta.getAliases())
-                .meta("description", serviceMeta.getDescription())
-                .build());
+            .type("Added command")
+            .name(commandService.getClass().getSimpleName())
+            .took(took)
+            .meta("label", serviceMeta.getLabel())
+            .meta("aliases", serviceMeta.getAliases())
+            .meta("description", serviceMeta.getDescription())
+            .build());
         creator.increaseStatistics("commands", 1);
 
         return commandService;

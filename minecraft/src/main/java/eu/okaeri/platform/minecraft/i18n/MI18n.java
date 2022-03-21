@@ -25,9 +25,7 @@ public abstract class MI18n extends MOCI18n {
     private final @Getter Map<Locale, LocaleConfig> configs = new HashMap<>();
     private final @Getter String prefixField;
     private final @Getter String prefixMarker;
-
-    @Getter @Setter
-    private I18nPrefixProvider prefixProvider;
+    private @Getter @Setter I18nPrefixProvider prefixProvider;
 
     @Override
     public MI18n registerConfig(@NonNull Locale locale, @NonNull LocaleConfig config) {
@@ -92,10 +90,11 @@ public abstract class MI18n extends MOCI18n {
         }
 
         String prefix = this.color((String) declaration.getFields().stream()
-                .filter(field -> this.getPrefixField().equals(field.getField().getName()))
-                .findFirst()
-                .map(FieldDeclaration::getValue)
-                .orElse(""));
+            .filter(field -> this.getPrefixField().equals(field.getField().getName()))
+            .findFirst()
+            .map(FieldDeclaration::getValue)
+            .orElse(""));
+
         this.setPrefixProvider((entity, key) -> prefix);
     }
 

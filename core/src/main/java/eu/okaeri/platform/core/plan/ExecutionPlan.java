@@ -66,9 +66,9 @@ public class ExecutionPlan {
 
     public long execute(@NonNull List<ExecutionPhase> phases) {
         return phases.stream()
-                .map(this::execute)
-                .mapToInt(Long::intValue)
-                .sum();
+            .map(this::execute)
+            .mapToInt(Long::intValue)
+            .sum();
     }
 
     @SuppressWarnings({"rawtypes", "unchecked"})

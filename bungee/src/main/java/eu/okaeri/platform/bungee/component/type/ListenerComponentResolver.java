@@ -43,14 +43,14 @@ public class ListenerComponentResolver implements ComponentResolver {
 
         long took = System.currentTimeMillis() - start;
         creator.log(ComponentHelper.buildComponentMessage()
-                .type("Added listener")
-                .name(listener.getClass().getSimpleName())
-                .took(took)
-                .meta("methods", Arrays.stream(listener.getClass().getDeclaredMethods())
-                        .filter(method -> method.getAnnotation(EventHandler.class) != null)
-                        .map(Method::getName)
-                        .collect(Collectors.toList()))
-                .build());
+            .type("Added listener")
+            .name(listener.getClass().getSimpleName())
+            .took(took)
+            .meta("methods", Arrays.stream(listener.getClass().getDeclaredMethods())
+                .filter(method -> method.getAnnotation(EventHandler.class) != null)
+                .map(Method::getName)
+                .collect(Collectors.toList()))
+            .build());
         creator.increaseStatistics("listeners", 1);
 
         return listener;

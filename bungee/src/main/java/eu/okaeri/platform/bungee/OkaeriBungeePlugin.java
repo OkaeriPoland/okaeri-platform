@@ -35,6 +35,7 @@ public class OkaeriBungeePlugin extends Plugin implements OkaeriPlatform {
 
     private @Getter @Setter Injector injector;
     private @Getter @Setter ComponentCreator creator;
+    private ExecutionPlan plan;
 
     public OkaeriBungeePlugin() {
         super();
@@ -78,8 +79,6 @@ public class OkaeriBungeePlugin extends Plugin implements OkaeriPlatform {
         plan.add(SHUTDOWN, new BungeeSchedulerShutdownTask());
         plan.add(SHUTDOWN, new PersistenceShutdownTask());
     }
-
-    private ExecutionPlan plan;
 
     @Override
     @Deprecated

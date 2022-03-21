@@ -12,7 +12,7 @@ import java.lang.reflect.Method;
 
 /**
  * Resolves generic @Component classes.
- *
+ * <p>
  * Remember to register last as otherwise {@link #supports(Class)} may interfere
  * with other ComponentResolver implementations that due to being 3rd party
  * extension are not provided with custom annotation e.g. bukkit's listeners.
@@ -38,10 +38,10 @@ public class GenericComponentResolver implements ComponentResolver {
         long took = System.currentTimeMillis() - start;
         if (took > 1) {
             creator.log(ComponentHelper.buildComponentMessage()
-                    .type("Added generic component")
-                    .name(manifest.getType().getSimpleName())
-                    .took(took)
-                    .build());
+                .type("Added generic component")
+                .name(manifest.getType().getSimpleName())
+                .took(took)
+                .build());
         }
         creator.increaseStatistics("components", 1);
 

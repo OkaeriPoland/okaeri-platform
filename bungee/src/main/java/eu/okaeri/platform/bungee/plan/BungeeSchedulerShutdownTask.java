@@ -9,6 +9,6 @@ public class BungeeSchedulerShutdownTask implements ExecutionTask<OkaeriBungeePl
     @Override
     public void execute(OkaeriBungeePlugin platform) {
         platform.getInjector().getExact("scheduler", PlatformScheduler.class)
-                .ifPresent(PlatformScheduler::cancelAll);
+            .ifPresent(PlatformScheduler::cancelAll);
     }
 }

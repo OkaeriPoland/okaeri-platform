@@ -72,13 +72,13 @@ public class RequestHandlerComponentResolver implements ComponentResolver {
 
         long took = System.currentTimeMillis() - start;
         creator.log(ComponentHelper.buildComponentMessage()
-                .type("Added handler")
-                .name(parentClass.getSimpleName() + "#" + method.getName())
-                .took(took)
-                .meta("path", handlerPath)
-                .meta("type", handlerType)
-                .meta("permittedRoles", Arrays.stream(handlerPermittedRoles).map(SimpleRouteRole::getName).collect(Collectors.toList()))
-                .build());
+            .type("Added handler")
+            .name(parentClass.getSimpleName() + "#" + method.getName())
+            .took(took)
+            .meta("path", handlerPath)
+            .meta("type", handlerType)
+            .meta("permittedRoles", Arrays.stream(handlerPermittedRoles).map(SimpleRouteRole::getName).collect(Collectors.toList()))
+            .build());
         creator.increaseStatistics("handlers", 1);
 
         return handler;

@@ -36,8 +36,8 @@ public class ScheduledComponentResolver implements ComponentResolver {
         Runnable runnable = ComponentHelper.manifestToRunnable(manifest, injector);
 
         Scheduled scheduled = manifest.getSource() == BeanSource.METHOD
-                ? manifest.getMethod().getAnnotation(Scheduled.class)
-                : manifest.getType().getAnnotation(Scheduled.class);
+            ? manifest.getMethod().getAnnotation(Scheduled.class)
+            : manifest.getType().getAnnotation(Scheduled.class);
 
         if (!scheduled.name().isEmpty()) {
             manifest.setName(scheduled.name());
@@ -51,13 +51,13 @@ public class ScheduledComponentResolver implements ComponentResolver {
 
         long took = System.currentTimeMillis() - start;
         creator.log(ComponentHelper.buildComponentMessage()
-                .type("Added scheduled")
-                .name(manifest.getSource() == BeanSource.METHOD ? manifest.getName() : manifest.getType().getSimpleName())
-                .took(took)
-                .meta("delay", delay)
-                .meta("rate", rate)
-                .meta("async", async)
-                .build());
+            .type("Added scheduled")
+            .name(manifest.getSource() == BeanSource.METHOD ? manifest.getName() : manifest.getType().getSimpleName())
+            .took(took)
+            .meta("delay", delay)
+            .meta("rate", rate)
+            .meta("async", async)
+            .build());
         creator.increaseStatistics("scheduled", 1);
 
         return runnable;

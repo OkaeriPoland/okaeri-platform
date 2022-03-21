@@ -56,8 +56,8 @@ public class ComponentCreatorRegistry {
 
         // check if any of annotations is marked as dynamic
         return this.dynamicAnnotations.stream()
-                .map(type -> parameter.getAnnotation(type))
-                .anyMatch(Objects::nonNull);
+            .map(type -> parameter.getAnnotation(type))
+            .anyMatch(Objects::nonNull);
     }
 
     public boolean supports(Class<?> type) {
@@ -72,16 +72,16 @@ public class ComponentCreatorRegistry {
 
         if (manifest.getSource() == BeanSource.COMPONENT) {
             return this.componentResolvers.stream()
-                    .filter(resolver -> resolver.supports(manifest.getType()))
-                    .map(resolver -> resolver.make(creator, manifest, this.injector))
-                    .findAny();
+                .filter(resolver -> resolver.supports(manifest.getType()))
+                .map(resolver -> resolver.make(creator, manifest, this.injector))
+                .findAny();
         }
 
         if (manifest.getSource() == BeanSource.METHOD) {
             return this.componentResolvers.stream()
-                    .filter(resolver -> resolver.supports(manifest.getMethod()))
-                    .map(resolver -> resolver.make(creator, manifest, this.injector))
-                    .findAny();
+                .filter(resolver -> resolver.supports(manifest.getMethod()))
+                .map(resolver -> resolver.make(creator, manifest, this.injector))
+                .findAny();
         }
 
         throw new IllegalArgumentException("Unsupported manifest source: " + manifest.getSource());

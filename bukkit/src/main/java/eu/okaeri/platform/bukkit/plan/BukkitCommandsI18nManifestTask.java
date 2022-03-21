@@ -12,7 +12,7 @@ public class BukkitCommandsI18nManifestTask implements ExecutionTask<OkaeriBukki
     public void execute(OkaeriBukkitPlugin platform) {
 
         BeanManifest manifest = platform.getInjector().get("manifest", BeanManifest.class)
-                .orElseThrow(() -> new RuntimeException("Cannot hook i18n-platform-commands without manifest being present!"));
+            .orElseThrow(() -> new RuntimeException("Cannot hook i18n-platform-commands without manifest being present!"));
 
         ClassLoader classLoader = platform.getClass().getClassLoader();
         ComponentCreator creator = platform.getCreator();

@@ -17,8 +17,8 @@ public abstract class ComponentCreator {
 
     private static final Set<BeanSource> SUPPORTED_BEAN_SOURCES = new HashSet<>(Arrays.asList(BeanSource.METHOD, BeanSource.COMPONENT));
 
-    @Getter @NonNull private final ComponentCreatorRegistry registry;
-    @Getter(AccessLevel.PROTECTED) @NonNull private final Map<String, Integer> statisticsMap = new TreeMap<>();
+    private @Getter @NonNull final ComponentCreatorRegistry registry;
+    private @Getter(AccessLevel.PROTECTED) @NonNull final Map<String, Integer> statisticsMap = new TreeMap<>();
 
     public void increaseStatistics(String identifier, int count) {
         this.getStatisticsMap().put(identifier, this.getStatisticsMap().getOrDefault(identifier, 0) + 1);
@@ -53,8 +53,8 @@ public abstract class ComponentCreator {
 
     public String getSummaryText(long took) {
         String statistics = this.getStatisticsMap().entrySet().stream()
-                .map(entry -> entry.getKey() + ": " + entry.getValue())
-                .collect(Collectors.joining(", "));
+            .map(entry -> entry.getKey() + ": " + entry.getValue())
+            .collect(Collectors.joining(", "));
         return "= (" + statistics + ") [blocking: " + took + " ms]";
     }
 

@@ -63,7 +63,7 @@ public class MessagesComponentResolver implements ComponentResolver {
         }
 
         Placeholders defaultPlaceholders = injector.getExact("placeholders", Placeholders.class)
-                .orElseThrow(() -> new IllegalArgumentException("cannot find placeholders required for @Messages"));
+            .orElseThrow(() -> new IllegalArgumentException("cannot find placeholders required for @Messages"));
 
         long start = System.currentTimeMillis();
         Class<? extends LocaleConfig> beanClazz = (Class<? extends LocaleConfig>) manifest.getType();
@@ -129,9 +129,9 @@ public class MessagesComponentResolver implements ComponentResolver {
 
         // prepare serdes
         OkaeriSerdesPack[] serdesPacks = Stream.of(this.defaultConfigurerSerdes)
-                .map(injector::createInstance)
-                .distinct()
-                .toArray(OkaeriSerdesPack[]::new);
+            .map(injector::createInstance)
+            .distinct()
+            .toArray(OkaeriSerdesPack[]::new);
 
         // gather colors config
         I18nColorsConfig colorsConfig = ConfigManager.create(I18nColorsConfig.class, (it) -> {
@@ -165,8 +165,8 @@ public class MessagesComponentResolver implements ComponentResolver {
                 Locale locale = Locale.forLanguageTag(localeName);
                 // create configurer
                 Configurer configurer = (provider == Messages.DEFAULT.class)
-                        ? this.defaultConfigurerProvider.get()
-                        : injector.createInstance(provider);
+                    ? this.defaultConfigurerProvider.get()
+                    : injector.createInstance(provider);
                 // register
                 LocaleConfig localeConfig = LocaleConfigManager.create(beanClazz, configurer, file, !defaultLocale.equals(locale));
                 i18n.registerConfig(locale, localeConfig);
@@ -183,8 +183,8 @@ public class MessagesComponentResolver implements ComponentResolver {
                 if (loadedLocales.contains(locale)) continue;
                 // create configurer
                 Configurer configurer = (provider == Messages.DEFAULT.class)
-                        ? this.defaultConfigurerProvider.get()
-                        : injector.createInstance(provider);
+                    ? this.defaultConfigurerProvider.get()
+                    : injector.createInstance(provider);
                 // register
                 LocaleConfig localeConfig = ConfigManager.create(beanClazz, (it) -> {
                     it.withConfigurer(configurer);
@@ -200,8 +200,8 @@ public class MessagesComponentResolver implements ComponentResolver {
             if (!loadedLocales.contains(defaultLocale)) {
                 // create configurer
                 Configurer configurer = (provider == Messages.DEFAULT.class)
-                        ? this.defaultConfigurerProvider.get()
-                        : injector.createInstance(provider);
+                    ? this.defaultConfigurerProvider.get()
+                    : injector.createInstance(provider);
                 // register default locale based on interface values
                 LocaleConfig defaultLocaleConfig = ConfigManager.create(beanClazz, it -> {
                     it.withBindFile(new File(directory, messages.defaultLocale() + suffix));
@@ -216,14 +216,14 @@ public class MessagesComponentResolver implements ComponentResolver {
             long took = System.currentTimeMillis() - start;
             if ((beanClazz != I18nCommandsMessages.class) || DEBUG) {
                 creator.log(ComponentHelper.buildComponentMessage()
-                        .type("Loaded messages")
-                        .name(beanClazz.getSimpleName())
-                        .took(took)
-                        .meta("path", path)
-                        .meta("suffix", suffix)
-                        .meta("provider", provider.getSimpleName())
-                        .footer("  > " + loadedLocales.stream().map(Locale::toString).collect(Collectors.joining(", ")))
-                        .build());
+                    .type("Loaded messages")
+                    .name(beanClazz.getSimpleName())
+                    .took(took)
+                    .meta("path", path)
+                    .meta("suffix", suffix)
+                    .meta("provider", provider.getSimpleName())
+                    .footer("  > " + loadedLocales.stream().map(Locale::toString).collect(Collectors.joining(", ")))
+                    .build());
             }
 
             manifest.setName(path);

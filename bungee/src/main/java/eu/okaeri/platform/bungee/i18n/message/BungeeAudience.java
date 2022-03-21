@@ -21,8 +21,8 @@ public class BungeeAudience extends Audience {
 
     public static BungeeAudience of(@NonNull Object... targets) {
         return (targets.length == 0)
-                ? new BungeeAudience()
-                : new BungeeAudience(new ArrayList<>(Arrays.asList(targets)));
+            ? new BungeeAudience()
+            : new BungeeAudience(new ArrayList<>(Arrays.asList(targets)));
     }
 
     public static BungeeAudience of(@NonNull Collection<Object> targets) {
@@ -56,8 +56,8 @@ public class BungeeAudience extends Audience {
 
     public BungeeAudience andOfPlayersWithPermission(@NonNull String permission) {
         this.targets.addAll(new ArrayList<>(ProxyServer.getInstance().getPlayers()).stream()
-                .filter(player -> player.hasPermission(permission))
-                .collect(Collectors.toList()));
+            .filter(player -> player.hasPermission(permission))
+            .collect(Collectors.toList()));
         return this;
     }
 

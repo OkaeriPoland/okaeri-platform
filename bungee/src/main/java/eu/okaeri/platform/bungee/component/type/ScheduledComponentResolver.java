@@ -10,7 +10,6 @@ import eu.okaeri.platform.core.component.creator.ComponentResolver;
 import eu.okaeri.platform.core.component.manifest.BeanManifest;
 import eu.okaeri.platform.core.component.manifest.BeanSource;
 import lombok.NonNull;
-import net.md_5.bungee.api.plugin.Plugin;
 
 import java.lang.reflect.Method;
 import java.util.concurrent.TimeUnit;
@@ -27,7 +26,6 @@ public class ScheduledComponentResolver implements ComponentResolver {
         return method.getAnnotation(Scheduled.class) != null;
     }
 
-    private @Inject Plugin plugin;
     private @Inject PlatformScheduler scheduler;
 
     @Override
@@ -37,8 +35,8 @@ public class ScheduledComponentResolver implements ComponentResolver {
         Runnable runnable = ComponentHelper.manifestToRunnable(manifest, injector);
 
         Scheduled scheduled = manifest.getSource() == BeanSource.METHOD
-                ? manifest.getMethod().getAnnotation(Scheduled.class)
-                : manifest.getType().getAnnotation(Scheduled.class);
+            ? manifest.getMethod().getAnnotation(Scheduled.class)
+            : manifest.getType().getAnnotation(Scheduled.class);
 
         if (!scheduled.name().isEmpty()) {
             manifest.setName(scheduled.name());
@@ -52,13 +50,13 @@ public class ScheduledComponentResolver implements ComponentResolver {
 
         long took = System.currentTimeMillis() - start;
         creator.log(ComponentHelper.buildComponentMessage()
-                .type("Added scheduled")
-                .name(manifest.getSource() == BeanSource.METHOD ? manifest.getName() : manifest.getType().getSimpleName())
-                .took(took)
-                .meta("delay", delay)
-                .meta("rate", rate)
-                .meta("timeUnit", timeUnit)
-                .build());
+            .type("Added scheduled")
+            .name(manifest.getSource() == BeanSource.METHOD ? manifest.getName() : manifest.getType().getSimpleName())
+            .took(took)
+            .meta("delay", delay)
+            .meta("rate", rate)
+            .meta("timeUnit", timeUnit)
+            .build());
 
         creator.increaseStatistics("scheduled", 1);
 

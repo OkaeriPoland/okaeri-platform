@@ -33,8 +33,8 @@ public class PlatformScheduler {
 
     public BukkitTask run(Runnable runnable, boolean async) {
         return async
-                ? this.scheduler.runTaskAsynchronously(this.plugin, runnable)
-                : this.scheduler.runTask(this.plugin, runnable);
+            ? this.scheduler.runTaskAsynchronously(this.plugin, runnable)
+            : this.scheduler.runTask(this.plugin, runnable);
     }
 
     public BukkitTask runLaterAsync(Runnable runnable, long delay) {
@@ -47,8 +47,8 @@ public class PlatformScheduler {
 
     public BukkitTask runLater(Runnable runnable, long delay, boolean async) {
         return async
-                ? this.scheduler.runTaskLaterAsynchronously(this.plugin, runnable, delay)
-                : this.scheduler.runTaskLater(this.plugin, runnable, delay);
+            ? this.scheduler.runTaskLaterAsynchronously(this.plugin, runnable, delay)
+            : this.scheduler.runTaskLater(this.plugin, runnable, delay);
     }
 
     public BukkitTask runTimerAsync(Runnable runnable, long delay, long rate) {
@@ -61,7 +61,7 @@ public class PlatformScheduler {
 
     public BukkitTask runTimer(Runnable runnable, long delay, long rate, boolean async) {
         return async
-                ? this.scheduler.runTaskTimerAsynchronously(this.plugin, runnable, delay, rate)
-                : this.scheduler.runTaskTimer(this.plugin, runnable, delay, rate);
+            ? this.scheduler.runTaskTimerAsynchronously(this.plugin, runnable, delay, rate)
+            : this.scheduler.runTaskTimer(this.plugin, runnable, delay, rate);
     }
 }

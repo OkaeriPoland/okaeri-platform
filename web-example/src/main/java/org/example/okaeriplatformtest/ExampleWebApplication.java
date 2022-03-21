@@ -83,8 +83,8 @@ public class ExampleWebApplication extends OkaeriWebApplication {
 
                 // if found, return user roles
                 return accessRepository.findByToken(tokenOptional.get())
-                        .map(Access::getRoles)
-                        .orElse(Set.of());
+                    .map(Access::getRoles)
+                    .orElse(Set.of());
             }
         };
     }

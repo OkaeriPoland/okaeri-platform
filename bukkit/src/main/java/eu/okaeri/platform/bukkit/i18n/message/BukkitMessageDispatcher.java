@@ -123,14 +123,14 @@ public class BukkitMessageDispatcher implements MessageDispatcher<Message> {
 
     public BukkitMessageDispatcher sendToPlayersThatCanSee(@NonNull Player player) {
         return this.sendTo(new ArrayList<>(Bukkit.getOnlinePlayers()).stream()
-                .filter(onlinePlayer -> onlinePlayer.canSee(player))
-                .collect(Collectors.toList()));
+            .filter(onlinePlayer -> onlinePlayer.canSee(player))
+            .collect(Collectors.toList()));
     }
 
     public BukkitMessageDispatcher sendToPlayersWithPermission(@NonNull String permission) {
         return this.sendTo(new ArrayList<>(Bukkit.getOnlinePlayers()).stream()
-                .filter(player -> player.hasPermission(permission))
-                .collect(Collectors.toList()));
+            .filter(player -> player.hasPermission(permission))
+            .collect(Collectors.toList()));
     }
 
     public BukkitMessageDispatcher sendToConsole() {

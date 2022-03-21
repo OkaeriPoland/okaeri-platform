@@ -40,6 +40,7 @@ public class OkaeriBukkitPlugin extends JavaPlugin implements OkaeriPlatform {
     private final @Getter File file = super.getFile();
     private @Getter @Setter Injector injector;
     private @Getter @Setter ComponentCreator creator;
+    private ExecutionPlan plan;
 
     public OkaeriBukkitPlugin() {
         super();
@@ -85,8 +86,6 @@ public class OkaeriBukkitPlugin extends JavaPlugin implements OkaeriPlatform {
 
         plan.add(SHUTDOWN, new PersistenceShutdownTask());
     }
-
-    private ExecutionPlan plan;
 
     @Override
     @Deprecated

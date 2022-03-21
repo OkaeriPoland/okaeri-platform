@@ -37,8 +37,8 @@ import java.util.List;
 public class I18nColorsConfig extends OkaeriConfig {
 
     private List<I18nColorMatcher> matchers = Arrays.asList(
-            I18nColorMatcher.of("^.*(fail|rejected|not.?found|limit.?reached|already|cannot|invalid|error|alert|warning).*$", ChatColor.RED, ChatColor.YELLOW),
-            I18nColorMatcher.of("^.*(success|succeeded|accepted|created|removed|added|done|ended).*$", ChatColor.GREEN, ChatColor.WHITE),
-            I18nColorMatcher.of("^.*$", ChatColor.YELLOW, ChatColor.WHITE)
+        I18nColorMatcher.of("^.*(fail|rejected|not.?found|limit.?reached|already|cannot|invalid|error|alert|warning).*$", ChatColor.RED, ChatColor.YELLOW),
+        I18nColorMatcher.of("^.*(success|succeeded|accepted|created|removed|added|done|ended).*$", ChatColor.GREEN, ChatColor.WHITE),
+        I18nColorMatcher.of("^.*$", ChatColor.YELLOW, ChatColor.WHITE)
     );
 }
