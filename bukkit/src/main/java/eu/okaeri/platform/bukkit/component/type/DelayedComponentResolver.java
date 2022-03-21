@@ -33,7 +33,7 @@ public class DelayedComponentResolver implements ComponentResolver {
     public Object make(@NonNull ComponentCreator creator, @NonNull BeanManifest manifest, @NonNull Injector injector) {
 
         long start = System.currentTimeMillis();
-        Runnable runnable = ComponentHelper.manifestToRunnable(manifest, injector);
+        Runnable runnable = ComponentHelper.manifestToRunnableWithRegister(manifest, injector);
 
         Delayed delayed = manifest.getSource() == BeanSource.METHOD
                 ? manifest.getMethod().getAnnotation(Delayed.class)
