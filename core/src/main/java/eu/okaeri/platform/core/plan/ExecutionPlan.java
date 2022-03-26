@@ -27,8 +27,8 @@ public class ExecutionPlan {
         this.tasks.computeIfAbsent(phase, (t) -> new ArrayList<>()).add(task);
     }
 
-    public void addMethods(@NonNull Object parent) {
-        for (Method declaredMethod : parent.getClass().getDeclaredMethods()) {
+    public void addMethods(@NonNull Object parent, @NonNull Class<?> sourceClazz) {
+        for (Method declaredMethod : sourceClazz.getDeclaredMethods()) {
             Planned[] annotations = declaredMethod.getAnnotationsByType(Planned.class);
             if (annotations.length != 1) {
                 continue;
@@ -38,6 +38,10 @@ public class ExecutionPlan {
             declaredMethod.setAccessible(true);
             this.add(phase, new PlannedMethodTask(parent, declaredMethod));
         }
+    }
+
+    public void addMethods(@NonNull Object parent) {
+        this.addMethods(parent, parent.getClass());
     }
 
     public ExecutionResult execute() {
