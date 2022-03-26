@@ -1,6 +1,5 @@
 package eu.okaeri.platform.minecraft.i18n;
 
-import eu.okaeri.configs.schema.ConfigDeclaration;
 import eu.okaeri.configs.schema.FieldDeclaration;
 import eu.okaeri.i18n.configs.LocaleConfig;
 import eu.okaeri.i18n.configs.impl.MOCI18n;
@@ -23,13 +22,16 @@ public abstract class MI18n extends MOCI18n {
     private static final Pattern MESSAGE_FIELD_PATTERN = Pattern.compile("\\{[^{]+}");
 
     private final @Getter Map<Locale, LocaleConfig> configs = new HashMap<>();
+    private final @Getter Map<Locale, Map<String, Object>> rawConfigs = new HashMap<>();
+
     private final @Getter String prefixField;
     private final @Getter String prefixMarker;
     private @Getter @Setter I18nPrefixProvider prefixProvider;
 
     @Override
     public MI18n registerConfig(@NonNull Locale locale, @NonNull LocaleConfig config) {
-        this.update(config);
+        this.rawConfigs.putIfAbsent(locale, config.asMap(config.getConfigurer(), true));
+        this.update(locale, config);
         this.configs.put(locale, config);
         return (MI18n) super.registerConfig(locale, config);
     }
@@ -49,12 +51,19 @@ public abstract class MI18n extends MOCI18n {
         return message;
     }
 
-    protected void update(@NonNull LocaleConfig config) {
+    protected void update(@NonNull Locale locale, @NonNull LocaleConfig config) {
 
-        if ((config.getBindFile() != null) && Files.exists(config.getBindFile())) config.load(true);
-        ConfigDeclaration declaration = config.getDeclaration();
+        // load from file
+        if ((config.getBindFile() != null) && Files.exists(config.getBindFile())) {
+            config.load(true);
+        }
+        // use previous known if available
+        else if (this.rawConfigs.containsKey(locale)) {
+            config.load(this.rawConfigs.get(locale));
+        }
 
-        for (FieldDeclaration field : declaration.getFields()) {
+        // update fields
+        for (FieldDeclaration field : config.getDeclaration().getFields()) {
 
             if (!(field.getValue() instanceof String)) {
                 continue;
@@ -89,7 +98,7 @@ public abstract class MI18n extends MOCI18n {
             }
         }
 
-        String prefix = this.color((String) declaration.getFields().stream()
+        String prefix = this.color((String) config.getDeclaration().getFields().stream()
             .filter(field -> this.getPrefixField().equals(field.getField().getName()))
             .findFirst()
             .map(FieldDeclaration::getValue)

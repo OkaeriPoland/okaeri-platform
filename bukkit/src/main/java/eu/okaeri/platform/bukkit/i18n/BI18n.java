@@ -49,9 +49,7 @@ public class BI18n extends MI18n {
         }
 
         for (Map.Entry<Locale, LocaleConfig> entry : this.getConfigs().entrySet()) {
-            LocaleConfig config = entry.getValue();
-            this.update(config);
-            super.registerConfig(entry.getKey(), config);
+            super.registerConfig(entry.getKey(), entry.getValue());
         }
     }
 

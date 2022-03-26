@@ -11,7 +11,6 @@ import lombok.NonNull;
 import net.md_5.bungee.api.ChatColor;
 
 import java.nio.file.Files;
-import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
@@ -21,7 +20,6 @@ public class BI18n extends MI18n {
 
     private static final Pattern ALT_COLOR_PATTERN = Pattern.compile("&[0-9A-Fa-fK-Ok-oRXrx]");
 
-    private final @Getter Map<Locale, LocaleConfig> configs = new HashMap<>();
     private final @Getter I18nColorsConfig colorsConfig;
     private final @Getter PlaceholdersFactory placeholdersFactory;
 
@@ -51,9 +49,7 @@ public class BI18n extends MI18n {
         }
 
         for (Map.Entry<Locale, LocaleConfig> entry : this.getConfigs().entrySet()) {
-            LocaleConfig config = entry.getValue();
-            this.update(config);
-            super.registerConfig(entry.getKey(), config);
+            super.registerConfig(entry.getKey(), entry.getValue());
         }
     }
 
