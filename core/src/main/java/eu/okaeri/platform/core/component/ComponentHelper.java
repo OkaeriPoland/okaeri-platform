@@ -1,6 +1,5 @@
 package eu.okaeri.platform.core.component;
 
-import eu.okaeri.injector.Injectable;
 import eu.okaeri.injector.Injector;
 import eu.okaeri.injector.annotation.Inject;
 import eu.okaeri.injector.annotation.PostConstruct;
@@ -123,14 +122,12 @@ public final class ComponentHelper {
     }
 
     public static void closeAllOfType(@NonNull Class<? extends Closeable> type, @NonNull Injector injector) {
-        injector.allOf(type).stream()
-            .map(Injectable::getObject)
-            .forEach(closeable -> {
-                try {
-                    closeable.close();
-                } catch (Throwable ignored) {
-                }
-            });
+        injector.streamOf(type).forEach(closeable -> {
+            try {
+                closeable.close();
+            } catch (Throwable ignored) {
+            }
+        });
     }
 
     public static ComponentMessageBuilder buildComponentMessage() {
