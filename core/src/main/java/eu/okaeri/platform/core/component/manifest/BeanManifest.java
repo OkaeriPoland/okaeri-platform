@@ -8,8 +8,7 @@ import eu.okaeri.platform.core.OkaeriPlatform;
 import eu.okaeri.platform.core.annotation.*;
 import eu.okaeri.platform.core.component.ExternalResourceProvider;
 import eu.okaeri.platform.core.component.creator.ComponentCreator;
-import lombok.Data;
-import lombok.NonNull;
+import lombok.*;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
@@ -206,6 +205,23 @@ public class BeanManifest {
     private List<BeanManifest> depends;
     private List<External> externals;
     private Map<DependencyPair, Integer> failCounter = new HashMap<>();
+
+    @Override
+    public String toString() {
+        return "BeanManifest(" +
+            "name='" + this.name + '\'' +
+            ", object=" + this.object +
+            ", type=" + this.type +
+            ", source=" + this.source +
+            ", parent=" + (this.parent == null ? null : "[present]") +
+            ", method=" + this.method +
+            ", preload=" + this.preload +
+            ", fullLoad=" + this.fullLoad +
+            ", depends=" + (this.depends == null ? null : "[present (" + this.depends.size() + ")]") +
+            ", externals=" + (this.externals == null ? null : "[present (" + this.externals.size() + ")]") +
+            ", failCounter=" + this.failCounter +
+            ')';
+    }
 
     public BeanManifest withDepend(int pos, @NonNull BeanManifest beanManifest) {
         this.depends.add(pos, beanManifest);

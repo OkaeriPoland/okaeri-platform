@@ -72,8 +72,11 @@ public class ConfigurationComponentResolver implements ComponentResolver {
                 .distinct()
                 .toArray(OkaeriSerdesPack[]::new);
 
+            String extension = configurer.getExtensions().isEmpty() ? "bin" : configurer.getExtensions().get(0);
+            String resolvedPath = path.replace("{ext}", extension);
+
             OkaeriConfig config = ConfigManager.create(configType, (it) -> {
-                it.withBindFile(new File(this.dataFolder, path));
+                it.withBindFile(new File(this.dataFolder, resolvedPath));
                 it.withConfigurer(new OkaeriValidator(configurer, defaultNotNull), serdesPacks);
                 it.saveDefaults();
                 it.load(true);

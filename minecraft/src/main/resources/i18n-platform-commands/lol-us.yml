@@ -1,8 +1,8 @@
-commands-system-usage-template: |-
+commandSystemUsageTemplate: |-
   ~&eCowwect u-uwusage of /{label}:
   {entries}
-commands-system-permissions-error: '~Nyo pewmission {permission}!'
-commands-system-command-error: '~Ewwow: {message}'
-commands-system-unknown-error: '~Unknyown ewwow!!11 Wefewence ID: {id}'
-commands-system-console-only-error: '~This c-c-command is fow consowe onwy.'
-commands-system-player-only-error: '~This c-c-command is fow pwayews onwy.'
+commandSystemPermissionsError: '~Nyo pewmission {permission}!'
+commandSystemCommandError: '~Ewwow: {message}'
+commandSystemUnknownError: '~Unknyown ewwow!!11 Wefewence ID: {id}'
+commandSystemConsoleOnlyError: '~This c-c-command is fow consowe onwy.'
+commandSystemPlayerOnlyError: '~This c-c-command is fow pwayews onwy.'

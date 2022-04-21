@@ -1,0 +1,61 @@
+package eu.okaeri.platform.core.commands;
+
+import eu.okaeri.acl.guardian.GuardianContext;
+import eu.okaeri.commands.guard.context.DefaultGuardianContextProvider;
+import eu.okaeri.commands.meta.CommandMeta;
+import eu.okaeri.commands.meta.InvocationMeta;
+import eu.okaeri.commands.service.CommandService;
+import eu.okaeri.platform.core.OkaeriPlatform;
+import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
+import lombok.SneakyThrows;
+
+import java.lang.reflect.Field;
+import java.util.HashSet;
+import java.util.Set;
+
+@RequiredArgsConstructor
+public class PlatformGuardianContextProvider extends DefaultGuardianContextProvider {
+
+    private final OkaeriPlatform platform;
+
+    @Override
+    @SneakyThrows
+    public GuardianContext provide(@NonNull InvocationMeta invocationMeta) {
+
+        GuardianContext guardianContext = super.provide(invocationMeta);
+        Set<String> alreadyPresent = new HashSet<>(guardianContext.getData().keySet());
+        Set<String> clazzPresent = new HashSet<>();
+
+        CommandMeta command = invocationMeta.getInvocation().getCommand();
+        if (command != null) {
+            CommandService implementor = command.getService().getImplementor();
+
+            // add declared fields
+            for (Field declaredField : implementor.getClass().getDeclaredFields()) {
+                declaredField.setAccessible(true);
+                clazzPresent.add(declaredField.getName());
+                guardianContext.with(declaredField.getName(), declaredField.get(implementor));
+            }
+
+            // add fields (accessible from superclasses)
+            for (Field field : implementor.getClass().getFields()) {
+                if (clazzPresent.contains(field.getName())) {
+                    continue;
+                }
+                field.setAccessible(true);
+                clazzPresent.add(field.getName());
+                guardianContext.with(field.getName(), field.get(implementor));
+            }
+        }
+
+        // add injector
+        this.platform.getInjector().stream()
+            .filter(injectable -> !injectable.getName().isEmpty()) // no unnamed
+            .filter(injectable -> !alreadyPresent.contains(injectable.getName())) // no overriding super
+            .filter(injectable -> !clazzPresent.contains(injectable.getName())) // no overriding class local
+            .forEach(injectable -> guardianContext.with(injectable.getName(), injectable.getObject()));
+
+        return guardianContext;
+    }
+}

@@ -12,7 +12,7 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 public @interface Configuration {
 
-    String path() default "config.yml";
+    String path() default "config.{ext}";
     Class<? extends Configurer> provider() default DEFAULT.class;
     Class<? extends OkaeriSerdesPack>[] serdes() default {};
     boolean defaultNotNull() default true;

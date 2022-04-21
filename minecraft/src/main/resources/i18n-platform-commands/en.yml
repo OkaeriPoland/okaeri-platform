@@ -1,10 +1,10 @@
-commands-system-usage-template: |-
+commandSystemUsageTemplate: |-
   ~&eCorrect usage of /{label}:
   {entries}
-commands-system-usage-entry: '&r - /{usage}'
-commands-system-usage-entry-description: '   &7{description}'
-commands-system-permissions-error: '~No permission {permission}!'
-commands-system-command-error: '~Error: {message}'
-commands-system-unknown-error: '~Unknown error! Reference ID: {id}'
-commands-system-console-only-error: '~This command is for console only.'
-commands-system-player-only-error: '~This command is for players only.'
+commandSystem-usage-entry: '&r - /{usage}'
+commandSystem-usage-entry-description: '   &7{description}'
+commandSystemPermissionsError: '~No permission {permission}!'
+commandSystemCommandError: '~Error: {message}'
+commandSystemUnknownError: '~Unknown error! Reference ID: {id}'
+commandSystemConsoleOnlyError: '~This command is for console only.'
+commandSystemPlayerOnlyError: '~This command is for players only.'

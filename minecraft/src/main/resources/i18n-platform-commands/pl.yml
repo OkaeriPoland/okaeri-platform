@@ -1,8 +1,8 @@
-commands-system-usage-template: |-
+commandSystemUsageTemplate: |-
   ~&ePoprawne użycie /{label}:
   {entries}
-commands-system-permissions-error: '~Brak uprawnienia {permission}!'
-commands-system-command-error: '~Błąd: {message}'
-commands-system-unknown-error: '~Nieznany błąd! Numer referencyjny: {id}'
-commands-system-console-only-error: '~Ta komenda jest tylko dla konsoli.'
-commands-system-player-only-error: '~Ta komenda jest tylko dla graczy.'
+commandSystemPermissionsError: '~Brak uprawnienia {permission}!'
+commandSystemCommandError: '~Błąd: {message}'
+commandSystemUnknownError: '~Nieznany błąd! Numer referencyjny: {id}'
+commandSystemConsoleOnlyError: '~Ta komenda jest tylko dla konsoli.'
+commandSystemPlayerOnlyError: '~Ta komenda jest tylko dla graczy.'

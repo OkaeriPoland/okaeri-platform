@@ -1,8 +1,8 @@
-commands-system-usage-template: |-
+commandSystemUsageTemplate: |-
   ~&eПравильное использование /{label}:
   {entries}
-commands-system-permissions-error: '~Нет разрешения {permission}!'
-commands-system-command-error: '~Ошибка: {message}'
-commands-system-unknown-error: '~Неизвестная ошибка! Идентификатор:  {id}'
-commands-system-console-only-error: '~Эта команда предназначена только для консоли.'
-commands-system-player-only-error: '~Эта команда предназначена только для игроков.'
+commandSystemPermissionsError: '~Нет разрешения {permission}!'
+commandSystemCommandError: '~Ошибка: {message}'
+commandSystemUnknownError: '~Неизвестная ошибка! Идентификатор:  {id}'
+commandSystemConsoleOnlyError: '~Эта команда предназначена только для консоли.'
+commandSystemPlayerOnlyError: '~Эта команда предназначена только для игроков.'

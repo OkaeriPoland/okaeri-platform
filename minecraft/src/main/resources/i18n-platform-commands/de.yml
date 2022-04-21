@@ -1,8 +1,8 @@
-commands-system-usage-template: |-
+commandSystemUsageTemplate: |-
   ~&eRichtige Verwendung von /{label}:
   {entries}
-commands-system-permissions-error: '~Keine Permission {permission}!'
-commands-system-command-error: '~Fehler: {message}'
-commands-system-unknown-error: '~Unbekannter Fehler! Referenz ID: {id}'
-commands-system-console-only-error: '~Dieser Befehl ist nur für die Konsole.'
-commands-system-player-only-error: '~Dieser Befehl ist nur für Spieler.'
+commandSystemPermissionsError: '~Keine Permission {permission}!'
+commandSystemCommandError: '~Fehler: {message}'
+commandSystemUnknownError: '~Unbekannter Fehler! Referenz ID: {id}'
+commandSystemConsoleOnlyError: '~Dieser Befehl ist nur für die Konsole.'
+commandSystemPlayerOnlyError: '~Dieser Befehl ist nur für Spieler.'

@@ -1,8 +1,8 @@
-commands-system-usage-template: |-
+commandSystemUsageTemplate: |-
   ~&eCorrect usage o' /{label}:
   {entries}
-commands-system-permissions-error: '~Ye ''ave no permission {permission}!'
-commands-system-command-error: '~Error ''appened: {message}'
-commands-system-unknown-error: '~Unknown error! Yer reference ID: {id}'
-commands-system-console-only-error: '~This here command be fer console only.'
-commands-system-player-only-error: '~This here command be fer players only.'
+commandSystemPermissionsError: '~Ye ''ave no permission {permission}!'
+commandSystemCommandError: '~Error ''appened: {message}'
+commandSystemUnknownError: '~Unknown error! Yer reference ID: {id}'
+commandSystemConsoleOnlyError: '~This here command be fer console only.'
+commandSystemPlayerOnlyError: '~This here command be fer players only.'

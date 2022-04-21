@@ -5,7 +5,7 @@
     <parent>
         <artifactId>okaeri-platform</artifactId>
         <groupId>eu.okaeri</groupId>
-        <version>0.4.0-preview62</version>
+        <version>0.4.0-preview64</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
@@ -16,7 +16,7 @@
         <dependency>
             <groupId>eu.okaeri</groupId>
             <artifactId>okaeri-platform-minecraft</artifactId>
-            <version>0.4.0-preview62</version>
+            <version>0.4.0-preview64</version>
         </dependency>
 
         <!-- commons -->
@@ -43,10 +43,15 @@
             <version>${library.okaeri-configs.version}</version>
         </dependency>
 
-        <!-- messages -->
+        <!-- placeholders -->
         <dependency>
             <groupId>eu.okaeri</groupId>
             <artifactId>okaeri-placeholders-bukkit</artifactId>
+            <version>${library.okaeri-placeholders.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>eu.okaeri</groupId>
+            <artifactId>okaeri-placeholders-reflect</artifactId>
             <version>${library.okaeri-placeholders.version}</version>
         </dependency>
 
@@ -60,6 +65,11 @@
             <groupId>eu.okaeri</groupId>
             <artifactId>okaeri-commands-brigadier</artifactId>
             <version>${library.okaeri-commands.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>eu.okaeri</groupId>
+            <artifactId>okaeri-acl-reflect</artifactId>
+            <version>${library.okaeri-acl.version}</version>
         </dependency>
 
         <!-- spigot -->
