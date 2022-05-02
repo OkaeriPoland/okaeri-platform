@@ -7,11 +7,9 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import eu.okaeri.persistence.PersistenceCollection;
 import eu.okaeri.persistence.PersistencePath;
 import eu.okaeri.persistence.document.DocumentPersistence;
-import eu.okaeri.persistence.document.DocumentSaver;
 
 public abstract class DocumentMixIn {
 
-    @JsonIgnore private DocumentSaver saver;
     @JsonIgnore private DocumentPersistence persistence;
     @JsonIgnore private PersistenceCollection collection;
 

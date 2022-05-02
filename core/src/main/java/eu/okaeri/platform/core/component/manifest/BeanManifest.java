@@ -96,23 +96,22 @@ public class BeanManifest {
             .map(method -> BeanManifest.of(manifest, method, creator))
             .collect(Collectors.toList()));
 
-        boolean constructorDepends = false;
-        for (Constructor<?> constructor : clazz.getConstructors()) {
-            if (constructor.getAnnotation(Inject.class) != null) {
-                depends.addAll(Arrays.stream(constructor.getParameters())
-                    .map(param -> BeanManifest.of(param, true))
-                    .collect(Collectors.toList()));
-                constructorDepends = true;
-                break;
-            }
-        }
+        List<Constructor<?>> injectConstructors = Arrays.stream(clazz.getConstructors())
+            .filter(constructor -> constructor.getAnnotation(Inject.class) != null)
+            .collect(Collectors.toList());
 
-        if (!constructorDepends) {
-            depends.addAll(Arrays.stream(clazz.getDeclaredFields())
-                .filter(field -> field.getAnnotation(Inject.class) != null)
-                .map(BeanManifest::of)
+        if (injectConstructors.size() > 1) {
+            throw new IllegalArgumentException("More than one constructor is marked with @Inject in " + clazz);
+        } else if (!injectConstructors.isEmpty()) {
+            depends.addAll(Arrays.stream(injectConstructors.get(0).getParameters())
+                .map(param -> BeanManifest.of(param, true))
                 .collect(Collectors.toList()));
         }
+
+        depends.addAll(Arrays.stream(clazz.getDeclaredFields())
+            .filter(field -> field.getAnnotation(Inject.class) != null)
+            .map(BeanManifest::of)
+            .collect(Collectors.toList()));
 
         return manifest;
     }
