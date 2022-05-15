@@ -2,13 +2,13 @@ package eu.okaeri.platform.bukkit.i18n;
 
 import eu.okaeri.commons.bukkit.UnsafeBukkitCommons;
 import eu.okaeri.i18n.provider.LocaleProvider;
-import lombok.AllArgsConstructor;
-import lombok.NoArgsConstructor;
-import lombok.NonNull;
+import lombok.*;
 import org.bukkit.entity.Player;
 
 import java.util.Locale;
 
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 public class PlayerLocaleProvider implements LocaleProvider<Player> {

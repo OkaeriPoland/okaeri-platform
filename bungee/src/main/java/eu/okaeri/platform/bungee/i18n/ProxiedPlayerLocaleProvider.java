@@ -1,13 +1,13 @@
 package eu.okaeri.platform.bungee.i18n;
 
 import eu.okaeri.i18n.provider.LocaleProvider;
-import lombok.AllArgsConstructor;
-import lombok.NoArgsConstructor;
-import lombok.NonNull;
+import lombok.*;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 
 import java.util.Locale;
 
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 public class ProxiedPlayerLocaleProvider implements LocaleProvider<ProxiedPlayer> {
