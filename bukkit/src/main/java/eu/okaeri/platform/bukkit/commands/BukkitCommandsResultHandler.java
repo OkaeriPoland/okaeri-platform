@@ -20,7 +20,10 @@ public class BukkitCommandsResultHandler extends BukkitResultHandler {
         }
 
         if (object instanceof Message) {
-            sender.sendMessage(((Message) object).apply());
+            String result = ((Message) object).apply();
+            if (!result.isEmpty()) {
+                sender.sendMessage(result);
+            }
             return true;
         }
 

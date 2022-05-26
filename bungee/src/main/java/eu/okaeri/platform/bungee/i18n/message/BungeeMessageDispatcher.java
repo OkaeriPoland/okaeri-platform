@@ -95,6 +95,11 @@ public class BungeeMessageDispatcher implements MessageDispatcher<Message> {
         this.fields.forEach(context::with);
         String contents = context.apply();
 
+        // do not dispatch empty messages
+        if (contents.isEmpty()) {
+            return this;
+        }
+
         // target is chat or receiver is not a player
         if (this.target == BungeeMessageTarget.CHAT || !(receiver instanceof ProxiedPlayer)) {
             receiver.sendMessage(TextComponent.fromLegacyText(contents));
