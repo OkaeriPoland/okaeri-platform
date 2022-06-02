@@ -28,6 +28,10 @@ Whole ecosystems built on top of the best okaeri packages.
 We believe Okaeri Platform is best learned by examples, so feel free to explore README files of supported platforms and linked example projects. 
 This approach also allows us to keep examples always up-to-date. You can also ask/search for any related questions in [discussions](https://github.com/OkaeriPoland/okaeri-platform/discussions).
 
+## Built with Okaeri Platform
+- [okaeri-poly](https://github.com/OkaeriPoland/okaeri-poly): Minecraft scripting plugin with the support for Groovy, JavaScript, and Python — a great addition to traditional plugins and rapid prototyping tool
+- [okaeri-minecraft](https://github.com/OkaeriPoland/okaeri-minecraft): Minecraft plugins built for various [okaeri services](https://www.okaeri.eu), based around integrating Minecraft servers with the WEB APIs
+
 ## Recommendations
 It is highly recommended to use `-parameters` compiler flag for better overall feature support.
 
