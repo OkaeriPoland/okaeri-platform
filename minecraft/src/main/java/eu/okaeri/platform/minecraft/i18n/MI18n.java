@@ -72,14 +72,19 @@ public abstract class MI18n extends MOCI18n {
             String fieldName = field.getName().toLowerCase(Locale.ROOT);
             String fieldValue = String.valueOf(field.getValue());
 
-            // prefix
+            // ignore prefix/coloring of empty messages
+            if (fieldValue.isEmpty()) {
+                continue;
+            }
+
+            // resolve prefix or empty if not applicable
             String localPrefix = "";
             if (fieldValue.startsWith(this.getPrefixMarker())) {
                 fieldValue = fieldValue.substring(this.getPrefixMarker().length());
                 localPrefix = this.getPrefixMarker();
             }
 
-            // already contains colors - ignore
+            // do not auto-color messages with predefined colors
             if (this.hasColors(fieldValue)) {
                 field.updateValue(localPrefix + this.color(fieldValue));
                 continue;
