@@ -9,12 +9,16 @@
 Whole ecosystems built on top of the best okaeri packages.
 
 - Based on dependency injection/beans/components schema:
-  - subcomponent registration with Register(component class) annotation
-  - automatic field injections and bean creation
+  - `@Component` registration with `@Register` or `@Scan`
+  - automatic field/constructor injection and bean creation
 
 - Lots of platform specific utilities:
   - register platform specific services as components
   - use commons for the most boring tasks and cleaner code
+
+## Real-life uses
+- [okaeri-poly](https://github.com/OkaeriPoland/okaeri-poly): Minecraft scripting plugin with the support for Groovy, JavaScript, and Python — a great addition to traditional plugins and a rapid prototyping tool
+- [okaeri-minecraft](https://github.com/OkaeriPoland/okaeri-minecraft): Minecraft plugins built for various [okaeri services](https://www.okaeri.eu), based around integrating Minecraft servers with the WEB APIs
 
 ## Supported platforms
 - **Minecraft**
@@ -27,10 +31,6 @@ Whole ecosystems built on top of the best okaeri packages.
 ## Documentation
 We believe Okaeri Platform is best learned by examples, so feel free to explore README files of supported platforms and linked example projects. 
 This approach also allows us to keep examples always up-to-date. You can also ask/search for any related questions in [discussions](https://github.com/OkaeriPoland/okaeri-platform/discussions).
-
-## Built with Okaeri Platform
-- [okaeri-poly](https://github.com/OkaeriPoland/okaeri-poly): Minecraft scripting plugin with the support for Groovy, JavaScript, and Python — a great addition to traditional plugins and rapid prototyping tool
-- [okaeri-minecraft](https://github.com/OkaeriPoland/okaeri-minecraft): Minecraft plugins built for various [okaeri services](https://www.okaeri.eu), based around integrating Minecraft servers with the WEB APIs
 
 ## Recommendations
 It is highly recommended to use `-parameters` compiler flag for better overall feature support.
