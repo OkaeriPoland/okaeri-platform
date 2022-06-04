@@ -56,24 +56,23 @@ public class TemplateItem {
         }
 
         if (this.i18n != null && entity != null && this.nameKey != null) {
-            String name = this.i18n.get(entity, this.nameKey).apply();
-            itemMeta.setDisplayName(name);
+            Message message = this.i18n.get(entity, this.nameKey);
+            this.fields.forEach(message::with);
+            itemMeta.setDisplayName(message.apply());
         }
-
-        if (itemMeta.getDisplayName() != null) {
+        else if (itemMeta.getDisplayName() != null) {
             Message message = Message.of(itemMeta.getDisplayName());
             this.fields.forEach(message::with);
             itemMeta.setDisplayName(message.apply());
         }
 
         if (this.i18n != null && entity != null && this.descriptionKey != null) {
-            String fullLore = this.i18n.get(entity, this.descriptionKey).apply();
-            itemMeta.setLore(Arrays.asList(fullLore.split("\n")));
+            Message message = this.i18n.get(entity, this.descriptionKey);
+            this.fields.forEach(message::with);
+            itemMeta.setLore(Arrays.asList(message.apply().split("\n")));
         }
-
-        if (itemMeta.getLore() != null) {
-            String fullLore = String.join("\n", itemMeta.getLore());
-            Message message = Message.of(fullLore);
+        else if (itemMeta.getLore() != null) {
+            Message message = Message.of(String.join("\n", itemMeta.getLore()));
             this.fields.forEach(message::with);
             itemMeta.setLore(Arrays.asList(message.apply().split("\n")));
         }
