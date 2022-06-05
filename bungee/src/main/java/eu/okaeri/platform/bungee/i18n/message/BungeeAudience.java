@@ -1,5 +1,6 @@
 package eu.okaeri.platform.bungee.i18n.message;
 
+import eu.okaeri.i18n.message.Message;
 import eu.okaeri.platform.core.i18n.message.Audience;
 import lombok.NonNull;
 import net.md_5.bungee.api.ProxyServer;
@@ -9,7 +10,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.stream.Collectors;
 
-public class BungeeAudience extends Audience {
+public class BungeeAudience extends Audience<Message> {
 
     protected BungeeAudience() {
         this(new ArrayList<>());

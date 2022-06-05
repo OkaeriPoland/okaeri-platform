@@ -5,7 +5,7 @@ import eu.okaeri.i18n.message.Message;
 import eu.okaeri.platform.bungee.i18n.message.BungeeMessageDispatcher;
 import eu.okaeri.platform.core.placeholder.PlaceholdersFactory;
 import eu.okaeri.platform.minecraft.i18n.I18nMessageColors;
-import eu.okaeri.platform.minecraft.i18n.MI18n;
+import eu.okaeri.platform.minecraft.i18n.base.MessageI18n;
 import lombok.Getter;
 import lombok.NonNull;
 import net.md_5.bungee.api.ChatColor;
@@ -16,7 +16,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.regex.Pattern;
 
-public class BI18n extends MI18n {
+public class BI18n extends MessageI18n {
 
     private static final Pattern ALT_COLOR_PATTERN = Pattern.compile("&[0-9A-Fa-fK-Ok-oRXrx]");
 

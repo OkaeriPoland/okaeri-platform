@@ -1,4 +1,4 @@
-package eu.okaeri.platform.minecraft.i18n;
+package eu.okaeri.platform.minecraft.commands;
 
 import eu.okaeri.i18n.configs.LocaleConfig;
 import eu.okaeri.platform.core.annotation.Messages;

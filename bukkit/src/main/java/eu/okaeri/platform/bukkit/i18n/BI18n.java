@@ -1,11 +1,11 @@
 package eu.okaeri.platform.bukkit.i18n;
 
 import eu.okaeri.i18n.configs.LocaleConfig;
-import eu.okaeri.i18n.message.Message;
 import eu.okaeri.platform.bukkit.i18n.message.BukkitMessageDispatcher;
+import eu.okaeri.platform.bukkit.i18n.minedown.ComponentMessage;
+import eu.okaeri.platform.bukkit.i18n.minedown.MinedownMessageI18n;
 import eu.okaeri.platform.core.placeholder.PlaceholdersFactory;
 import eu.okaeri.platform.minecraft.i18n.I18nMessageColors;
-import eu.okaeri.platform.minecraft.i18n.MI18n;
 import lombok.Getter;
 import lombok.NonNull;
 import org.bukkit.ChatColor;
@@ -16,7 +16,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.regex.Pattern;
 
-public class BI18n extends MI18n {
+public class BI18n extends MinedownMessageI18n {
 
     private static final Pattern ALT_COLOR_PATTERN = Pattern.compile("&[0-9A-Fa-fK-Ok-oRXrx]");
 
@@ -31,12 +31,12 @@ public class BI18n extends MI18n {
 
     @Override
     public BukkitMessageDispatcher get(@NonNull String key) {
-        return new BukkitMessageDispatcher(this, key, this.getPlaceholders(), this.getPlaceholdersFactory());
+        return new BukkitMessageDispatcher(this, key, this.getPlaceholdersFactory());
     }
 
     @Override
-    public Message get(@NonNull Object entity, @NonNull String key) {
-        Message message = super.get(entity, key);
+    public ComponentMessage get(@NonNull Object entity, @NonNull String key) {
+        ComponentMessage message = super.get(entity, key);
         this.getPlaceholdersFactory().provide(entity).forEach(message::with);
         return message;
     }

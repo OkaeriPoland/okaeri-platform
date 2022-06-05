@@ -1,6 +1,5 @@
 package eu.okaeri.platform.core.i18n.message;
 
-import eu.okaeri.i18n.message.Message;
 import eu.okaeri.i18n.message.MessageDispatcher;
 import lombok.AccessLevel;
 import lombok.NonNull;
@@ -13,35 +12,28 @@ import java.util.Collection;
 import java.util.List;
 
 @RequiredArgsConstructor(access = AccessLevel.PUBLIC)
-public class Audience implements Closeable {
+public class Audience<M> implements Closeable {
 
     protected final Collection<Object> targets;
-    protected final List<MessageDispatcher<Message>> messages = new ArrayList<>();
+    protected final List<MessageDispatcher<M>> messages = new ArrayList<>();
 
-    public Audience andOf(@NonNull Object... targets) {
+    public Audience<M> andOf(@NonNull Object... targets) {
         this.targets.addAll(Arrays.asList(targets));
         return this;
     }
 
-    public Audience andOf(@NonNull Collection<Object> targets) {
+    public Audience<M> andOf(@NonNull Collection<Object> targets) {
         this.targets.addAll(targets);
         return this;
     }
 
-    public Audience accept(@NonNull MessageDispatcher<Message> dispatcher) {
+    public Audience<M> accept(@NonNull MessageDispatcher<M> dispatcher) {
         this.messages.add(dispatcher);
         return this;
     }
 
-    @SafeVarargs
-    public final Audience accept(@NonNull MessageDispatcher<Message>... dispatchers) {
-        if (dispatchers.length == 0) {
-            return this;
-        }
-        if (dispatchers.length == 1) {
-            this.messages.add(dispatchers[0]);
-            return this;
-        }
+    @SuppressWarnings("unchecked")
+    public Audience<M> accept(@NonNull MessageDispatcher<M>... dispatchers) {
         this.messages.addAll(Arrays.asList(dispatchers));
         return this;
     }
@@ -49,7 +41,7 @@ public class Audience implements Closeable {
     @Override
     public void close() {
         for (Object target : this.targets) {
-            for (MessageDispatcher<Message> message : this.messages) {
+            for (MessageDispatcher<M> message : this.messages) {
                 message.sendTo(target);
             }
         }

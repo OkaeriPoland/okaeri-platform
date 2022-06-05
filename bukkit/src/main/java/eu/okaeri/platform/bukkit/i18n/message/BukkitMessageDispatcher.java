@@ -1,12 +1,9 @@
 package eu.okaeri.platform.bukkit.i18n.message;
 
 import eu.okaeri.commons.bukkit.UnsafeBukkitCommons;
-import eu.okaeri.i18n.message.Message;
 import eu.okaeri.i18n.message.MessageDispatcher;
-import eu.okaeri.placeholders.Placeholders;
-import eu.okaeri.placeholders.context.PlaceholderContext;
-import eu.okaeri.placeholders.message.CompiledMessage;
 import eu.okaeri.platform.bukkit.i18n.BI18n;
+import eu.okaeri.platform.bukkit.i18n.minedown.ComponentMessage;
 import eu.okaeri.platform.core.placeholder.PlaceholdersFactory;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
@@ -22,11 +19,10 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 @RequiredArgsConstructor
-public class BukkitMessageDispatcher implements MessageDispatcher<Message> {
+public class BukkitMessageDispatcher implements MessageDispatcher<ComponentMessage> {
 
     private final BI18n i18n;
     private final String key;
-    private final Placeholders placeholders;
     private final PlaceholdersFactory placeholdersFactory;
     private final Map<String, Object> fields = new LinkedHashMap<>();
 
@@ -87,32 +83,34 @@ public class BukkitMessageDispatcher implements MessageDispatcher<Message> {
 
     public BukkitMessageDispatcher sendTo(@NonNull CommandSender receiver) {
 
-        CompiledMessage compiled = this.i18n.get(receiver, this.key).compiled();
-        PlaceholderContext context = PlaceholderContext.of(this.placeholders, compiled);
-        this.placeholdersFactory.provide(receiver).forEach(context::with);
-        this.fields.forEach(context::with);
-        String contents = context.apply();
+        ComponentMessage componentMessage = this.i18n.get(receiver, this.key);
+        this.placeholdersFactory.provide(receiver).forEach(componentMessage::with);
+        this.fields.forEach(componentMessage::with);
 
         // do not dispatch empty messages
-        if (contents.isEmpty()) {
+        if (componentMessage.raw().isEmpty()) {
             return this;
         }
 
         // target is chat or receiver is not a player
         if (this.target == BukkitMessageTarget.CHAT || !(receiver instanceof Player)) {
-            receiver.sendMessage(contents);
+            if (receiver instanceof Player) {
+                UnsafeBukkitCommons.sendComponent((Player) receiver, componentMessage.components(), UnsafeBukkitCommons.ChatTarget.CHAT);
+            } else {
+                UnsafeBukkitCommons.sendComponent(receiver, componentMessage.components());
+            }
             return this;
         }
 
         // action bar for player
         if (this.target == BukkitMessageTarget.ACTION_BAR) {
-            UnsafeBukkitCommons.sendMessage(((Player) receiver), contents, UnsafeBukkitCommons.ChatTarget.ACTION_BAR);
+            UnsafeBukkitCommons.sendMessage(((Player) receiver), componentMessage.apply(), UnsafeBukkitCommons.ChatTarget.ACTION_BAR);
             return this;
         }
 
         // title for player
         if (this.target == BukkitMessageTarget.TITLE) {
-            String[] parts = contents.split("\n", 2);
+            String[] parts = componentMessage.apply().split("\n", 2);
             String title = parts[0];
             String subtitle = parts.length > 1 ? parts[1] : "";
             UnsafeBukkitCommons.sendTitle(((Player) receiver), title, subtitle, this.titleFadeIn, this.titleStay, this.titleFadeOut);

@@ -1,13 +1,14 @@
-package eu.okaeri.platform.minecraft.i18n;
+package eu.okaeri.platform.minecraft.i18n.base;
 
 import eu.okaeri.configs.schema.FieldDeclaration;
 import eu.okaeri.i18n.configs.LocaleConfig;
-import eu.okaeri.i18n.configs.impl.MOCI18n;
-import eu.okaeri.i18n.message.Message;
-import lombok.Getter;
-import lombok.NonNull;
-import lombok.RequiredArgsConstructor;
-import lombok.Setter;
+import eu.okaeri.i18n.configs.OCI18n;
+import eu.okaeri.i18n.message.MessageDispatcher;
+import eu.okaeri.placeholders.Placeholders;
+import eu.okaeri.placeholders.message.CompiledMessage;
+import eu.okaeri.platform.minecraft.i18n.I18nMessageColors;
+import eu.okaeri.platform.minecraft.i18n.I18nPrefixProvider;
+import lombok.*;
 
 import java.nio.file.Files;
 import java.util.HashMap;
@@ -16,39 +17,27 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.regex.Pattern;
 
+@AllArgsConstructor
 @RequiredArgsConstructor
-public abstract class MI18n extends MOCI18n {
+public abstract class MinecraftI18n<T> extends OCI18n<CompiledMessage, T, MessageDispatcher<T>> {
 
     private static final Pattern MESSAGE_FIELD_PATTERN = Pattern.compile("\\{[^{]+}");
 
-    private final @Getter Map<Locale, LocaleConfig> configs = new HashMap<>();
-    private final @Getter Map<Locale, Map<String, Object>> rawConfigs = new HashMap<>();
+    protected final @Getter Map<Locale, LocaleConfig> configs = new HashMap<>();
+    protected final @Getter Map<Locale, Map<String, Object>> rawConfigs = new HashMap<>();
 
-    private final @Getter String prefixField;
-    private final @Getter String prefixMarker;
-    private @Getter @Setter I18nPrefixProvider prefixProvider;
+    protected final @Getter String prefixField;
+    protected final @Getter String prefixMarker;
+
+    protected @Getter @Setter Placeholders placeholders;
+    protected @Getter @Setter I18nPrefixProvider prefixProvider;
 
     @Override
-    public MI18n registerConfig(@NonNull Locale locale, @NonNull LocaleConfig config) {
+    public MinecraftI18n<T> registerConfig(@NonNull Locale locale, @NonNull LocaleConfig config) {
         this.rawConfigs.putIfAbsent(locale, config.asMap(config.getConfigurer(), true));
         this.update(locale, config);
         this.configs.put(locale, config);
-        return (MI18n) super.registerConfig(locale, config);
-    }
-
-    @Override
-    public Message get(@NonNull Object entity, @NonNull String key) {
-
-        Message message = super.get(entity, key);
-        String raw = message.raw();
-
-        if (raw.startsWith(this.getPrefixMarker()) && (this.getPrefixProvider() != null)) {
-            raw = raw.substring(this.getPrefixMarker().length());
-            String prefix = this.getPrefixProvider().getPrefix(entity, key);
-            return Message.of(this.getPlaceholders(), prefix + raw);
-        }
-
-        return message;
+        return (MinecraftI18n<T>) super.registerConfig(locale, config);
     }
 
     protected void update(@NonNull Locale locale, @NonNull LocaleConfig config) {

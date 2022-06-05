@@ -4,7 +4,7 @@ import eu.okaeri.platform.bukkit.OkaeriBukkitPlugin;
 import eu.okaeri.platform.core.component.creator.ComponentCreator;
 import eu.okaeri.platform.core.component.manifest.BeanManifest;
 import eu.okaeri.platform.core.plan.ExecutionTask;
-import eu.okaeri.platform.minecraft.i18n.I18nCommandsMessages;
+import eu.okaeri.platform.minecraft.commands.I18nCommandsMessages;
 
 public class BukkitCommandsI18nManifestTask implements ExecutionTask<OkaeriBukkitPlugin> {
 

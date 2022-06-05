@@ -1,5 +1,6 @@
 package eu.okaeri.platform.bukkit.i18n.message;
 
+import eu.okaeri.platform.bukkit.i18n.minedown.ComponentMessage;
 import eu.okaeri.platform.core.i18n.message.Audience;
 import lombok.NonNull;
 import org.bukkit.Bukkit;
@@ -8,9 +9,10 @@ import org.bukkit.entity.Player;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.List;
 import java.util.stream.Collectors;
 
-public class BukkitAudience extends Audience {
+public class BukkitAudience extends Audience<ComponentMessage> {
 
     protected BukkitAudience() {
         this(new ArrayList<>());
@@ -79,6 +81,21 @@ public class BukkitAudience extends Audience {
 
     public BukkitAudience andOfConsole() {
         this.targets.add(Bukkit.getConsoleSender());
+        return this;
+    }
+
+    public BukkitAudience accept(@NonNull BukkitMessageDispatcher dispatcher) {
+        this.messages.add(dispatcher);
+        return this;
+    }
+
+    public BukkitAudience accept(@NonNull BukkitMessageDispatcher... dispatchers) {
+        this.messages.addAll(Arrays.asList(dispatchers));
+        return this;
+    }
+
+    public BukkitAudience accept(@NonNull List<BukkitMessageDispatcher> dispatchers) {
+        this.messages.addAll(dispatchers);
         return this;
     }
 }

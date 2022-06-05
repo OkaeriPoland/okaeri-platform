@@ -18,7 +18,7 @@ import eu.okaeri.platform.core.component.creator.ComponentCreator;
 import eu.okaeri.platform.core.component.creator.ComponentResolver;
 import eu.okaeri.platform.core.component.manifest.BeanManifest;
 import eu.okaeri.platform.core.placeholder.PlaceholdersFactory;
-import eu.okaeri.platform.minecraft.i18n.I18nCommandsMessages;
+import eu.okaeri.platform.minecraft.commands.I18nCommandsMessages;
 import lombok.NonNull;
 import net.md_5.bungee.api.plugin.Plugin;
 
