@@ -1,8 +1,8 @@
 commandSystemUsageTemplate: |-
   ~&eCorrect usage of /{label}:
   {entries}
-commandSystem-usage-entry: '&r - /{usage}'
-commandSystem-usage-entry-description: '   &7{description}'
+commandSystemUsageEntry: '&r - /{usage}'
+commandSystemUsageEntryDescription: '   &7{description}'
 commandSystemPermissionsError: '~No permission {permission}!'
 commandSystemCommandError: '~Error: {message}'
 commandSystemUnknownError: '~Unknown error! Reference ID: {id}'
