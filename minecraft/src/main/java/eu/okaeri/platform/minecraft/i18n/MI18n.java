@@ -4,16 +4,16 @@ import eu.okaeri.configs.schema.FieldDeclaration;
 import eu.okaeri.i18n.configs.LocaleConfig;
 import eu.okaeri.i18n.configs.impl.MOCI18n;
 import eu.okaeri.i18n.message.Message;
+import eu.okaeri.placeholders.message.CompiledMessage;
+import eu.okaeri.placeholders.message.part.MessageElement;
+import eu.okaeri.placeholders.message.part.MessageStatic;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 
 import java.nio.file.Files;
-import java.util.HashMap;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.regex.Pattern;
 
 @RequiredArgsConstructor
@@ -39,21 +39,35 @@ public abstract class MI18n extends MOCI18n {
     @Override
     public Message get(@NonNull Object entity, @NonNull String key) {
 
-        Locale locale = this.getLocale(entity);
-        Message message = super.get(locale, key);
-        String raw = message.raw();
-
-        if (raw.startsWith(this.getPrefixMarker()) && (this.getPrefixProvider() != null)) {
-            raw = raw.substring(this.getPrefixMarker().length());
-            String prefix = this.getPrefixProvider().getPrefix(entity, key);
-            if (prefix.isEmpty()) {
-                return message;
-            }
-            // FIXME: don't recompile prefixed messages every get call
-            return Message.of(this.getPlaceholders(), locale, prefix + raw);
+        Message message = super.get(entity, key);
+        if (this.getPrefixProvider() == null) {
+            return message;
         }
 
-        return message;
+        List<MessageElement> messageElements = message.compiled().getParts();
+        if (messageElements.isEmpty()) {
+            return message;
+        }
+
+        MessageElement firstElement = messageElements.get(0);
+        if (!(firstElement instanceof MessageStatic)) {
+            return message;
+        }
+
+        MessageStatic staticElement = (MessageStatic) firstElement;
+        String elementValue = staticElement.getValue();
+
+        if (!elementValue.startsWith(this.getPrefixMarker())) {
+            return message;
+        }
+
+        String prefix = this.getPrefixProvider().getPrefix(entity, key);
+        String base = elementValue.substring(this.getPrefixMarker().length());
+
+        List<MessageElement> elementsCopy = new ArrayList<>(messageElements);
+        elementsCopy.set(0, MessageStatic.of(prefix + base));
+
+        return Message.of(this.getPlaceholders(), CompiledMessage.of(message.raw(), elementsCopy));
     }
 
     protected void update(@NonNull Locale locale, @NonNull LocaleConfig config) {
