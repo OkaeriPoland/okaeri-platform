@@ -9,6 +9,7 @@ import org.bukkit.inventory.meta.ItemMeta;
 
 import java.util.Arrays;
 import java.util.LinkedHashMap;
+import java.util.Locale;
 import java.util.Map;
 
 @RequiredArgsConstructor(staticName = "of")
@@ -61,7 +62,8 @@ public class TemplateItem {
             itemMeta.setDisplayName(message.apply());
         }
         else if (itemMeta.getDisplayName() != null) {
-            Message message = Message.of(itemMeta.getDisplayName());
+            Locale fallbackLocale = (this.i18n == null || entity == null) ? Locale.ENGLISH : this.i18n.getLocale(entity);
+            Message message = Message.of(fallbackLocale, itemMeta.getDisplayName());
             this.fields.forEach(message::with);
             itemMeta.setDisplayName(message.apply());
         }
@@ -72,7 +74,8 @@ public class TemplateItem {
             itemMeta.setLore(Arrays.asList(message.apply().split("\n")));
         }
         else if (itemMeta.getLore() != null) {
-            Message message = Message.of(String.join("\n", itemMeta.getLore()));
+            Locale fallbackLocale = (this.i18n == null || entity == null) ? Locale.ENGLISH : this.i18n.getLocale(entity);
+            Message message = Message.of(fallbackLocale, String.join("\n", itemMeta.getLore()));
             this.fields.forEach(message::with);
             itemMeta.setLore(Arrays.asList(message.apply().split("\n")));
         }

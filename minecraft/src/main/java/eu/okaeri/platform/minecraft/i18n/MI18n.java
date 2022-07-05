@@ -39,13 +39,18 @@ public abstract class MI18n extends MOCI18n {
     @Override
     public Message get(@NonNull Object entity, @NonNull String key) {
 
-        Message message = super.get(entity, key);
+        Locale locale = this.getLocale(entity);
+        Message message = super.get(locale, key);
         String raw = message.raw();
 
         if (raw.startsWith(this.getPrefixMarker()) && (this.getPrefixProvider() != null)) {
             raw = raw.substring(this.getPrefixMarker().length());
             String prefix = this.getPrefixProvider().getPrefix(entity, key);
-            return Message.of(this.getPlaceholders(), prefix + raw);
+            if (prefix.isEmpty()) {
+                return message;
+            }
+            // FIXME: don't recompile prefixed messages every get call
+            return Message.of(this.getPlaceholders(), locale, prefix + raw);
         }
 
         return message;
