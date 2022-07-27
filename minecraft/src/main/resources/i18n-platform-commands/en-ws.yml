@@ -3,6 +3,6 @@ commandSystemUsageTemplate: |-
   {entries}
 commandSystemPermissionsError: '~Nay permission {permission}!'
 commandSystemCommandError: '~Error: {message}'
-commandSystemUnknownError: '~Unknown error! reference id: {id}'
+commandSystemUnknownError: '~Unknown error! Reference ID: {id}'
 commandSystemConsoleOnlyError: '~This hest is for console only.'
 commandSystemPlayerOnlyError: '~This hest is for players only.'
