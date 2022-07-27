@@ -67,7 +67,10 @@ public abstract class MI18n extends MOCI18n {
         List<MessageElement> elementsCopy = new ArrayList<>(messageElements);
         elementsCopy.set(0, MessageStatic.of(prefix + base));
 
-        return Message.of(this.getPlaceholders(), CompiledMessage.of(message.raw(), elementsCopy));
+        String raw = prefix + message.raw().substring(this.getPrefixMarker().length()); // wat
+        CompiledMessage compiled = CompiledMessage.of(raw, elementsCopy);
+
+        return Message.of(this.getPlaceholders(), compiled);
     }
 
     protected void update(@NonNull Locale locale, @NonNull LocaleConfig config) {
