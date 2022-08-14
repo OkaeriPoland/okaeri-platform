@@ -23,37 +23,51 @@ public class PlatformGuardianContextProvider extends DefaultGuardianContextProvi
     @SneakyThrows
     public GuardianContext provide(@NonNull InvocationMeta invocationMeta) {
 
+        // add bindings: method parameters
         GuardianContext guardianContext = super.provide(invocationMeta);
         Set<String> alreadyPresent = new HashSet<>(guardianContext.getData().keySet());
-        Set<String> clazzPresent = new HashSet<>();
 
+        // add bindings: class fields
         CommandMeta command = invocationMeta.getInvocation().getCommand();
         if (command != null) {
             CommandService implementor = command.getService().getImplementor();
 
+            // add bindings: this
+            if (alreadyPresent.add("this")) {
+                guardianContext.with("this", implementor);
+            }
+
             // add declared fields
             for (Field declaredField : implementor.getClass().getDeclaredFields()) {
+                if (alreadyPresent.contains(declaredField.getName())) {
+                    continue;
+                }
                 declaredField.setAccessible(true);
-                clazzPresent.add(declaredField.getName());
+                alreadyPresent.add(declaredField.getName());
                 guardianContext.with(declaredField.getName(), declaredField.get(implementor));
             }
 
             // add fields (accessible from superclasses)
             for (Field field : implementor.getClass().getFields()) {
-                if (clazzPresent.contains(field.getName())) {
+                if (alreadyPresent.contains(field.getName())) {
                     continue;
                 }
                 field.setAccessible(true);
-                clazzPresent.add(field.getName());
+                alreadyPresent.add(field.getName());
                 guardianContext.with(field.getName(), field.get(implementor));
             }
         }
 
-        // add injector
+        // add bindings: command context
+        if (alreadyPresent.add("commandContext")) {
+            guardianContext.with("commandContext", invocationMeta.getCommand());
+        }
+
+        // add bindings: injector
         this.platform.getInjector().stream()
             .filter(injectable -> !injectable.getName().isEmpty()) // no unnamed
             .filter(injectable -> !alreadyPresent.contains(injectable.getName())) // no overriding super
-            .filter(injectable -> !clazzPresent.contains(injectable.getName())) // no overriding class local
+            .filter(injectable -> !alreadyPresent.contains(injectable.getName())) // no overriding class local
             .forEach(injectable -> guardianContext.with(injectable.getName(), injectable.getObject()));
 
         return guardianContext;
