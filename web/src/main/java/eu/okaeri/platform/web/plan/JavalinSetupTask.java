@@ -8,9 +8,9 @@ import eu.okaeri.platform.web.OkaeriWebApplication;
 import eu.okaeri.platform.web.meta.role.FallbackAccessManager;
 import eu.okaeri.platform.web.persistence.DocumentMixIn;
 import eu.okaeri.platform.web.persistence.OkaeriConfigMixIn;
-import io.javalin.core.JavalinConfig;
-import io.javalin.core.security.AccessManager;
-import io.javalin.plugin.json.JavalinJackson;
+import io.javalin.config.JavalinConfig;
+import io.javalin.json.JavalinJackson;
+import io.javalin.security.AccessManager;
 
 import java.util.function.Consumer;
 
@@ -20,7 +20,7 @@ public class JavalinSetupTask implements ExecutionTask<OkaeriWebApplication> {
     public void execute(OkaeriWebApplication platform) {
 
         // basic setup
-        JavalinConfig.applyUserConfig(platform.getJavalin(), platform.getJavalin()._conf, config -> {
+        platform.getJavalin().updateConfig(config -> {
             // simple properties
             config.showJavalinBanner = false;
             // json mapper
@@ -35,7 +35,7 @@ public class JavalinSetupTask implements ExecutionTask<OkaeriWebApplication> {
         // custom setup routine
         platform.getInjector().getExact("javalinConfigurer", Consumer.class).ifPresent(configurer -> {
             @SuppressWarnings("unchecked") Consumer<JavalinConfig> javalinConfigurer = (Consumer<JavalinConfig>) configurer;
-            JavalinConfig.applyUserConfig(platform.getJavalin(), platform.getJavalin()._conf, javalinConfigurer);
+            platform.getJavalin().updateConfig(javalinConfigurer);
         });
     }
 }

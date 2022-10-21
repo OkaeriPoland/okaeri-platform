@@ -10,4 +10,5 @@ public abstract class OkaeriConfigMixIn {
     @JsonIgnore private Path bindFile;
     @JsonIgnore private Configurer configurer;
     @JsonIgnore private ConfigDeclaration declaration;
+    @JsonIgnore private boolean removeOrphans;
 }
