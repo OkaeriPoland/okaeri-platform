@@ -97,6 +97,6 @@ public class OkaeriWebApplication implements OkaeriPlatform {
 
     @SneakyThrows
     public static <T extends OkaeriWebApplication> T run(@NonNull Class<? extends T> type, @NonNull String[] args) {
-        return run(type.newInstance(), args);
+        return run(type.getConstructor().newInstance(), args);
     }
 }
