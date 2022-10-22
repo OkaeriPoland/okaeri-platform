@@ -6,6 +6,7 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import eu.okaeri.persistence.PersistenceCollection;
 import eu.okaeri.persistence.PersistencePath;
+import eu.okaeri.persistence.document.Document;
 import eu.okaeri.persistence.document.DocumentPersistence;
 
 public abstract class DocumentMixIn {
@@ -17,4 +18,6 @@ public abstract class DocumentMixIn {
     @JsonSerialize(using = PersistencePathSerializer.class)
     @JsonDeserialize(using = PersistencePathDeserializer.class)
     private PersistencePath path;
+
+    @JsonIgnore private Document cachedInto;
 }
