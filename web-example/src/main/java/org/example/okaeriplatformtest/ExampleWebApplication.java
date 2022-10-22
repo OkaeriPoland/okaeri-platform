@@ -44,7 +44,7 @@ public class ExampleWebApplication extends OkaeriWebApplication {
 
     // basic entrypoint inspired by Spring Boot
     public static void main(String[] args) {
-        OkaeriWebApplication.run(ExampleWebApplication.class, args);
+        OkaeriWebApplication.run(new ExampleWebApplication(), args);
     }
 
     // setup platform before any beans are executed
