@@ -1,6 +1,7 @@
 package eu.okaeri.platform.bungee;
 
 import eu.okaeri.configs.serdes.commons.SerdesCommons;
+import eu.okaeri.configs.serdes.okaeri.SerdesOkaeri;
 import eu.okaeri.configs.yaml.bukkit.serdes.SerdesBungee;
 import eu.okaeri.configs.yaml.bungee.YamlBungeeConfigurer;
 import eu.okaeri.injector.Injector;
@@ -64,7 +65,7 @@ public class OkaeriBungeePlugin extends Plugin implements OkaeriPlatform {
             platform.registerInjectable("scheduler", new PlatformScheduler(platform, platform.getProxy().getScheduler()));
             platform.registerInjectable("pluginManager", platform.getProxy().getPluginManager());
             platform.registerInjectable("defaultConfigurerProvider", (ConfigurerProvider) YamlBungeeConfigurer::new);
-            platform.registerInjectable("defaultConfigurerSerdes", new Class[]{SerdesCommons.class, SerdesBungee.class});
+            platform.registerInjectable("defaultConfigurerSerdes", new Class[]{SerdesCommons.class, SerdesOkaeri.class, SerdesBungee.class});
             platform.registerInjectable("defaultPlaceholdersFactory", new SimplePlaceholdersFactory());
             platform.registerInjectable("i18nLocaleProvider", new ProxiedPlayerLocaleProvider());
         });
