@@ -7,7 +7,7 @@
     <groupId>eu.okaeri</groupId>
     <artifactId>okaeri-platform</artifactId>
     <packaging>pom</packaging>
-    <version>0.4.0-preview.83</version>
+    <version>0.4.0-preview.84</version>
 
     <modules>
         <module>core</module>
@@ -19,6 +19,8 @@
         <module>standalone</module>
         <module>web</module>
         <module>cli</module>
+        <!-- extensions -->
+        <module>ext-scheduler-quartz</module>
     </modules>
 
     <properties>

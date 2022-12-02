@@ -9,7 +9,7 @@
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>okaeri-platform-standalone</artifactId>
+    <artifactId>okaeri-platform-ext-scheduler-quartz</artifactId>
 
     <dependencies>
         <!-- core -->
@@ -19,19 +19,13 @@
             <version>0.4.0-preview.84</version>
         </dependency>
 
-        <!-- persistence -->
+        <!-- quartz -->
         <dependency>
-            <groupId>eu.okaeri</groupId>
-            <artifactId>okaeri-persistence-flat</artifactId>
-            <version>${library.okaeri-persistence.version}</version>
+            <groupId>org.quartz-scheduler</groupId>
+            <artifactId>quartz</artifactId>
+            <version>2.3.2</version>
         </dependency>
 
-        <!-- configs -->
-        <dependency>
-            <groupId>eu.okaeri</groupId>
-            <artifactId>okaeri-configs-yaml-snakeyaml</artifactId>
-            <version>${library.okaeri-configs.version}</version>
-        </dependency>
     </dependencies>
 
 </project>
