@@ -19,7 +19,7 @@
         <dependency>
             <groupId>eu.okaeri</groupId>
             <artifactId>okaeri-platform-bukkit</artifactId>
-            <version>0.4.0-preview.85</version>
+            <version>0.4.0-preview.86</version>
             <scope>compile</scope>
         </dependency>
 
@@ -27,7 +27,7 @@
         <dependency>
             <groupId>eu.okaeri</groupId>
             <artifactId>okaeri-configs-json-simple</artifactId>
-            <version>4.0.6</version>
+            <version>4.0.8</version>
             <scope>compile</scope>
         </dependency>
 
