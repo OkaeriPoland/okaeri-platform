@@ -9,6 +9,7 @@ import eu.okaeri.validator.annotation.Nullable;
 import lombok.NonNull;
 import net.md_5.bungee.api.chat.BaseComponent;
 
+import java.util.Locale;
 import java.util.Map;
 import java.util.stream.Collectors;
 
@@ -18,12 +19,22 @@ public class ComponentMessage extends Message {
         super(compiled, context);
     }
 
+    @Deprecated
     public static ComponentMessage of(@NonNull String raw) {
-        return of(null, raw);
+        return of(null, CompiledMessage.of(raw));
     }
 
+    public static ComponentMessage of(@NonNull Locale locale, @NonNull String raw) {
+        return of(null, locale, raw);
+    }
+
+    @Deprecated
     public static ComponentMessage of(Placeholders placeholders, @NonNull String raw) {
         return of(placeholders, CompiledMessage.of(raw));
+    }
+
+    public static ComponentMessage of(Placeholders placeholders, @NonNull Locale locale, @NonNull String raw) {
+        return of(placeholders, CompiledMessage.of(locale, raw));
     }
 
     public static ComponentMessage of(Placeholders placeholders, @NonNull CompiledMessage compiled) {

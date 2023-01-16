@@ -45,7 +45,7 @@ public class BukkitCommandsResultHandler extends BukkitResultHandler {
         }
 
         if (object instanceof Audience) {
-            ((Audience) object).close();
+            ((Audience<?>) object).close();
             return true;
         }
 
