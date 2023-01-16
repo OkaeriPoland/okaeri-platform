@@ -1,19 +1,43 @@
 package eu.okaeri.platform.bukkit.i18n.minedown;
 
-import de.themoep.minedown.MineDown;
 import eu.okaeri.i18n.message.Message;
 import eu.okaeri.placeholders.Placeholders;
 import eu.okaeri.placeholders.context.PlaceholderContext;
 import eu.okaeri.placeholders.message.CompiledMessage;
 import eu.okaeri.validator.annotation.Nullable;
 import lombok.NonNull;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.TextReplacementConfig;
+import net.kyori.adventure.text.minimessage.MiniMessage;
+import net.kyori.adventure.text.serializer.gson.GsonComponentSerializer;
+import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import net.md_5.bungee.api.chat.BaseComponent;
+import net.md_5.bungee.chat.ComponentSerializer;
 
 import java.util.Locale;
 import java.util.Map;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 public class ComponentMessage extends Message {
+
+    private static final Pattern SECTION_COLOR_PATTERN = Pattern.compile("(?i)§([0-9A-FK-OR])");
+
+    private static final Pattern ALL_TEXT_PATTERN = Pattern.compile(".*");
+    private static final Pattern FIELD_PATTERN = Pattern.compile("\\{(?<content>[^}]+)\\}");
+
+    private static final LegacyComponentSerializer SECTION_SERIALIZER = LegacyComponentSerializer.legacySection();
+    private static final LegacyComponentSerializer AMPERSAND_SERIALIZER = LegacyComponentSerializer.legacyAmpersand();
+    private static final GsonComponentSerializer GSON_SERIALIZER = GsonComponentSerializer.gson();
+
+    private static final TextReplacementConfig COLOR_REPLACEMENTS = TextReplacementConfig.builder()
+        .match(ALL_TEXT_PATTERN)
+        .replacement((result, input) -> AMPERSAND_SERIALIZER.deserialize(result.group()))
+        .build();
+    private static final MiniMessage MINI_MESSAGE = MiniMessage.builder()
+        .preProcessor(text -> SECTION_COLOR_PATTERN.matcher(text).replaceAll("&$1")) // convert section to ampersand
+        .postProcessor(component -> component.replaceText(COLOR_REPLACEMENTS))
+        .build();
 
     ComponentMessage(@NonNull CompiledMessage compiled, @NonNull PlaceholderContext context) {
         super(compiled, context);
@@ -63,17 +87,24 @@ public class ComponentMessage extends Message {
 
     public BaseComponent[] components() {
 
-        MineDown minedown = new MineDown(this.raw())
-            .placeholderPrefix("{")
-            .placeholderSuffix("}");
-
-        minedown.replace(this.context.renderFields().entrySet().stream()
+        Map<String, String> renderedFields = this.context.renderFields()
+            .entrySet()
+            .stream()
             .collect(Collectors.toMap(
                 entry -> entry.getKey().getSource(),
                 Map.Entry::getValue
-            )));
+            ));
 
-        return minedown.toComponent();
+        TextReplacementConfig replacer = TextReplacementConfig.builder()
+            .match(FIELD_PATTERN)
+            .replacement((result, input) -> {
+                String fieldValue = renderedFields.get(result.group(1));
+                return SECTION_SERIALIZER.deserialize(fieldValue);
+            })
+            .build();
+
+        Component component = MINI_MESSAGE.deserialize(this.raw()).replaceText(replacer);
+        return ComponentSerializer.parse(GSON_SERIALIZER.serialize(component));
     }
 
     @Override
