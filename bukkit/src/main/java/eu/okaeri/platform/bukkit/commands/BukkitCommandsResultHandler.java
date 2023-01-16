@@ -5,7 +5,7 @@ import eu.okaeri.commands.service.CommandContext;
 import eu.okaeri.commands.service.InvocationContext;
 import eu.okaeri.commons.bukkit.UnsafeBukkitCommons;
 import eu.okaeri.i18n.message.Message;
-import eu.okaeri.platform.bukkit.i18n.minedown.ComponentMessage;
+import eu.okaeri.platform.bukkit.i18n.component.ComponentMessage;
 import eu.okaeri.platform.core.i18n.message.Audience;
 import eu.okaeri.tasker.core.chain.TaskerChain;
 import lombok.NonNull;

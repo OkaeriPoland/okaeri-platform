@@ -1,6 +1,6 @@
 package eu.okaeri.platform.bukkit.i18n.message;
 
-import eu.okaeri.platform.bukkit.i18n.minedown.ComponentMessage;
+import eu.okaeri.platform.bukkit.i18n.component.ComponentMessage;
 import eu.okaeri.platform.core.i18n.message.Audience;
 import lombok.NonNull;
 import org.bukkit.Bukkit;

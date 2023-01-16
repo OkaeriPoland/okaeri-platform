@@ -3,7 +3,7 @@ package eu.okaeri.platform.bukkit.i18n.message;
 import eu.okaeri.commons.bukkit.UnsafeBukkitCommons;
 import eu.okaeri.i18n.message.MessageDispatcher;
 import eu.okaeri.platform.bukkit.i18n.BI18n;
-import eu.okaeri.platform.bukkit.i18n.minedown.ComponentMessage;
+import eu.okaeri.platform.bukkit.i18n.component.ComponentMessage;
 import eu.okaeri.platform.core.placeholder.PlaceholdersFactory;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;

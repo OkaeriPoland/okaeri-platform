@@ -1,4 +1,4 @@
-package eu.okaeri.platform.bukkit.i18n.minedown;
+package eu.okaeri.platform.bukkit.i18n.component;
 
 import eu.okaeri.placeholders.Placeholders;
 import eu.okaeri.placeholders.message.CompiledMessage;
@@ -13,13 +13,13 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
-public abstract class MinedownMessageI18n extends MinecraftI18n<ComponentMessage> {
+public abstract class ComponentMessageI18n extends MinecraftI18n<ComponentMessage> {
 
-    public MinedownMessageI18n(String prefixField, String prefixMarker, Placeholders placeholders, I18nPrefixProvider prefixProvider) {
+    public ComponentMessageI18n(String prefixField, String prefixMarker, Placeholders placeholders, I18nPrefixProvider prefixProvider) {
         super(prefixField, prefixMarker, placeholders, prefixProvider);
     }
 
-    public MinedownMessageI18n(String prefixField, String prefixMarker) {
+    public ComponentMessageI18n(String prefixField, String prefixMarker) {
         super(prefixField, prefixMarker);
     }
 

@@ -1,4 +1,4 @@
-package eu.okaeri.platform.bukkit.i18n.minedown;
+package eu.okaeri.platform.bukkit.i18n.component;
 
 import eu.okaeri.i18n.message.Message;
 import eu.okaeri.placeholders.Placeholders;
@@ -12,6 +12,7 @@ import net.kyori.adventure.text.minimessage.MiniMessage;
 import net.kyori.adventure.text.serializer.gson.GsonComponentSerializer;
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import net.md_5.bungee.api.chat.BaseComponent;
+import net.md_5.bungee.api.chat.TextComponent;
 import net.md_5.bungee.chat.ComponentSerializer;
 
 import java.util.Locale;
@@ -39,8 +40,13 @@ public class ComponentMessage extends Message {
         .postProcessor(component -> component.replaceText(COLOR_REPLACEMENTS))
         .build();
 
+    private final @Nullable Component component;
+
     ComponentMessage(@NonNull CompiledMessage compiled, @NonNull PlaceholderContext context) {
         super(compiled, context);
+        this.component = compiled.getRaw().contains("<") && compiled.getRaw().contains(">")
+            ? MINI_MESSAGE.deserialize(compiled.getRaw())
+            : null;
     }
 
     @Deprecated
@@ -87,6 +93,10 @@ public class ComponentMessage extends Message {
 
     public BaseComponent[] components() {
 
+        if (this.component == null) {
+            return TextComponent.fromLegacyText(super.apply());
+        }
+
         Map<String, String> renderedFields = this.context.renderFields()
             .entrySet()
             .stream()
@@ -103,12 +113,14 @@ public class ComponentMessage extends Message {
             })
             .build();
 
-        Component component = MINI_MESSAGE.deserialize(this.raw()).replaceText(replacer);
+        Component component = this.component.replaceText(replacer);
         return ComponentSerializer.parse(GSON_SERIALIZER.serialize(component));
     }
 
     @Override
     public String apply() {
-        return BaseComponent.toLegacyText(this.components());
+        return this.component != null
+            ? BaseComponent.toLegacyText(this.components())
+            : super.apply();
     }
 }

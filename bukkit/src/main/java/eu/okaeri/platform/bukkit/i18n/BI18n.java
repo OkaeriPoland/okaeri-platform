@@ -2,8 +2,8 @@ package eu.okaeri.platform.bukkit.i18n;
 
 import eu.okaeri.i18n.configs.LocaleConfig;
 import eu.okaeri.platform.bukkit.i18n.message.BukkitMessageDispatcher;
-import eu.okaeri.platform.bukkit.i18n.minedown.ComponentMessage;
-import eu.okaeri.platform.bukkit.i18n.minedown.MinedownMessageI18n;
+import eu.okaeri.platform.bukkit.i18n.component.ComponentMessage;
+import eu.okaeri.platform.bukkit.i18n.component.ComponentMessageI18n;
 import eu.okaeri.platform.core.placeholder.PlaceholdersFactory;
 import eu.okaeri.platform.minecraft.i18n.I18nMessageColors;
 import lombok.Getter;
@@ -16,7 +16,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.regex.Pattern;
 
-public class BI18n extends MinedownMessageI18n {
+public class BI18n extends ComponentMessageI18n {
 
     private static final Pattern ALT_COLOR_PATTERN = Pattern.compile("&[0-9A-Fa-fK-Ok-oRXrx]");
 
