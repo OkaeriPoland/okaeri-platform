@@ -1,10 +1,10 @@
 package eu.okaeri.platform.bungee.i18n.message;
 
+import eu.okaeri.i18n.core.minecraft.adventure.BungeeMessage;
 import eu.okaeri.i18n.message.Message;
 import eu.okaeri.i18n.message.MessageDispatcher;
 import eu.okaeri.placeholders.Placeholders;
 import eu.okaeri.platform.bungee.i18n.BI18n;
-import eu.okaeri.platform.bungee.i18n.ComponentMessage;
 import eu.okaeri.platform.core.placeholder.PlaceholdersFactory;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
@@ -99,8 +99,8 @@ public class BungeeMessageDispatcher implements MessageDispatcher<Message> {
 
         // target is chat or receiver is not a player
         if (this.target == BungeeMessageTarget.CHAT || !(receiver instanceof ProxiedPlayer)) {
-            if (message instanceof ComponentMessage) {
-                receiver.sendMessage(((ComponentMessage) message).component());
+            if (message instanceof BungeeMessage) {
+                receiver.sendMessage(((BungeeMessage) message).component());
             } else {
                 receiver.sendMessage(TextComponent.fromLegacyText(message.apply()));
             }

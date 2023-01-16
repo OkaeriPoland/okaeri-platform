@@ -1,10 +1,10 @@
 package eu.okaeri.platform.bukkit.i18n.message;
 
 import eu.okaeri.commons.bukkit.UnsafeBukkitCommons;
+import eu.okaeri.i18n.core.minecraft.adventure.BungeeMessage;
 import eu.okaeri.i18n.message.Message;
 import eu.okaeri.i18n.message.MessageDispatcher;
 import eu.okaeri.platform.bukkit.i18n.BI18n;
-import eu.okaeri.platform.bukkit.i18n.ComponentMessage;
 import eu.okaeri.platform.core.placeholder.PlaceholdersFactory;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
@@ -101,8 +101,8 @@ public class BukkitMessageDispatcher implements MessageDispatcher<Message> {
 
         // chat for player
         if (this.target == BukkitMessageTarget.CHAT) {
-            if (message instanceof ComponentMessage) {
-                UnsafeBukkitCommons.sendComponent((Player) receiver, ((ComponentMessage) message).component(), UnsafeBukkitCommons.ChatTarget.CHAT);
+            if (message instanceof BungeeMessage) {
+                UnsafeBukkitCommons.sendComponent((Player) receiver, ((BungeeMessage) message).component(), UnsafeBukkitCommons.ChatTarget.CHAT);
             } else {
                 receiver.sendMessage(message.apply());
             }

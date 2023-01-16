@@ -50,6 +50,13 @@
 <!--            <version>0.5.2</version>-->
 <!--        </dependency>-->
 
+        <!-- i18n -->
+        <dependency>
+            <groupId>eu.okaeri</groupId>
+            <artifactId>okaeri-i18n-minecraft-bungee</artifactId>
+            <version>${library.okaeri-i18n.version}</version>
+        </dependency>
+
         <!-- bungeecord -->
         <dependency>
             <groupId>net.md-5</groupId>
