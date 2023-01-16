@@ -1,13 +1,18 @@
 package eu.okaeri.platform.bukkit.i18n;
 
 import eu.okaeri.i18n.configs.LocaleConfig;
+import eu.okaeri.i18n.configs.extended.MessageMEOCI18n;
+import eu.okaeri.i18n.extended.MessageColors;
+import eu.okaeri.i18n.message.Message;
+import eu.okaeri.i18n.message.SimpleMessage;
+import eu.okaeri.placeholders.Placeholders;
+import eu.okaeri.placeholders.message.CompiledMessage;
 import eu.okaeri.platform.bukkit.i18n.message.BukkitMessageDispatcher;
-import eu.okaeri.platform.bukkit.i18n.component.ComponentMessage;
-import eu.okaeri.platform.bukkit.i18n.component.ComponentMessageI18n;
+import eu.okaeri.platform.core.i18n.message.MessageAssembler;
 import eu.okaeri.platform.core.placeholder.PlaceholdersFactory;
-import eu.okaeri.platform.minecraft.i18n.I18nMessageColors;
 import lombok.Getter;
 import lombok.NonNull;
+import lombok.Setter;
 import org.bukkit.ChatColor;
 
 import java.nio.file.Files;
@@ -16,17 +21,23 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.regex.Pattern;
 
-public class BI18n extends ComponentMessageI18n {
+public class BI18n extends MessageMEOCI18n {
 
     private static final Pattern ALT_COLOR_PATTERN = Pattern.compile("&[0-9A-Fa-fK-Ok-oRXrx]");
 
     private final @Getter I18nColorsConfig colorsConfig;
     private final @Getter PlaceholdersFactory placeholdersFactory;
 
-    public BI18n(@NonNull I18nColorsConfig colorsConfig, @NonNull String prefixField, @NonNull String prefixMarker, @NonNull PlaceholdersFactory placeholdersFactory) {
-        super(prefixField, prefixMarker);
+    private @Getter @Setter MessageAssembler messageAssembler = SimpleMessage::of;
+
+    public BI18n(@NonNull I18nColorsConfig colorsConfig, @NonNull PlaceholdersFactory placeholdersFactory) {
         this.colorsConfig = colorsConfig;
         this.placeholdersFactory = placeholdersFactory;
+    }
+
+    @Override
+    public Message assembleMessage(Placeholders placeholders, @NonNull CompiledMessage compiled) {
+        return this.messageAssembler.assemble(placeholders, compiled);
     }
 
     @Override
@@ -35,8 +46,8 @@ public class BI18n extends ComponentMessageI18n {
     }
 
     @Override
-    public ComponentMessage get(@NonNull Object entity, @NonNull String key) {
-        ComponentMessage message = super.get(entity, key);
+    public Message get(@NonNull Object entity, @NonNull String key) {
+        Message message = super.get(entity, key);
         this.getPlaceholdersFactory().provide(entity).forEach(message::with);
         return message;
     }
@@ -59,15 +70,15 @@ public class BI18n extends ComponentMessageI18n {
     }
 
     @Override
-    public String color(String source) {
+    public String color(@NonNull String source) {
         return ChatColor.translateAlternateColorCodes('&', source);
     }
 
     @Override
-    protected Optional<I18nMessageColors> matchColors(String fieldName) {
+    protected Optional<MessageColors> matchColors(@NonNull String fieldName) {
         return this.getColorsConfig().getMatchers().stream()
             .filter(matcher -> matcher.getPattern().matcher(fieldName).matches())
-            .map(matcher -> I18nMessageColors.of(String.valueOf(matcher.getMessageColor()), String.valueOf(matcher.getFieldsColor())))
+            .map(matcher -> MessageColors.of(String.valueOf(matcher.getMessageColor()), String.valueOf(matcher.getFieldsColor())))
             .findAny();
     }
 }

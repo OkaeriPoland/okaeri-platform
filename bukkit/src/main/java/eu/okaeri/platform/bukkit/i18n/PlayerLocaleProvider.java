@@ -1,7 +1,7 @@
 package eu.okaeri.platform.bukkit.i18n;
 
 import eu.okaeri.commons.bukkit.UnsafeBukkitCommons;
-import eu.okaeri.i18n.provider.LocaleProvider;
+import eu.okaeri.i18n.locale.LocaleProvider;
 import lombok.*;
 import org.bukkit.entity.Player;
 

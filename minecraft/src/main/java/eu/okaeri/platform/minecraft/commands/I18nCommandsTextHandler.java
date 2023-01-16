@@ -3,7 +3,7 @@ package eu.okaeri.platform.minecraft.commands;
 import eu.okaeri.commands.handler.text.TextHandler;
 import eu.okaeri.commands.service.CommandContext;
 import eu.okaeri.commands.service.InvocationContext;
-import eu.okaeri.platform.minecraft.i18n.base.MessageI18n;
+import eu.okaeri.i18n.configs.extended.CustomMEOCI18n;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 
@@ -17,7 +17,7 @@ public class I18nCommandsTextHandler implements TextHandler {
     private static final Pattern CONTEXT_KEY_PATTERN = Pattern.compile("\\$\\{([^}]+)}");
     private static final Pattern STATIC_KEY_PATTERN = Pattern.compile("#\\{([^}]+)}");
 
-    private final Map<String, MessageI18n> i18n;
+    private final Map<String, CustomMEOCI18n<?>> i18n;
 
     @Override
     public String resolve(@NonNull String text) {
@@ -39,7 +39,7 @@ public class I18nCommandsTextHandler implements TextHandler {
 
         for (String key : contextKeys) {
 
-            List<MessageI18n> sources = new ArrayList<>();
+            List<CustomMEOCI18n<?>> sources = new ArrayList<>();
             if (key.contains(":")) {
 
                 String[] i18nParts = key.split(":", 2);
@@ -55,7 +55,7 @@ public class I18nCommandsTextHandler implements TextHandler {
                 sources.addAll(this.i18n.values());
             }
 
-            for (MessageI18n i18n : sources) {
+            for (CustomMEOCI18n<?> i18n : sources) {
                 String value = i18n.get(sender, key).raw();
                 if (this.isValid(value, key)) {
                     text = text.replace("${" + key + "}", value);

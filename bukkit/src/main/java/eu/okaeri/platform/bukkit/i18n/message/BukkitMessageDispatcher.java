@@ -1,9 +1,10 @@
 package eu.okaeri.platform.bukkit.i18n.message;
 
 import eu.okaeri.commons.bukkit.UnsafeBukkitCommons;
+import eu.okaeri.i18n.message.Message;
 import eu.okaeri.i18n.message.MessageDispatcher;
 import eu.okaeri.platform.bukkit.i18n.BI18n;
-import eu.okaeri.platform.bukkit.i18n.component.ComponentMessage;
+import eu.okaeri.platform.bukkit.i18n.ComponentMessage;
 import eu.okaeri.platform.core.placeholder.PlaceholdersFactory;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
@@ -19,7 +20,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 @RequiredArgsConstructor
-public class BukkitMessageDispatcher implements MessageDispatcher<ComponentMessage> {
+public class BukkitMessageDispatcher implements MessageDispatcher<Message> {
 
     private final BI18n i18n;
     private final String key;
@@ -83,34 +84,40 @@ public class BukkitMessageDispatcher implements MessageDispatcher<ComponentMessa
 
     public BukkitMessageDispatcher sendTo(@NonNull CommandSender receiver) {
 
-        ComponentMessage componentMessage = this.i18n.get(receiver, this.key);
-        this.placeholdersFactory.provide(receiver).forEach(componentMessage::with);
-        this.fields.forEach(componentMessage::with);
+        Message message = this.i18n.get(receiver, this.key);
+        this.placeholdersFactory.provide(receiver).forEach(message::with);
+        this.fields.forEach(message::with);
 
         // do not dispatch empty messages
-        if (componentMessage.raw().isEmpty()) {
+        if (message.raw().isEmpty()) {
             return this;
         }
 
-        // target is chat or receiver is not a player
-        if (this.target == BukkitMessageTarget.CHAT || !(receiver instanceof Player)) {
-            if (receiver instanceof Player) {
-                UnsafeBukkitCommons.sendComponent((Player) receiver, componentMessage.components(), UnsafeBukkitCommons.ChatTarget.CHAT);
+        // target is a non-player receiver
+        if (!(receiver instanceof Player)) {
+            receiver.sendMessage(message.apply());
+            return this;
+        }
+
+        // chat for player
+        if (this.target == BukkitMessageTarget.CHAT) {
+            if (message instanceof ComponentMessage) {
+                UnsafeBukkitCommons.sendComponent((Player) receiver, ((ComponentMessage) message).component(), UnsafeBukkitCommons.ChatTarget.CHAT);
             } else {
-                UnsafeBukkitCommons.sendComponent(receiver, componentMessage.components());
+                receiver.sendMessage(message.apply());
             }
             return this;
         }
 
         // action bar for player
         if (this.target == BukkitMessageTarget.ACTION_BAR) {
-            UnsafeBukkitCommons.sendMessage(((Player) receiver), componentMessage.apply(), UnsafeBukkitCommons.ChatTarget.ACTION_BAR);
+            UnsafeBukkitCommons.sendMessage(((Player) receiver), message.apply(), UnsafeBukkitCommons.ChatTarget.ACTION_BAR);
             return this;
         }
 
         // title for player
         if (this.target == BukkitMessageTarget.TITLE) {
-            String[] parts = componentMessage.apply().split("\n", 2);
+            String[] parts = message.apply().split("\n", 2);
             String title = parts[0];
             String subtitle = parts.length > 1 ? parts[1] : "";
             UnsafeBukkitCommons.sendTitle(((Player) receiver), title, subtitle, this.titleFadeIn, this.titleStay, this.titleFadeOut);

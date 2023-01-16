@@ -5,8 +5,8 @@ import eu.okaeri.configs.configurer.Configurer;
 import eu.okaeri.configs.serdes.OkaeriSerdesPack;
 import eu.okaeri.i18n.configs.LocaleConfig;
 import eu.okaeri.i18n.configs.LocaleConfigManager;
-import eu.okaeri.i18n.configs.impl.MOCI18n;
-import eu.okaeri.i18n.provider.LocaleProvider;
+import eu.okaeri.i18n.configs.simple.MessageOCI18n;
+import eu.okaeri.i18n.locale.LocaleProvider;
 import eu.okaeri.injector.Injector;
 import eu.okaeri.injector.annotation.Inject;
 import eu.okaeri.persistence.document.ConfigurerProvider;
@@ -128,7 +128,7 @@ public class MessagesComponentResolver implements ComponentResolver {
             File[] files = directory.listFiles((dir, name) -> name.toLowerCase(Locale.ROOT).endsWith(suffix));
             if (files == null) files = new File[0];
 
-            MOCI18n i18n = new MOCI18n();
+            MessageOCI18n i18n = new MessageOCI18n();
             i18n.setDefaultLocale(defaultLocale);
             i18n.registerLocaleProvider(this.i18nLocaleProvider);
             i18n.setPlaceholders(defaultPlaceholders.copy());

@@ -5,7 +5,7 @@ import eu.okaeri.configs.configurer.Configurer;
 import eu.okaeri.configs.serdes.OkaeriSerdesPack;
 import eu.okaeri.i18n.configs.LocaleConfig;
 import eu.okaeri.i18n.configs.LocaleConfigManager;
-import eu.okaeri.i18n.provider.LocaleProvider;
+import eu.okaeri.i18n.locale.LocaleProvider;
 import eu.okaeri.injector.Injector;
 import eu.okaeri.injector.annotation.Inject;
 import eu.okaeri.persistence.document.ConfigurerProvider;
@@ -17,6 +17,7 @@ import eu.okaeri.platform.core.component.ComponentHelper;
 import eu.okaeri.platform.core.component.creator.ComponentCreator;
 import eu.okaeri.platform.core.component.creator.ComponentResolver;
 import eu.okaeri.platform.core.component.manifest.BeanManifest;
+import eu.okaeri.platform.core.i18n.message.MessageAssembler;
 import eu.okaeri.platform.core.placeholder.PlaceholdersFactory;
 import eu.okaeri.platform.minecraft.commands.I18nCommandsMessages;
 import lombok.NonNull;
@@ -133,6 +134,10 @@ public class MessagesComponentResolver implements ComponentResolver {
             .distinct()
             .toArray(OkaeriSerdesPack[]::new);
 
+        // find applicable message assembler
+        MessageAssembler messageAssembler = injector.get(path, MessageAssembler.class)
+            .orElse(null);
+
         // gather colors config
         I18nColorsConfig colorsConfig = ConfigManager.create(I18nColorsConfig.class, (it) -> {
             Configurer configurer = (provider == Messages.DEFAULT.class) ? this.defaultConfigurerProvider.get() : injector.createInstance(provider);
@@ -148,10 +153,16 @@ public class MessagesComponentResolver implements ComponentResolver {
             File[] files = directory.listFiles((dir, name) -> name.toLowerCase(Locale.ROOT).endsWith(suffix));
             if (files == null) files = new File[0];
 
-            BI18n i18n = new BI18n(colorsConfig, messages.prefix().field(), messages.prefix().marker(), this.defaultPlaceholdersFactory);
+            BI18n i18n = new BI18n(colorsConfig, this.defaultPlaceholdersFactory);
+            i18n.setPrefixField(messages.prefix().field());
+            i18n.setPrefixMarker(messages.prefix().marker());
             i18n.setDefaultLocale(defaultLocale);
             i18n.registerLocaleProvider(this.i18nLocaleProvider);
             i18n.setPlaceholders(defaultPlaceholders.copy());
+
+            if (messageAssembler != null) {
+                i18n.setMessageAssembler(messageAssembler);
+            }
 
             List<Locale> loadedLocales = new ArrayList<>();
             injector.registerInjectable(path, template);

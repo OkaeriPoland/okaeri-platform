@@ -1,11 +1,11 @@
 package eu.okaeri.platform.minecraft.task;
 
 import eu.okaeri.commands.Commands;
+import eu.okaeri.i18n.configs.extended.CustomMEOCI18n;
+import eu.okaeri.i18n.extended.PrefixProvider;
 import eu.okaeri.platform.core.OkaeriPlatform;
 import eu.okaeri.platform.core.plan.ExecutionTask;
 import eu.okaeri.platform.minecraft.commands.I18nCommandsTextHandler;
-import eu.okaeri.platform.minecraft.i18n.I18nPrefixProvider;
-import eu.okaeri.platform.minecraft.i18n.base.MessageI18n;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -16,20 +16,20 @@ public class CommandsI18nSetupTask implements ExecutionTask<OkaeriPlatform> {
     @Override
     public void execute(OkaeriPlatform platform) {
 
-        Map<String, MessageI18n> i18nCommandsProviders = new LinkedHashMap<>();
-        AtomicReference<I18nPrefixProvider> prefixProvider = new AtomicReference<>();
+        Map<String, CustomMEOCI18n<?>> i18nCommandsProviders = new LinkedHashMap<>();
+        AtomicReference<PrefixProvider> prefixProvider = new AtomicReference<>();
 
         // read all available i18n
-        platform.getInjector().allOf(MessageI18n.class)
+        platform.getInjector().allOf(CustomMEOCI18n.class)
             .forEach(injectable -> i18nCommandsProviders.put(injectable.getName(), injectable.getObject()));
 
         // get main i18n and resolve prefixProvider
-        platform.getInjector().get("i18n", MessageI18n.class)
+        platform.getInjector().get("i18n", CustomMEOCI18n.class)
             .ifPresent(i18n -> prefixProvider.set(i18n.getPrefixProvider()));
 
         // update prefix provider of commands to the main one
         if (prefixProvider.get() != null) {
-            platform.getInjector().get("i18n-platform-commands", MessageI18n.class)
+            platform.getInjector().get("i18n-platform-commands", CustomMEOCI18n.class)
                 .ifPresent(i18n -> i18n.setPrefixProvider(prefixProvider.get()));
         }
 

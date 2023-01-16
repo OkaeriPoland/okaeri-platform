@@ -1,6 +1,6 @@
 package eu.okaeri.platform.bukkit.i18n.message;
 
-import eu.okaeri.platform.bukkit.i18n.component.ComponentMessage;
+import eu.okaeri.i18n.message.Message;
 import eu.okaeri.platform.core.i18n.message.Audience;
 import lombok.NonNull;
 import org.bukkit.Bukkit;
@@ -12,7 +12,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class BukkitAudience extends Audience<ComponentMessage> {
+public class BukkitAudience extends Audience<Message> {
 
     protected BukkitAudience() {
         this(new ArrayList<>());

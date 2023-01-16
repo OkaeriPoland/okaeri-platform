@@ -3,9 +3,8 @@ package eu.okaeri.platform.bungee.i18n.message;
 import eu.okaeri.i18n.message.Message;
 import eu.okaeri.i18n.message.MessageDispatcher;
 import eu.okaeri.placeholders.Placeholders;
-import eu.okaeri.placeholders.context.PlaceholderContext;
-import eu.okaeri.placeholders.message.CompiledMessage;
 import eu.okaeri.platform.bungee.i18n.BI18n;
+import eu.okaeri.platform.bungee.i18n.ComponentMessage;
 import eu.okaeri.platform.core.placeholder.PlaceholdersFactory;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
@@ -89,34 +88,36 @@ public class BungeeMessageDispatcher implements MessageDispatcher<Message> {
 
     public BungeeMessageDispatcher sendTo(@NonNull CommandSender receiver) {
 
-        CompiledMessage compiled = this.i18n.get(receiver, this.key).compiled();
-        PlaceholderContext context = PlaceholderContext.of(this.placeholders, compiled);
-        this.placeholdersFactory.provide(receiver).forEach(context::with);
-        this.fields.forEach(context::with);
-        String contents = context.apply();
+        Message message = this.i18n.get(receiver, this.key);
+        this.placeholdersFactory.provide(receiver).forEach(message::with);
+        this.fields.forEach(message::with);
 
         // do not dispatch empty messages
-        if (contents.isEmpty()) {
+        if (message.raw().isEmpty()) {
             return this;
         }
 
         // target is chat or receiver is not a player
         if (this.target == BungeeMessageTarget.CHAT || !(receiver instanceof ProxiedPlayer)) {
-            receiver.sendMessage(TextComponent.fromLegacyText(contents));
+            if (message instanceof ComponentMessage) {
+                receiver.sendMessage(((ComponentMessage) message).component());
+            } else {
+                receiver.sendMessage(TextComponent.fromLegacyText(message.apply()));
+            }
             return this;
         }
 
         // action bar for player
         if (this.target == BungeeMessageTarget.ACTION_BAR) {
             ProxiedPlayer player = (ProxiedPlayer) receiver;
-            player.sendMessage(ChatMessageType.ACTION_BAR, TextComponent.fromLegacyText(contents));
+            player.sendMessage(ChatMessageType.ACTION_BAR, TextComponent.fromLegacyText(message.apply()));
             return this;
         }
 
         // title for player
         if (this.target == BungeeMessageTarget.TITLE) {
 
-            String[] parts = contents.split("\n", 2);
+            String[] parts = message.apply().split("\n", 2);
             String title = parts[0];
             String subtitle = parts.length > 1 ? parts[1] : "";
 
