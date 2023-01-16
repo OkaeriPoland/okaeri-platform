@@ -12,7 +12,7 @@ public class ExampleCliApplication extends OkaeriCliApplication {
 
     // basic entrypoint inspired by Spring Boot
     public static void main(String[] args) {
-        OkaeriCliApplication.run(ExampleCliApplication.class, args);
+        OkaeriCliApplication.run(new ExampleCliApplication(), args);
     }
 
     // disabling logging of platform startup

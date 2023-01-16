@@ -1,7 +1,8 @@
 package org.example.okaeriplatformtest;
 
-import com.mongodb.MongoClient;
-import com.mongodb.MongoClientURI;
+import com.mongodb.ConnectionString;
+import com.mongodb.client.MongoClient;
+import com.mongodb.client.MongoClients;
 import com.zaxxer.hikari.HikariConfig;
 import eu.okaeri.commons.Strings;
 import eu.okaeri.configs.json.simple.JsonSimpleConfigurer;
@@ -22,10 +23,10 @@ import eu.okaeri.platform.web.OkaeriWebApplication;
 import eu.okaeri.platform.web.meta.role.SimpleAccessManager;
 import eu.okaeri.platform.web.meta.role.SimpleRouteRole;
 import eu.okaeri.platform.web.meta.serdes.SerdesWeb;
-import io.javalin.core.security.AccessManager;
-import io.javalin.core.validation.JavalinValidation;
 import io.javalin.http.Context;
 import io.javalin.jetty.JettyServer;
+import io.javalin.security.AccessManager;
+import io.javalin.validation.JavalinValidation;
 import io.lettuce.core.RedisClient;
 import io.lettuce.core.RedisURI;
 import org.example.okaeriplatformtest.config.TestConfig;
@@ -43,7 +44,7 @@ public class ExampleWebApplication extends OkaeriWebApplication {
 
     // basic entrypoint inspired by Spring Boot
     public static void main(String[] args) {
-        OkaeriWebApplication.run(ExampleWebApplication.class, args);
+        OkaeriWebApplication.run(new ExampleWebApplication(), args);
     }
 
     // setup platform before any beans are executed
@@ -141,11 +142,11 @@ public class ExampleWebApplication extends OkaeriWebApplication {
                 return new DocumentPersistence(new RedisPersistence(basePath, redisClient), JsonSimpleConfigurer::new, new SerdesWeb());
             case MONGO:
                 // construct mongo client based on your needs, e.g. using config
-                MongoClientURI mongoUri = new MongoClientURI(config.getStorage().getUri());
-                MongoClient mongoClient = new MongoClient(mongoUri);
+                ConnectionString mongoUri = new ConnectionString(config.getStorage().getUri());
+                MongoClient mongoClient = MongoClients.create(mongoUri);
                 // validate if uri contains database
                 if (mongoUri.getDatabase() == null) {
-                    throw new IllegalArgumentException("Mongo URI needs to specify the database: " + mongoUri.getURI());
+                    throw new IllegalArgumentException("Mongo URI needs to specify the database");
                 }
                 // it is REQUIRED to use json configurer for the mongo backend
                 return new DocumentPersistence(new MongoPersistence(basePath, mongoClient, mongoUri.getDatabase()), JsonSimpleConfigurer::new, new SerdesWeb());

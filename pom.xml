@@ -7,7 +7,7 @@
     <groupId>eu.okaeri</groupId>
     <artifactId>okaeri-platform</artifactId>
     <packaging>pom</packaging>
-    <version>0.4.0-preview.73</version>
+    <version>0.4.0-preview.87</version>
 
     <modules>
         <module>core</module>
@@ -19,6 +19,8 @@
         <module>standalone</module>
         <module>web</module>
         <module>cli</module>
+        <!-- extensions -->
+        <module>ext-scheduler-quartz</module>
     </modules>
 
     <properties>
@@ -26,15 +28,15 @@
         <maven.compiler.source>8</maven.compiler.source>
         <maven.compiler.target>8</maven.compiler.target>
 
-        <library.okaeri-commands.version>0.8.8</library.okaeri-commands.version>
-        <library.okaeri-configs.version>4.0.1</library.okaeri-configs.version>
-        <library.okaeri-i18n.version>3.0.3</library.okaeri-i18n.version>
-        <library.okaeri-commons.version>0.2.17</library.okaeri-commons.version>
+        <library.okaeri-commands.version>0.8.15</library.okaeri-commands.version>
+        <library.okaeri-configs.version>5.0.0-beta.2</library.okaeri-configs.version>
+        <library.okaeri-i18n.version>4.0.5</library.okaeri-i18n.version>
+        <library.okaeri-commons.version>0.2.22</library.okaeri-commons.version>
         <library.okaeri-injector.version>2.1.0</library.okaeri-injector.version>
-        <library.okaeri-validator.version>2.0.2</library.okaeri-validator.version>
-        <library.okaeri-placeholders.version>3.0.4</library.okaeri-placeholders.version>
-        <library.okaeri-persistence.version>1.5.12</library.okaeri-persistence.version>
-        <library.okaeri-tasker.version>1.1.6</library.okaeri-tasker.version>
+        <library.okaeri-validator.version>2.0.4</library.okaeri-validator.version>
+        <library.okaeri-placeholders.version>4.0.3</library.okaeri-placeholders.version>
+        <library.okaeri-persistence.version>2.0.0-beta.1</library.okaeri-persistence.version>
+        <library.okaeri-tasker.version>1.1.9</library.okaeri-tasker.version>
         <library.okaeri-acl.version>0.1.4</library.okaeri-acl.version>
     </properties>
 
@@ -42,7 +44,7 @@
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
-            <version>1.18.22</version>
+            <version>1.18.24</version>
             <scope>provided</scope>
         </dependency>
     </dependencies>
@@ -51,9 +53,12 @@
         <pluginManagement>
             <plugins>
                 <plugin>
-                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-surefire-plugin</artifactId>
+                    <version>3.0.0-M7</version>
+                </plugin>
+                <plugin>
                     <artifactId>maven-compiler-plugin</artifactId>
-                    <version>3.8.1</version>
+                    <version>3.10.1</version>
                     <configuration>
                         <compilerArgs>
                             <arg>-parameters</arg>
@@ -61,8 +66,8 @@
                     </configuration>
                 </plugin>
                 <plugin>
-                    <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-source-plugin</artifactId>
+                    <version>3.2.1</version>
                     <executions>
                         <execution>
                             <id>attach-sources</id>
@@ -73,8 +78,11 @@
                     </executions>
                 </plugin>
                 <plugin>
-                    <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-javadoc-plugin</artifactId>
+                    <version>3.4.0</version>
+                    <configuration>
+                        <doclint>all,-missing</doclint>
+                    </configuration>
                     <executions>
                         <execution>
                             <id>attach-javadocs</id>
@@ -86,6 +94,14 @@
                 </plugin>
             </plugins>
         </pluginManagement>
+        <plugins>
+            <plugin>
+                <artifactId>maven-source-plugin</artifactId>
+            </plugin>
+            <plugin>
+                <artifactId>maven-javadoc-plugin</artifactId>
+            </plugin>
+        </plugins>
     </build>
 
     <repositories>

@@ -18,7 +18,6 @@ import eu.okaeri.platform.bukkit.annotation.Chain;
 import eu.okaeri.platform.bukkit.i18n.BI18n;
 import eu.okaeri.platform.core.annotation.Bean;
 import eu.okaeri.tasker.core.chain.TaskerChain;
-import org.apache.commons.lang.RandomStringUtils;
 import org.bukkit.*;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -157,7 +156,10 @@ public class TestCommand implements CommandService {
         for (int i = 0; i < num; i++) {
             OfflinePlayer randomPlayer = Bukkit.getOfflinePlayer(UUID.randomUUID());
             PlayerProperties properties = this.playerPersistence.get(randomPlayer);
-            properties.setName(RandomStringUtils.randomAlphanumeric(8));
+            properties.setName(ThreadLocalRandom.current().ints('a', 'z' + 1)
+                    .limit(8)
+                    .collect(StringBuilder::new, StringBuilder::appendCodePoint, StringBuilder::append)
+                    .toString());
             properties.setLastJoined(Instant.ofEpochMilli(ThreadLocalRandom.current().nextLong(start)));
             World world = Bukkit.getWorlds().get(ThreadLocalRandom.current().nextInt(Bukkit.getWorlds().size()));
             int x = ThreadLocalRandom.current().nextInt(20_000);

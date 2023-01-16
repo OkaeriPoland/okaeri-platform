@@ -1,7 +1,8 @@
 package org.example.okaeriplatformtest;
 
-import com.mongodb.MongoClient;
-import com.mongodb.MongoClientURI;
+import com.mongodb.ConnectionString;
+import com.mongodb.client.MongoClient;
+import com.mongodb.client.MongoClients;
 import com.zaxxer.hikari.HikariConfig;
 import eu.okaeri.commons.cache.Cached;
 import eu.okaeri.configs.json.simple.JsonSimpleConfigurer;
@@ -86,11 +87,11 @@ public class ExamplePlugin extends OkaeriBungeePlugin {
                 return new DocumentPersistence(new RedisPersistence(basePath, redisClient), JsonSimpleConfigurer::new);
             case MONGO:
                 // construct mongo client based on your needs, e.g. using config
-                MongoClientURI mongoUri = new MongoClientURI(config.getStorage().getUri());
-                MongoClient mongoClient = new MongoClient(mongoUri);
+                ConnectionString mongoUri = new ConnectionString(config.getStorage().getUri());
+                MongoClient mongoClient = MongoClients.create(mongoUri);
                 // validate if uri contains database
                 if (mongoUri.getDatabase() == null) {
-                    throw new IllegalArgumentException("Mongo URI needs to specify the database: " + mongoUri.getURI());
+                    throw new IllegalArgumentException("Mongo URI needs to specify the database");
                 }
                 // it is REQUIRED to use json configurer for the mongo backend
                 return new DocumentPersistence(new MongoPersistence(basePath, mongoClient, mongoUri.getDatabase()), JsonSimpleConfigurer::new);

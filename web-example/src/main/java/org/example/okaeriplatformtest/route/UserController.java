@@ -4,7 +4,7 @@ import eu.okaeri.injector.annotation.Inject;
 import eu.okaeri.platform.core.annotation.Component;
 import eu.okaeri.platform.web.annotation.*;
 import io.javalin.http.Context;
-import io.javalin.http.HttpCode;
+import io.javalin.http.HttpStatus;
 import org.example.okaeriplatformtest.persistence.User;
 import org.example.okaeriplatformtest.persistence.UserRepository;
 
@@ -26,7 +26,7 @@ public class UserController {
 
         Optional<User> dataOptional = this.userRepository.findByPath(id);
         if (dataOptional.isEmpty()) {
-            context.status(HttpCode.NOT_FOUND).json(Map.of("error", HttpCode.NOT_FOUND));
+            context.status(HttpStatus.NOT_FOUND).json(Map.of("error", HttpStatus.NOT_FOUND));
             return;
         }
 

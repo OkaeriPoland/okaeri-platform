@@ -1,6 +1,6 @@
 package eu.okaeri.platform.web.meta.role;
 
-import io.javalin.core.security.RouteRole;
+import io.javalin.security.RouteRole;
 import lombok.Data;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;

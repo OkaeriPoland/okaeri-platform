@@ -2,6 +2,7 @@ package eu.okaeri.platform.web;
 
 import eu.okaeri.commands.OkaeriCommands;
 import eu.okaeri.configs.serdes.commons.SerdesCommons;
+import eu.okaeri.configs.serdes.okaeri.SerdesOkaeri;
 import eu.okaeri.configs.yaml.snakeyaml.YamlSnakeYamlConfigurer;
 import eu.okaeri.injector.Injector;
 import eu.okaeri.persistence.document.ConfigurerProvider;
@@ -65,7 +66,7 @@ public class OkaeriWebApplication implements OkaeriPlatform {
             platform.registerInjectable("jetty", Objects.requireNonNull(platform.getJavalin().jettyServer()));
             platform.registerInjectable("placeholders", Placeholders.create(true));
             platform.registerInjectable("defaultConfigurerProvider", (ConfigurerProvider) YamlSnakeYamlConfigurer::new);
-            platform.registerInjectable("defaultConfigurerSerdes", new Class[]{SerdesCommons.class, SerdesWeb.class});
+            platform.registerInjectable("defaultConfigurerSerdes", new Class[]{SerdesCommons.class, SerdesOkaeri.class, SerdesWeb.class});
             platform.registerInjectable("defaultPlaceholdersFactory", new SimplePlaceholdersFactory());
             platform.registerInjectable("i18nLocaleProvider", new SystemLocaleProvider());
         });
@@ -97,6 +98,6 @@ public class OkaeriWebApplication implements OkaeriPlatform {
 
     @SneakyThrows
     public static <T extends OkaeriWebApplication> T run(@NonNull Class<? extends T> type, @NonNull String[] args) {
-        return run(type.newInstance(), args);
+        return run(type.getConstructor().newInstance(), args);
     }
 }
