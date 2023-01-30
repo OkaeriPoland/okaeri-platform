@@ -1,7 +1,7 @@
 package eu.okaeri.platform.bukkit.i18n.message;
 
 import eu.okaeri.commons.bukkit.UnsafeBukkitCommons;
-import eu.okaeri.i18n.core.minecraft.adventure.BungeeMessage;
+import eu.okaeri.i18n.core.minecraft.bungee.BungeeMessage;
 import eu.okaeri.i18n.message.Message;
 import eu.okaeri.i18n.message.MessageDispatcher;
 import eu.okaeri.platform.bukkit.i18n.BI18n;

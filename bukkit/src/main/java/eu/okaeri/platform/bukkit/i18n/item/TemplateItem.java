@@ -4,6 +4,7 @@ import eu.okaeri.i18n.message.Message;
 import eu.okaeri.platform.bukkit.i18n.BI18n;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
+import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
@@ -17,6 +18,10 @@ public class TemplateItem {
 
     private final Map<String, Object> fields = new LinkedHashMap<>();
     @NonNull private final ItemStack item;
+
+    public static TemplateItem of(@NonNull Material material) {
+        return of(new ItemStack(material));
+    }
 
     private BI18n i18n;
     private String nameKey;

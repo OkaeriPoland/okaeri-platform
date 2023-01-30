@@ -1,12 +1,14 @@
 package eu.okaeri.platform.bukkit;
 
 import eu.okaeri.acl.reflect.ReflectGuardian;
+import eu.okaeri.commands.Commands;
 import eu.okaeri.configs.serdes.commons.SerdesCommons;
 import eu.okaeri.configs.serdes.okaeri.SerdesOkaeri;
 import eu.okaeri.configs.serdes.okaeri.SerdesOkaeriBukkit;
 import eu.okaeri.configs.yaml.bukkit.YamlBukkitConfigurer;
 import eu.okaeri.configs.yaml.bukkit.serdes.SerdesBukkit;
 import eu.okaeri.injector.Injector;
+import eu.okaeri.persistence.Persistence;
 import eu.okaeri.persistence.document.ConfigurerProvider;
 import eu.okaeri.placeholders.bukkit.BukkitPlaceholders;
 import eu.okaeri.placeholders.reflect.ReflectPlaceholders;
@@ -89,7 +91,8 @@ public class OkaeriBukkitPlugin extends JavaPlugin implements OkaeriPlatform {
         plan.add(POST_SETUP, new BeanManifestExecuteTask());
         plan.add(POST_SETUP, new CommandsI18nSetupTask());
 
-        plan.add(SHUTDOWN, new PersistenceShutdownTask());
+        plan.add(SHUTDOWN, new CloseableShutdownTask(Persistence.class));
+        plan.add(SHUTDOWN, new CloseableShutdownTask(Commands.class));
     }
 
     @Override

@@ -1,10 +1,12 @@
 package eu.okaeri.platform.bungee;
 
+import eu.okaeri.commands.Commands;
 import eu.okaeri.configs.serdes.commons.SerdesCommons;
 import eu.okaeri.configs.serdes.okaeri.SerdesOkaeri;
 import eu.okaeri.configs.yaml.bukkit.serdes.SerdesBungee;
 import eu.okaeri.configs.yaml.bungee.YamlBungeeConfigurer;
 import eu.okaeri.injector.Injector;
+import eu.okaeri.persistence.Persistence;
 import eu.okaeri.persistence.document.ConfigurerProvider;
 import eu.okaeri.placeholders.bungee.BungeePlaceholders;
 import eu.okaeri.platform.bungee.component.BungeeComponentCreator;
@@ -78,7 +80,8 @@ public class OkaeriBungeePlugin extends Plugin implements OkaeriPlatform {
         plan.add(POST_SETUP, new BeanManifestExecuteTask());
 
         plan.add(SHUTDOWN, new BungeeSchedulerShutdownTask());
-        plan.add(SHUTDOWN, new PersistenceShutdownTask());
+        plan.add(SHUTDOWN, new CloseableShutdownTask(Persistence.class));
+        plan.add(SHUTDOWN, new CloseableShutdownTask(Commands.class));
     }
 
     @Override

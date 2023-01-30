@@ -1,10 +1,12 @@
 package eu.okaeri.platform.web;
 
+import eu.okaeri.commands.Commands;
 import eu.okaeri.commands.OkaeriCommands;
 import eu.okaeri.configs.serdes.commons.SerdesCommons;
 import eu.okaeri.configs.serdes.okaeri.SerdesOkaeri;
 import eu.okaeri.configs.yaml.snakeyaml.YamlSnakeYamlConfigurer;
 import eu.okaeri.injector.Injector;
+import eu.okaeri.persistence.Persistence;
 import eu.okaeri.persistence.document.ConfigurerProvider;
 import eu.okaeri.placeholders.Placeholders;
 import eu.okaeri.platform.core.OkaeriPlatform;
@@ -82,7 +84,8 @@ public class OkaeriWebApplication implements OkaeriPlatform {
         plan.add(STARTUP, new JavalinStartTask());
 
         plan.add(SHUTDOWN, new JavalinShutdownTask());
-        plan.add(SHUTDOWN, new PersistenceShutdownTask());
+        plan.add(SHUTDOWN, new CloseableShutdownTask(Persistence.class));
+        plan.add(SHUTDOWN, new CloseableShutdownTask(Commands.class));
     }
 
     public static <T extends OkaeriWebApplication> T run(@NonNull T app, @NonNull String[] args) {

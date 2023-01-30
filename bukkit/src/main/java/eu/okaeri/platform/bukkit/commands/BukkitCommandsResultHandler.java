@@ -4,7 +4,7 @@ import eu.okaeri.commands.bukkit.handler.BukkitResultHandler;
 import eu.okaeri.commands.service.CommandContext;
 import eu.okaeri.commands.service.InvocationContext;
 import eu.okaeri.commons.bukkit.UnsafeBukkitCommons;
-import eu.okaeri.i18n.core.minecraft.adventure.BungeeMessage;
+import eu.okaeri.i18n.core.minecraft.bungee.BungeeMessage;
 import eu.okaeri.i18n.message.Message;
 import eu.okaeri.platform.core.i18n.message.Audience;
 import eu.okaeri.tasker.core.chain.TaskerChain;
