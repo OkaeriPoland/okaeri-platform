@@ -27,7 +27,7 @@ public class TemplateItem {
     private String nameKey;
     private String descriptionKey;
 
-    public TemplateItem with(@NonNull String field, @NonNull Object value) {
+    public TemplateItem with(@NonNull String field, Object value) {
         this.fields.put(field, value);
         return this;
     }
