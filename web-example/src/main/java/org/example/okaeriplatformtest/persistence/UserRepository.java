@@ -13,8 +13,8 @@ import java.util.UUID;
 // required to auto register the repository
 // with correct persistence
 @DependsOn(
-        type = DocumentPersistence.class,
-        name = "persistence"
+    type = DocumentPersistence.class,
+    name = "persistence"
 )
 // example flat/database persistence with custom object
 // note that saving can be done using User#save()
@@ -22,7 +22,7 @@ import java.util.UUID;
 // DocumentRepository provides multiple default methods
 // to create, read, update and delete entities
 @DocumentCollection(path = "user", keyLength = 36, indexes = {
-        @DocumentIndex(path = "name", maxLength = 32)
+    @DocumentIndex(path = "name", maxLength = 32)
 })
 public interface UserRepository extends DocumentRepository<UUID, User> {
 

@@ -55,8 +55,8 @@ public class TestCommand implements CommandService {
     @Executor
     public BukkitResponse example(@Label String label) {
         return SuccessResponse.of("It works! {label} [{test}]")
-                .withField("label", label)
-                .withField("test", this.test);
+            .withField("label", label)
+            .withField("test", this.test);
     }
 
     // testcmd|testing complex
@@ -75,14 +75,14 @@ public class TestCommand implements CommandService {
     //
     public TaskerChain<?> chains(@Chain("name"/* or empty if not queued */) TaskerChain<?> chain) {
         return chain
-                .async(() -> {
-                    String threadName = Thread.currentThread().getName();
-                    return "some async data from " + threadName;
-                })
-                .acceptSync((data) -> {
-                    String threadName = Thread.currentThread().getName();
-                    Bukkit.broadcastMessage("received: " + data + " in " + threadName);
-                }); // do not execute if returning, will be executed by platform
+            .supplyAsync(() -> {
+                String threadName = Thread.currentThread().getName();
+                return "some async data from " + threadName;
+            })
+            .acceptSync((data) -> {
+                String threadName = Thread.currentThread().getName();
+                Bukkit.broadcastMessage("received: " + data + " in " + threadName);
+            }); // do not execute if returning, will be executed by platform
     }
 
     // testcmd|testing greet|greeting
@@ -95,7 +95,7 @@ public class TestCommand implements CommandService {
     @Executor
     public Message i18n(CommandSender sender) {
         return this.i18n.get(sender, this.messages.getPlayerMessage())
-                .with("sender", sender);
+            .with("sender", sender);
     }
 
     // testcmd|testing reload
@@ -105,8 +105,7 @@ public class TestCommand implements CommandService {
         try {
             this.config.load(); // reload config
             this.i18n.load(); // reload current i18n locales configs (no removing, no adding at runtime)
-        }
-        catch (Exception exception) {
+        } catch (Exception exception) {
             this.logger.log(Level.SEVERE, "Failed to reload configuration", exception);
             return this.i18n.get(sender, this.messages.getCommandsReloadFail());
         }
@@ -125,7 +124,7 @@ public class TestCommand implements CommandService {
         }
         long took = System.nanoTime() - start;
         sender.sendMessage(builder.substring(0, 1));
-        sender.sendMessage(took + " " + (took / 1000) );
+        sender.sendMessage(took + " " + (took / 1000));
         return message;
     }
 
@@ -135,13 +134,13 @@ public class TestCommand implements CommandService {
         this.logger.info("test i18n " + value);
         if ("1".equals(value)) {
             return this.i18n.get(sender, this.messages.getExampleMessage())
-                    .with("who", 1);
+                .with("who", 1);
         } else if ("2".equals(value)) {
             return this.i18n.get(sender, this.messages.getExampleMessage())
-                    .with("who", 2);
+                .with("who", 2);
         } else if ("you".equals(value)) {
             Message with = this.i18n.get(sender, this.messages.getExampleMessage())
-                    .with("who", "you");
+                .with("who", "you");
             this.logger.info(with.apply());
             return with;
         } else {
@@ -157,9 +156,9 @@ public class TestCommand implements CommandService {
             OfflinePlayer randomPlayer = Bukkit.getOfflinePlayer(UUID.randomUUID());
             PlayerProperties properties = this.playerPersistence.get(randomPlayer);
             properties.setName(ThreadLocalRandom.current().ints('a', 'z' + 1)
-                    .limit(8)
-                    .collect(StringBuilder::new, StringBuilder::appendCodePoint, StringBuilder::append)
-                    .toString());
+                .limit(8)
+                .collect(StringBuilder::new, StringBuilder::appendCodePoint, StringBuilder::append)
+                .toString());
             properties.setLastJoined(Instant.ofEpochMilli(ThreadLocalRandom.current().nextLong(start)));
             World world = Bukkit.getWorlds().get(ThreadLocalRandom.current().nextInt(Bukkit.getWorlds().size()));
             int x = ThreadLocalRandom.current().nextInt(20_000);
@@ -177,10 +176,10 @@ public class TestCommand implements CommandService {
     @Executor
     public String visittest() {
         return this.playerPersistence.streamAll()
-                .filter(entity -> entity.getLastJoinedLocation().getY() > 250)
-                .findFirst()
-                .map(OkaeriConfig::saveToString)
-                .orElse("no match found");
+            .filter(entity -> entity.getLastJoinedLocation().getY() > 250)
+            .findFirst()
+            .map(OkaeriConfig::saveToString)
+            .orElse("no match found");
     }
 
     // testcmd|testing findplayer <name>
@@ -188,8 +187,8 @@ public class TestCommand implements CommandService {
     public String findplayer(@Arg("name") String name) {
         long start = System.currentTimeMillis();
         String data = this.playerPersistence.findByName(name)
-                .map(OkaeriConfig::saveToString)
-                .orElse("huh");
+            .map(OkaeriConfig::saveToString)
+            .orElse("huh");
         long took = System.currentTimeMillis() - start;
         data += "\n" + took + " ms";
         return data;
@@ -200,9 +199,9 @@ public class TestCommand implements CommandService {
     public String findbyworld(@Arg("world") String worldName) {
         long start = System.currentTimeMillis();
         String data = this.playerPersistence.findByLastJoinedLocationWorld(worldName)
-                .limit(10)
-                .map(OkaeriConfig::saveToString)
-                .collect(Collectors.joining("\n"));
+            .limit(10)
+            .map(OkaeriConfig::saveToString)
+            .collect(Collectors.joining("\n"));
         long took = System.currentTimeMillis() - start;
         data += "\n" + took + " ms";
         return data;
@@ -213,9 +212,9 @@ public class TestCommand implements CommandService {
     public String findbyy(@Arg("world") int y) {
         long start = System.currentTimeMillis();
         String data = this.playerPersistence.findByLastJoinedLocationY(y)
-                .limit(10)
-                .map(OkaeriConfig::saveToString)
-                .collect(Collectors.joining("\n"));
+            .limit(10)
+            .map(OkaeriConfig::saveToString)
+            .collect(Collectors.joining("\n"));
         long took = System.currentTimeMillis() - start;
         data += "\n" + took + " ms";
         return data;
@@ -233,9 +232,9 @@ public class TestCommand implements CommandService {
         long start = System.currentTimeMillis();
         Collection<PlayerProperties> all = this.playerPersistence.findAll();
         sender.sendMessage(all.stream()
-                .map(properties -> properties.getName() + ": " + properties.getLastJoined())
-                .limit(100)
-                .collect(Collectors.joining("\n")));
+            .map(properties -> properties.getName() + ": " + properties.getLastJoined())
+            .limit(100)
+            .collect(Collectors.joining("\n")));
         long took = System.currentTimeMillis() - start;
         sender.sendMessage(took + " ms (records total: " + all.size() + ")");
     }
@@ -266,8 +265,8 @@ public class TestCommand implements CommandService {
         CompiledMessage message = CompiledMessage.of(raw);
 
         return this.i18n.getPlaceholders().contextOf(message)
-                .with("sender", sender)
-                .apply();
+            .with("sender", sender)
+            .apply();
     }
 
     @Executor
@@ -291,13 +290,13 @@ public class TestCommand implements CommandService {
         // for simplicity player using the command is teleported too
         // notice how we use #join() on the future - this operation is blocking
         // and thus requires executor to be async or scheduler to be used
-        // alternatively if awaiting for all teleports is not required one may
+        // alternatively if awaiting all teleports is not required one may
         // use teleport(Collection<? extends Entity>, Location, TeleportActionCallback) instead
         this.server.getOnlinePlayers().stream()
-                .map(target -> this.teleports.teleport(target, playerLocation).join())
-                .forEach((target) -> SuccessResponse.of("You have been teleported here by {player}!")
-                        .withField("player", player)
-                        .sendTo(target));
+            .map(target -> this.teleports.teleport(target, playerLocation).join())
+            .forEach((target) -> SuccessResponse.of("You have been teleported here by {player}!")
+                .withField("player", player)
+                .sendTo(target));
 
         // respond to the player after everyone is teleported
         return SuccessResponse.of("Please welcome your new friends!");

@@ -55,21 +55,21 @@ public class TestListener implements Listener {
         // range from minor for flat storages and major for databases
         // okaeri platform provides easy to use fluent scheduler api
         this.tasker.newChain()
-                .async(() -> this.playerPersistence.get(event.getPlayer())) // read example
-                .acceptSync(playerProperties -> {
-                    Instant lastJoined = playerProperties.getLastJoined(); // get current value
-                    event.getPlayer().sendMessage("Your last join time: " + lastJoined);
-                    playerProperties.setLastJoined(Instant.now()); // update value
-                    playerProperties.setLastJoinedLocation(event.getPlayer().getLocation()); // bukkit types thanks to SerdesBukkit work too
-                })
-                .acceptAsync(playerProperties -> {
-                    // save player properties
-                    // normally this may not be required if data is not required to be saved immediately, see PlayerPersistence notes
-                    playerProperties.save();
-                    // yes, this is still async!
-                    event.getPlayer().sendMessage("Saved from " + Thread.currentThread().getName());
-                })
-                .execute();
+            .supplyAsync(() -> this.playerPersistence.get(event.getPlayer())) // read example
+            .acceptSync(playerProperties -> {
+                Instant lastJoined = playerProperties.getLastJoined(); // get current value
+                event.getPlayer().sendMessage("Your last join time: " + lastJoined);
+                playerProperties.setLastJoined(Instant.now()); // update value
+                playerProperties.setLastJoinedLocation(event.getPlayer().getLocation()); // bukkit types thanks to SerdesBukkit work too
+            })
+            .acceptAsync(playerProperties -> {
+                // save player properties
+                // normally this may not be required if data is not required to be saved immediately, see PlayerPersistence notes
+                playerProperties.save();
+                // yes, this is still async!
+                event.getPlayer().sendMessage("Saved from " + Thread.currentThread().getName());
+            })
+            .execute();
 
         // alternatively more classic scheduler can be used
         this.scheduler.runAsync(() -> event.getPlayer().sendMessage("Hi again from " + Thread.currentThread().getName()));

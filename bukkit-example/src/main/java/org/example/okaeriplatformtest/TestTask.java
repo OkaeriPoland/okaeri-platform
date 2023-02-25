@@ -31,10 +31,10 @@ public class TestTask implements Runnable {
         // built-in CommandRunner for easy exectution
         // of commands e.g. from the configuration/web/other source
         CommandRunner.of(this.plugin, this.server.getOnlinePlayers()) // accepts any single element or collection
-                .forceMainThread(true) // forces execution on the main thread
-                .field("ending", "hmmm..")
-                .field("name", HumanEntity::getName) // dynamic replaces based on current element or static values
-                .execute(Arrays.asList("say how are you {name}? {ending}", this.config.getRepeatingCommand())); // pass single element or collection of commands
+            .forceMainThread(true) // forces execution on the main thread
+            .field("ending", "hmmm..")
+            .field("name", HumanEntity::getName) // dynamic replaces based on current element or static values
+            .execute(Arrays.asList("say how are you {name}? {ending}", this.config.getRepeatingCommand())); // pass single element or collection of commands
 
         // accessing Cached<T>
         String cachedValue = this.cachedData.get();

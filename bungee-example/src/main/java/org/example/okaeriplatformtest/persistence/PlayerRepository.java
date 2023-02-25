@@ -15,8 +15,8 @@ import java.util.stream.Stream;
 // required to auto register the repository
 // with correct persistence
 @DependsOn(
-        type = DocumentPersistence.class,
-        name = "persistence"
+    type = DocumentPersistence.class,
+    name = "persistence"
 )
 // example flat/database persistence with custom object
 // note that saving can be done using PlayerPersistence#save()
@@ -24,8 +24,8 @@ import java.util.stream.Stream;
 // DocumentRepository provides multiple default methods
 // to create, read, update and delete entities
 @DocumentCollection(path = "player", keyLength = 36, indexes = {
-        @DocumentIndex(path = "name", maxLength = 24),
-        @DocumentIndex(path = "lastJoinedLocation.world", maxLength = 64)
+    @DocumentIndex(path = "name", maxLength = 24),
+    @DocumentIndex(path = "lastJoinedLocation.world", maxLength = 64)
 })
 public interface PlayerRepository extends DocumentRepository<UUID, PlayerProperties> {
 

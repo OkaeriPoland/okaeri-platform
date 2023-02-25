@@ -69,8 +69,10 @@ public class ExamplePlugin extends OkaeriBukkitPlugin {
     public DocumentPersistence configurePersistence(@Inject("dataFolder") File dataFolder, Plugin plugin, TestConfig config) {
 
         // jdbc drivers may require initialization for jdbc urls to work
+        // @formatter:off
         try { Class.forName("org.mariadb.jdbc.Driver"); } catch (ClassNotFoundException ignored) { }
         try { Class.forName("org.h2.Driver"); } catch (ClassNotFoundException ignored) { }
+        // @formatter:on
 
         // remember that if plugin is not intended to have shared state
         // between multiple instances you must allow users to set persistence's
@@ -185,13 +187,13 @@ public class ExamplePlugin extends OkaeriBukkitPlugin {
     @Bean("joinReward")
     public ItemStack configureRewardItem() {
         return ItemStackBuilder.of(Material.DIAMOND, 1)
-                .withName("&bDiamond") // name (auto color) or nameRaw
-                .withLore("&fWoah!") // lore or loreRaw, lists or single, appendLore or appendLoreRaw
-                .withEnchantment(Enchantment.DURABILITY, 10) // add enchantments
-                .withFlag(ItemFlag.HIDE_ENCHANTS) // add magic flag
-                .makeUnbreakable() // wow no breaking :O
-                .manipulate((item) -> item) // manipulate item manually without breaking out of the builder
-                .get(); // gotta resolve that stack
+            .withName("&bDiamond") // name (auto color) or nameRaw
+            .withLore("&fWoah!") // lore or loreRaw, lists or single, appendLore or appendLoreRaw
+            .withEnchantment(Enchantment.DURABILITY, 10) // add enchantments
+            .withFlag(ItemFlag.HIDE_ENCHANTS) // add magic flag
+            .makeUnbreakable() // wow no breaking :O
+            .manipulate((item) -> item) // manipulate item manually without breaking out of the builder
+            .get(); // gotta resolve that stack
     }
 
     // built-in cache abstraction

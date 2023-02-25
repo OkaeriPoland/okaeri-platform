@@ -117,8 +117,10 @@ public class ExampleWebApplication extends OkaeriWebApplication {
     public DocumentPersistence configurePersistence(@Inject("dataFolder") File dataFolder, TestConfig config) {
 
         // jdbc drivers may require initialization for jdbc urls to work
+        // @formatter:off
         try { Class.forName("org.mariadb.jdbc.Driver"); } catch (ClassNotFoundException ignored) { }
         try { Class.forName("org.h2.Driver"); } catch (ClassNotFoundException ignored) { }
+        // @formatter:on
 
         // remember that if plugin is not intended to have shared state
         // between multiple instances you must allow users to set persistence's

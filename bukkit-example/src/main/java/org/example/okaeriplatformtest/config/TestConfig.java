@@ -92,19 +92,19 @@ public class TestConfig extends OkaeriConfig {
     @TargetType(ArrayList.class)
     @Comment("Welcome items")
     private Collection<ItemStack> welcomeItems = Arrays.asList(
-            ItemStackBuilder.of(Material.STONE_PICKAXE, 1)
-                    .withName("&7Picky")
-                    .withLore(Arrays.asList("&fYour first,", "&fpickaxe!"))
-                    .withEnchantment(Enchantment.DURABILITY, 2)
-                    .withFlag(ItemFlag.HIDE_ENCHANTS)
-                    .makeUnbreakable()
-                    .get(),
-            ItemStackBuilder.of(Material.STONE_SPADE, 1)
-                    .withName("&7Spady")
-                    .withLore(Arrays.asList("&fYour first,", "&fspade!"))
-                    .withEnchantment(Enchantment.DURABILITY, 3)
-                    .withFlag(ItemFlag.HIDE_ENCHANTS)
-                    .makeUnbreakable()
-                    .get()
+        ItemStackBuilder.of(Material.STONE_PICKAXE, 1)
+            .withName("&7Picky")
+            .withLore(Arrays.asList("&fYour first,", "&fpickaxe!"))
+            .withEnchantment(Enchantment.DURABILITY, 2)
+            .withFlag(ItemFlag.HIDE_ENCHANTS)
+            .makeUnbreakable()
+            .get(),
+        ItemStackBuilder.of(Material.STONE_SPADE, 1)
+            .withName("&7Spady")
+            .withLore(Arrays.asList("&fYour first,", "&fspade!"))
+            .withEnchantment(Enchantment.DURABILITY, 3)
+            .withFlag(ItemFlag.HIDE_ENCHANTS)
+            .makeUnbreakable()
+            .get()
     );
 }
