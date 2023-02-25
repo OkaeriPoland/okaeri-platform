@@ -7,7 +7,7 @@ import eu.okaeri.commands.bukkit.CommandsBukkit;
 import eu.okaeri.commands.guard.GuardAccessHandler;
 import eu.okaeri.commands.handler.access.MultiAccessHandler;
 import eu.okaeri.commands.injector.CommandsInjector;
-import eu.okaeri.commands.injector.CommandsValidator;
+import eu.okaeri.commands.validator.CommandsValidator;
 import eu.okaeri.platform.bukkit.OkaeriBukkitPlugin;
 import eu.okaeri.platform.bukkit.commands.BukkitCommandsResultHandler;
 import eu.okaeri.platform.bukkit.commands.BukkitCommandsTasker;
