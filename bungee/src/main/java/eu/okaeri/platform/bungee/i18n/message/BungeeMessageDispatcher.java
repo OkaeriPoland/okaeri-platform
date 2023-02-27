@@ -1,6 +1,6 @@
 package eu.okaeri.platform.bungee.i18n.message;
 
-import eu.okaeri.i18n.core.minecraft.bungee.BungeeMessage;
+import eu.okaeri.i18n.minecraft.bungee.BungeeMessage;
 import eu.okaeri.i18n.message.Message;
 import eu.okaeri.i18n.message.MessageDispatcher;
 import eu.okaeri.placeholders.Placeholders;

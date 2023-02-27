@@ -1,7 +1,7 @@
 package eu.okaeri.platform.bukkit.i18n.message;
 
 import eu.okaeri.commons.bukkit.UnsafeBukkitCommons;
-import eu.okaeri.i18n.core.minecraft.bungee.BungeeMessage;
+import eu.okaeri.i18n.minecraft.bungee.BungeeMessage;
 import eu.okaeri.i18n.message.Message;
 import eu.okaeri.i18n.message.MessageDispatcher;
 import eu.okaeri.platform.bukkit.i18n.BI18n;
@@ -101,7 +101,7 @@ public class BukkitMessageDispatcher implements MessageDispatcher<Message> {
 
         // chat for player
         if (this.target == BukkitMessageTarget.CHAT) {
-            if (message instanceof BungeeMessage) {
+            if (message instanceof BungeeMessage && !((BungeeMessage) message).isSimple()) {
                 UnsafeBukkitCommons.sendComponent((Player) receiver, ((BungeeMessage) message).component(), UnsafeBukkitCommons.ChatTarget.CHAT);
             } else {
                 receiver.sendMessage(message.apply());

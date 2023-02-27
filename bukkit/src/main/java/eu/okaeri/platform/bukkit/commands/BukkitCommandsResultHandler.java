@@ -4,7 +4,7 @@ import eu.okaeri.commands.bukkit.handler.BukkitResultHandler;
 import eu.okaeri.commands.service.CommandContext;
 import eu.okaeri.commands.service.InvocationContext;
 import eu.okaeri.commons.bukkit.UnsafeBukkitCommons;
-import eu.okaeri.i18n.core.minecraft.bungee.BungeeMessage;
+import eu.okaeri.i18n.minecraft.bungee.BungeeMessage;
 import eu.okaeri.i18n.message.Message;
 import eu.okaeri.platform.core.i18n.message.Audience;
 import eu.okaeri.tasker.core.chain.TaskerChain;
@@ -25,7 +25,11 @@ public class BukkitCommandsResultHandler extends BukkitResultHandler {
         if (object instanceof BungeeMessage) {
             if (sender instanceof Player) {
                 if (!((BungeeMessage) object).raw().isEmpty()) {
-                    UnsafeBukkitCommons.sendComponent((Player) sender, ((BungeeMessage) object).component(), UnsafeBukkitCommons.ChatTarget.CHAT);
+                    if (((BungeeMessage) object).isSimple()) {
+                        sender.sendMessage(((BungeeMessage) object).apply());
+                    } else {
+                        UnsafeBukkitCommons.sendComponent((Player) sender, ((BungeeMessage) object).component(), UnsafeBukkitCommons.ChatTarget.CHAT);
+                    }
                 }
             } else {
                 String result = ((BungeeMessage) object).apply();
