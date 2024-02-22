@@ -7,10 +7,7 @@ import eu.okaeri.platform.bungee.component.type.ListenerComponentResolver;
 import eu.okaeri.platform.bungee.component.type.MessagesComponentResolver;
 import eu.okaeri.platform.bungee.component.type.ScheduledComponentResolver;
 import eu.okaeri.platform.core.component.creator.ComponentCreatorRegistry;
-import eu.okaeri.platform.core.component.type.BeanComponentResolver;
-import eu.okaeri.platform.core.component.type.ConfigurationComponentResolver;
-import eu.okaeri.platform.core.component.type.DocumentCollectionComponentResolver;
-import eu.okaeri.platform.core.component.type.GenericComponentResolver;
+import eu.okaeri.platform.core.component.type.*;
 
 public class BungeeCreatorRegistry extends ComponentCreatorRegistry {
 
@@ -23,7 +20,7 @@ public class BungeeCreatorRegistry extends ComponentCreatorRegistry {
         this.register(DocumentCollectionComponentResolver.class);
         this.register(ListenerComponentResolver.class);
         this.register(MessagesComponentResolver.class);
-//        this.register(CommandComponentResolver.class); TODO: commands
+        this.register(CommandComponentResolver.class);
         this.register(ScheduledComponentResolver.class);
         // generic last
         this.register(BeanComponentResolver.class);

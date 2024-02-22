@@ -12,6 +12,8 @@ import eu.okaeri.placeholders.bungee.BungeePlaceholders;
 import eu.okaeri.platform.bungee.component.BungeeComponentCreator;
 import eu.okaeri.platform.bungee.component.BungeeCreatorRegistry;
 import eu.okaeri.platform.bungee.i18n.ProxiedPlayerLocaleProvider;
+import eu.okaeri.platform.bungee.plan.BungeeCommandsI18nManifestTask;
+import eu.okaeri.platform.bungee.plan.BungeeCommandsSetupTask;
 import eu.okaeri.platform.bungee.plan.BungeeExternalResourceProviderSetupTask;
 import eu.okaeri.platform.bungee.plan.BungeeSchedulerShutdownTask;
 import eu.okaeri.platform.bungee.scheduler.PlatformScheduler;
@@ -22,6 +24,7 @@ import eu.okaeri.platform.core.plan.ExecutionPlan;
 import eu.okaeri.platform.core.plan.ExecutionResult;
 import eu.okaeri.platform.core.plan.ExecutionTask;
 import eu.okaeri.platform.core.plan.task.*;
+import eu.okaeri.platform.minecraft.task.CommandsI18nSetupTask;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
@@ -72,12 +75,14 @@ public class OkaeriBungeePlugin extends Plugin implements OkaeriPlatform {
             platform.registerInjectable("i18nLocaleProvider", new ProxiedPlayerLocaleProvider());
         });
 
-        // plan.add(PRE_SETUP, new BungeeCommandsSetupTask()); TODO
+        plan.add(PRE_SETUP, new BungeeCommandsSetupTask());
         plan.add(SETUP, new CreatorSetupTask(BungeeComponentCreator.class, BungeeCreatorRegistry.class), "creator");
 
         plan.add(POST_SETUP, new BungeeExternalResourceProviderSetupTask());
         plan.add(POST_SETUP, new BeanManifestCreateTask());
+        plan.add(POST_SETUP, new BungeeCommandsI18nManifestTask());
         plan.add(POST_SETUP, new BeanManifestExecuteTask());
+        plan.add(POST_SETUP, new CommandsI18nSetupTask());
 
         plan.add(SHUTDOWN, new BungeeSchedulerShutdownTask());
         plan.add(SHUTDOWN, new CloseableShutdownTask(Persistence.class));

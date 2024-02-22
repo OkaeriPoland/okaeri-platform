@@ -19,6 +19,13 @@
             <version>0.4.0-preview.93</version>
         </dependency>
 
+        <!-- tasker -->
+        <dependency>
+            <groupId>eu.okaeri</groupId>
+            <artifactId>okaeri-tasker-bungee</artifactId>
+            <version>${library.okaeri-tasker.version}</version>
+        </dependency>
+
         <!-- configs -->
         <dependency>
             <groupId>eu.okaeri</groupId>
@@ -39,16 +46,16 @@
         </dependency>
 
         <!-- commands -->
-<!--        <dependency>-->
-<!--            <groupId>eu.okaeri</groupId>-->
-<!--            <artifactId>okaeri-commands-bukkit</artifactId>-->
-<!--            <version>0.5.2</version>-->
-<!--        </dependency>-->
-<!--        <dependency>-->
-<!--            <groupId>eu.okaeri</groupId>-->
-<!--            <artifactId>okaeri-commands-injector</artifactId>-->
-<!--            <version>0.5.2</version>-->
-<!--        </dependency>-->
+        <dependency>
+            <groupId>eu.okaeri</groupId>
+            <artifactId>okaeri-commands-bungee</artifactId>
+            <version>${library.okaeri-commands.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>eu.okaeri</groupId>
+            <artifactId>okaeri-commands-injector</artifactId>
+            <version>${library.okaeri-commands.version}</version>
+        </dependency>
 
         <!-- i18n -->
         <dependency>
@@ -61,14 +68,14 @@
         <dependency>
             <groupId>net.md-5</groupId>
             <artifactId>bungeecord-api</artifactId>
-            <version>1.17-R0.1-SNAPSHOT</version>
+            <version>1.20-R0.1-SNAPSHOT</version>
             <type>jar</type>
             <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>net.md-5</groupId>
             <artifactId>bungeecord-api</artifactId>
-            <version>1.17-R0.1-SNAPSHOT</version>
+            <version>1.20-R0.1-SNAPSHOT</version>
             <type>javadoc</type>
             <scope>provided</scope>
         </dependency>
