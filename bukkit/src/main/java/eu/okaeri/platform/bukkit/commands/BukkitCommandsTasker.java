@@ -4,8 +4,8 @@ import eu.okaeri.commands.Commands;
 import eu.okaeri.commands.CommandsExtension;
 import eu.okaeri.commands.handler.argument.MissingArgumentHandler;
 import eu.okaeri.commands.meta.CommandMeta;
-import eu.okaeri.commands.service.CommandContext;
-import eu.okaeri.commands.service.InvocationContext;
+import eu.okaeri.commands.service.CommandData;
+import eu.okaeri.commands.service.Invocation;
 import eu.okaeri.platform.bukkit.annotation.Chain;
 import eu.okaeri.tasker.core.Tasker;
 import lombok.NonNull;
@@ -30,11 +30,11 @@ public class BukkitCommandsTasker implements CommandsExtension {
         private final MissingArgumentHandler parent;
 
         @Override
-        public Object resolve(@NonNull InvocationContext invocationContext, @NonNull CommandContext commandContext, @NonNull CommandMeta command, @NonNull Parameter param, int index) {
+        public Object resolve(@NonNull Invocation invocation, @NonNull CommandData data, @NonNull CommandMeta command, @NonNull Parameter param, int index) {
 
             Chain chain = param.getAnnotation(Chain.class);
             if (chain == null) {
-                return this.parent.resolve(invocationContext, commandContext, command, param, index);
+                return this.parent.resolve(invocation, data, command, param, index);
             }
 
             String chainName = chain.value();

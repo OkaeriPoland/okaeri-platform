@@ -1,11 +1,11 @@
 package eu.okaeri.platform.bukkit.commands;
 
 import eu.okaeri.commands.bukkit.handler.BukkitResultHandler;
-import eu.okaeri.commands.service.CommandContext;
-import eu.okaeri.commands.service.InvocationContext;
+import eu.okaeri.commands.service.CommandData;
+import eu.okaeri.commands.service.Invocation;
 import eu.okaeri.commons.bukkit.UnsafeBukkitCommons;
-import eu.okaeri.i18n.minecraft.bungee.BungeeMessage;
 import eu.okaeri.i18n.message.Message;
+import eu.okaeri.i18n.minecraft.bungee.BungeeMessage;
 import eu.okaeri.platform.core.i18n.message.Audience;
 import eu.okaeri.tasker.core.chain.TaskerChain;
 import lombok.NonNull;
@@ -15,9 +15,9 @@ import org.bukkit.entity.Player;
 public class BukkitCommandsResultHandler extends BukkitResultHandler {
 
     @Override
-    public boolean handle(Object object, @NonNull CommandContext commandContext, @NonNull InvocationContext invocationContext) {
+    public boolean handle(Object object, @NonNull CommandData data, @NonNull Invocation invocation) {
 
-        CommandSender sender = commandContext.get("sender", CommandSender.class);
+        CommandSender sender = data.get("sender", CommandSender.class);
         if (sender == null) {
             throw new RuntimeException("Cannot return result, no sender found");
         }
@@ -58,6 +58,6 @@ public class BukkitCommandsResultHandler extends BukkitResultHandler {
             return true;
         }
 
-        return super.handle(object, commandContext, invocationContext);
+        return super.handle(object, data, invocation);
     }
 }

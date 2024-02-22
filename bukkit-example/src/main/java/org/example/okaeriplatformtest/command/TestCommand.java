@@ -2,7 +2,6 @@ package org.example.okaeriplatformtest.command;
 
 import eu.okaeri.commands.annotation.*;
 import eu.okaeri.commands.bukkit.annotation.Async;
-import eu.okaeri.commands.bukkit.annotation.Sender;
 import eu.okaeri.commands.bukkit.annotation.Sync;
 import eu.okaeri.commands.bukkit.response.BukkitResponse;
 import eu.okaeri.commands.bukkit.response.ErrorResponse;
@@ -250,7 +249,7 @@ public class TestCommand implements CommandService {
 
     // testcmd|testing deleteme
     @Executor
-    public void deleteme(@Sender Player player) {
+    public void deleteme(@Context Player player) {
         long start = System.currentTimeMillis();
         player.sendMessage("state: " + this.playerPersistence.deleteByPath(player.getUniqueId()));
         long took = System.currentTimeMillis() - start;
@@ -278,7 +277,7 @@ public class TestCommand implements CommandService {
     @Executor
     public BukkitResponse tphereall(CommandSender sender) {
 
-        /* waiting for okaeri-commands to use @Sender Player directly - not funny */
+        /* waiting for okaeri-commands to use @Context Player directly - not funny */
         if (!(sender instanceof Player)) {
             return ErrorResponse.of("Sorry we cannot do that!");
         }

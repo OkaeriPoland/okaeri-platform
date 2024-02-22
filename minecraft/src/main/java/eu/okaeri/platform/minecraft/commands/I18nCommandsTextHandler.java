@@ -1,8 +1,8 @@
 package eu.okaeri.platform.minecraft.commands;
 
 import eu.okaeri.commands.handler.text.TextHandler;
-import eu.okaeri.commands.service.CommandContext;
-import eu.okaeri.commands.service.InvocationContext;
+import eu.okaeri.commands.service.CommandData;
+import eu.okaeri.commands.service.Invocation;
 import eu.okaeri.i18n.configs.extended.CustomMEOCI18n;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
@@ -25,14 +25,14 @@ public class I18nCommandsTextHandler implements TextHandler {
     }
 
     @Override
-    public String resolve(@NonNull CommandContext commandContext, @NonNull InvocationContext invocationContext, @NonNull String text) {
+    public String resolve(@NonNull CommandData data, @NonNull Invocation invocation, @NonNull String text) {
 
         Set<String> contextKeys = findKeys(CONTEXT_KEY_PATTERN, text);
         if (contextKeys.isEmpty()) {
             return text;
         }
 
-        Object sender = commandContext.get("sender");
+        Object sender = data.get("sender");
         if (sender == null) {
             return text;
         }

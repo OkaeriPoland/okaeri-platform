@@ -1,7 +1,6 @@
 package org.example.okaeriplatformtest;
 
 import eu.okaeri.commands.bukkit.handler.CommandsUnknownErrorEvent;
-import eu.okaeri.commands.service.CommandContext;
 import eu.okaeri.commons.bukkit.teleport.QueuedTeleports;
 import eu.okaeri.injector.annotation.Inject;
 import eu.okaeri.platform.bukkit.scheduler.PlatformScheduler;
@@ -104,15 +103,14 @@ public class TestListener implements Listener {
         // event.setSendMessage(false);
 
         // fetch sender
-        CommandContext commandContext = event.getCommandContext();
-        CommandSender sender = commandContext.get("sender", CommandSender.class);
+        CommandSender sender = event.getData().get("sender", CommandSender.class);
         if (sender == null) {
             return;
         }
 
         // useful properties
         // String errorId = event.getErrorId();
-        // InvocationContext invocationContext = event.getInvocationContext();
+        // Invocation invocation = event.getInvocationContext();
 
         // custom handling, e.g. sentry
         StringWriter sw = new StringWriter();

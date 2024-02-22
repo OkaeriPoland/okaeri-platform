@@ -59,8 +59,8 @@ public class PlatformGuardianContextProvider extends DefaultGuardianContextProvi
         }
 
         // add bindings: command context
-        if (alreadyPresent.add("commandContext")) {
-            guardianContext.with("commandContext", invocationMeta.getCommand());
+        if (alreadyPresent.add("commandData")) {
+            guardianContext.with("commandData", invocationMeta.getCommand());
         }
 
         // add bindings: injector
