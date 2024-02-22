@@ -28,15 +28,15 @@
         <maven.compiler.source>8</maven.compiler.source>
         <maven.compiler.target>8</maven.compiler.target>
 
-        <library.okaeri-commands.version>0.8.18</library.okaeri-commands.version>
-        <library.okaeri-configs.version>5.0.0-beta.4</library.okaeri-configs.version>
+        <library.okaeri-commands.version>0.9.1</library.okaeri-commands.version>
+        <library.okaeri-configs.version>5.0.0-beta.5</library.okaeri-configs.version>
         <library.okaeri-i18n.version>5.0.1-beta.10</library.okaeri-i18n.version>
         <library.okaeri-commons.version>0.2.22</library.okaeri-commons.version>
         <library.okaeri-injector.version>2.1.0</library.okaeri-injector.version>
         <library.okaeri-validator.version>2.0.4</library.okaeri-validator.version>
         <library.okaeri-placeholders.version>4.0.7</library.okaeri-placeholders.version>
         <library.okaeri-persistence.version>2.0.0-beta.1</library.okaeri-persistence.version>
-        <library.okaeri-tasker.version>2.1.0-beta.2</library.okaeri-tasker.version>
+        <library.okaeri-tasker.version>2.1.0-beta.3</library.okaeri-tasker.version>
         <library.okaeri-acl.version>0.1.4</library.okaeri-acl.version>
     </properties>
 
