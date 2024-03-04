@@ -34,7 +34,7 @@ public class PersistencePathSerializer extends StdSerializer<PersistencePath> {
     @Override
     public void serialize(PersistencePath persistencePath, JsonGenerator jsonGenerator, SerializerProvider serializerProvider) throws IOException {
         String value = persistencePath.getValue();
-        if (Numbers.isInteger(value)) {
+        if (Numbers.isInt(value)) {
             jsonGenerator.writeNumber(Long.parseLong(value));
         } else {
             jsonGenerator.writeString(value);
