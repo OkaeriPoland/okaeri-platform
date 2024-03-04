@@ -48,6 +48,8 @@ Note the code below does not represent full source code of the example. Project 
 @Register(TestCommand.class)
 @Register(TestListener.class)
 @Register(TestTask.class)
+// alternatively instead of all @Register annotations:
+// @Scan(exclusions = "my.package.libs", deep = true)
 public class ExamplePlugin extends OkaeriBukkitPlugin {
 
   @Inject("subbean")

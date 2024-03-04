@@ -16,11 +16,23 @@ Whole ecosystems built on top of the best okaeri packages.
   - register platform specific services as components
   - use commons for the most boring tasks and cleaner code
 
-## Real-life uses
+## Real-life use cases
 - [okaeri-poly](https://github.com/OkaeriPoland/okaeri-poly): Minecraft scripting plugin with the support for Groovy, JavaScript, and Python — a great addition to traditional plugins and a rapid prototyping tool
 - [okaeri-minecraft](https://github.com/OkaeriPoland/okaeri-minecraft): Minecraft plugins built for various [okaeri services](https://www.okaeri.eu), based around integrating Minecraft servers with the WEB APIs
 
 ## Supported platforms
+```shell
+# platform
+─ core
+  └─ minecraft
+     ├─ bukkit
+     └─ bungee
+  └─ standalone
+     ├─ web
+     └─ cli
+# extensions
+─ ext-scheduler-quartz
+```
 - **Minecraft**
   - [bukkit](https://github.com/OkaeriPoland/okaeri-platform/tree/master/bukkit): your platform of choice for best Spigot/Paper development experience (*beta - possible breaking changes*)
   - [bungee](https://github.com/OkaeriPoland/okaeri-platform/tree/master/bungee): your platform of choice for best BungeeCord development experience (*beta - possible breaking changes*)
@@ -29,8 +41,9 @@ Whole ecosystems built on top of the best okaeri packages.
   - [cli](https://github.com/OkaeriPoland/okaeri-platform/tree/master/cli): allows access to platform features with minimal fuss, useful for bots or other standalone tools (*beta - possible breaking changes*)
 
 ## Documentation
-We believe Okaeri Platform is best learned by examples, so feel free to explore README files of supported platforms and linked example projects. 
-This approach also allows us to keep examples always up-to-date. You can also ask/search for any related questions in [discussions](https://github.com/OkaeriPoland/okaeri-platform/discussions).
+Okaeri Platform is a private use first project, not a public benefit project, and should be treated as such, the documentation might be non-existing or lacking.
+Feel free to explore README files of supported platforms for some basic guidance and [Real-life use cases](https://github.com/OkaeriPoland/okaeri-platform?tab=readme-ov-file#real-life-use-cases) projects.
+You can search for or make any okaeri-platform related questions in [discussions](https://github.com/OkaeriPoland/okaeri-platform/discussions).
 
 ## Recommendations
 It is highly recommended to use `-parameters` compiler flag for better overall feature support.
