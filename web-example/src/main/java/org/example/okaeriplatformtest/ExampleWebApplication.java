@@ -113,7 +113,7 @@ public class ExampleWebApplication extends OkaeriWebApplication {
     // built-in persistence utils
     // easy storage for e.g. player properties
     // see persistence/PlayerPersistence for details
-    @Bean(value = "persistence", preload = true)
+    @Bean(value = "persistence")
     public DocumentPersistence configurePersistence(@Inject("dataFolder") File dataFolder, TestConfig config) {
 
         // jdbc drivers may require initialization for jdbc urls to work

@@ -138,7 +138,6 @@ public class BeanManifest {
         BeanManifest manifest = new BeanManifest();
         manifest.setType(method.getReturnType());
         manifest.setName((annotation == null) ? "" : annotation.value());
-        manifest.setPreload(annotation != null && annotation.preload());
 
         manifest.setDepends(Arrays.stream(method.getParameters())
             .filter(parameter -> !creator.getRegistry().isDynamicParameter(parameter))
@@ -199,7 +198,6 @@ public class BeanManifest {
     private BeanSource source;
     private BeanManifest parent;
     private Method method;
-    private boolean preload = false;
     private boolean fullLoad = false;
     private List<BeanManifest> depends;
     private List<External> externals;
@@ -214,7 +212,6 @@ public class BeanManifest {
             ", source=" + this.source +
             ", parent=" + (this.parent == null ? null : "[present]") +
             ", method=" + this.method +
-            ", preload=" + this.preload +
             ", fullLoad=" + this.fullLoad +
             ", depends=" + (this.depends == null ? null : "[present (" + this.depends.size() + ")]") +
             ", externals=" + (this.externals == null ? null : "[present (" + this.externals.size() + ")]") +

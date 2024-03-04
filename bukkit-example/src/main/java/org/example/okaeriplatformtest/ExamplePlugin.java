@@ -65,7 +65,7 @@ public class ExamplePlugin extends OkaeriBukkitPlugin {
     // built-in persistence utils
     // easy storage for e.g. player properties
     // see persistence/PlayerPersistence for details
-    @Bean(value = "persistence", preload = true)
+    @Bean(value = "persistence")
     public DocumentPersistence configurePersistence(@Inject("dataFolder") File dataFolder, Plugin plugin, TestConfig config) {
 
         // jdbc drivers may require initialization for jdbc urls to work
