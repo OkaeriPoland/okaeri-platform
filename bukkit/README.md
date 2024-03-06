@@ -308,17 +308,6 @@ public class TestTask implements Runnable {
 @Header("================================")
 @Header("       Magic Configuration      ")
 @Header("================================")
-// automatically applies name transformations (by default)
-// config keys can be also individually changed using @CustomKey
-// strategies: 
-// - IDENTITY: do not change (default)
-// - SNAKE_CASE: exampleValue -> example_Value
-// - HYPHEN_CASE: exampleValue -> example-Value
-// modifiers:
-// - NONE: do not change (default)
-// - TO_LOWER_CASE: e.g. example-Value -> example-value
-// - TO_UPPER_CASE: e.g. example_Value -> EXAMPLE_VALUE
-@Names(strategy = NameStrategy.HYPHEN_CASE, modifier = NameModifier.TO_LOWER_CASE)
 public class TestConfig extends OkaeriConfig {
 
   @Size(min = 1, max = 64) // validation using okaeri-validator
@@ -339,7 +328,6 @@ public class TestConfig extends OkaeriConfig {
 // defaultLocale is a fallback locale and the assumed locale of the default field values
 // unpack defines should files present in the {path} of the plugin's resources should be written to the plugin's directory
 @Messages // path = "i18n", suffix = ".yml", defaultLocale = "en", unpack = true
-@Names(strategy = NameStrategy.HYPHEN_CASE, modifier = NameModifier.TO_LOWER_CASE)
 public class TestLocaleConfig extends LocaleConfig {
     // it is HIGHLY recommended that defaultLocale is implemented as default values here
     private String exampleMessage = "Hello {world,worlds#who|unknown}!"; // pluralization and default values: for details see okaeri-i18n

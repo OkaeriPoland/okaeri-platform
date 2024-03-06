@@ -13,7 +13,6 @@ import lombok.Getter;
 // defaultLocale is a fallback locale and the assumed locale of the default field values
 // unpack defines should files present in the {path} of the plugin's resources should be written to the plugin's directory
 @Messages // path = "i18n", suffix = ".yml", defaultLocale = "en", unpack = true
-@Names(strategy = NameStrategy.HYPHEN_CASE, modifier = NameModifier.TO_LOWER_CASE)
 public class TestLocaleConfig extends LocaleConfig {
     // it is HIGHLY recommended that defaultLocale is implemented as default values here
     private String exampleMessage = "Hello {world,worlds#who|unknown}!"; // pluralization and default values: for details see okaeri-i18n
