@@ -2,6 +2,7 @@ package eu.okaeri.platform.core.component.type;
 
 import eu.okaeri.injector.Injector;
 import eu.okaeri.platform.core.annotation.Component;
+import eu.okaeri.platform.core.annotation.Service;
 import eu.okaeri.platform.core.component.ComponentHelper;
 import eu.okaeri.platform.core.component.creator.ComponentCreator;
 import eu.okaeri.platform.core.component.creator.ComponentResolver;
@@ -21,7 +22,7 @@ public class GenericComponentResolver implements ComponentResolver {
 
     @Override
     public boolean supports(@NonNull Class<?> type) {
-        return type.getAnnotation(Component.class) != null;
+        return (type.getAnnotation(Service.class) != null) || (type.getAnnotation(Component.class) != null);
     }
 
     @Override
