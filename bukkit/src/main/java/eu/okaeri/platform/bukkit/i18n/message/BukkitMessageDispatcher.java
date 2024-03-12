@@ -1,9 +1,10 @@
 package eu.okaeri.platform.bukkit.i18n.message;
 
 import eu.okaeri.commons.bukkit.UnsafeBukkitCommons;
-import eu.okaeri.i18n.minecraft.bungee.BungeeMessage;
 import eu.okaeri.i18n.message.Message;
 import eu.okaeri.i18n.message.MessageDispatcher;
+import eu.okaeri.i18n.minecraft.bungee.BungeeMessage;
+import eu.okaeri.placeholders.context.PlaceholderContext;
 import eu.okaeri.platform.bukkit.i18n.BI18n;
 import eu.okaeri.platform.core.placeholder.PlaceholdersFactory;
 import lombok.NonNull;
@@ -61,6 +62,16 @@ public class BukkitMessageDispatcher implements MessageDispatcher<Message> {
 
     public BukkitMessageDispatcher with(@NonNull String field, Object value) {
         this.fields.put(field, value);
+        return this;
+    }
+
+    private BukkitMessageDispatcher with(@NonNull Map<String, Object> fields) {
+        this.fields.putAll(fields);
+        return this;
+    }
+
+    public BukkitMessageDispatcher with(@NonNull PlaceholderContext context) {
+        context.getFields().forEach((k, p) -> this.fields.put(k, p.getValue()));
         return this;
     }
 

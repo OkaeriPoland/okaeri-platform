@@ -4,6 +4,7 @@ import eu.okaeri.i18n.minecraft.bungee.BungeeMessage;
 import eu.okaeri.i18n.message.Message;
 import eu.okaeri.i18n.message.MessageDispatcher;
 import eu.okaeri.placeholders.Placeholders;
+import eu.okaeri.placeholders.context.PlaceholderContext;
 import eu.okaeri.platform.bungee.i18n.BI18n;
 import eu.okaeri.platform.core.placeholder.PlaceholdersFactory;
 import lombok.NonNull;
@@ -65,6 +66,16 @@ public class BungeeMessageDispatcher implements MessageDispatcher<Message> {
 
     public BungeeMessageDispatcher with(@NonNull String field, Object value) {
         this.fields.put(field, value);
+        return this;
+    }
+
+    private BungeeMessageDispatcher with(@NonNull Map<String, Object> fields) {
+        this.fields.putAll(fields);
+        return this;
+    }
+
+    public BungeeMessageDispatcher with(@NonNull PlaceholderContext context) {
+        context.getFields().forEach((k, p) -> this.fields.put(k, p.getValue()));
         return this;
     }
 
