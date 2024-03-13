@@ -17,7 +17,7 @@ public class I18nCommandsTextHandler implements TextHandler {
     private static final Pattern CONTEXT_KEY_PATTERN = Pattern.compile("\\$\\{([^}]+)}");
     private static final Pattern STATIC_KEY_PATTERN = Pattern.compile("#\\{([^}]+)}");
 
-    private final Map<String, CustomMEOCI18n<?>> i18n;
+    protected final Map<String, CustomMEOCI18n<?>> i18n;
 
     @Override
     public String resolve(@NonNull String text) {
