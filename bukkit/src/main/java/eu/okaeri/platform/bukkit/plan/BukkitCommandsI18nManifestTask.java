@@ -1,5 +1,6 @@
 package eu.okaeri.platform.bukkit.plan;
 
+import eu.okaeri.i18n.configs.extended.CustomMEOCI18n;
 import eu.okaeri.platform.bukkit.OkaeriBukkitPlugin;
 import eu.okaeri.platform.core.component.creator.ComponentCreator;
 import eu.okaeri.platform.core.component.manifest.BeanManifest;
@@ -16,6 +17,10 @@ public class BukkitCommandsI18nManifestTask implements ExecutionTask<OkaeriBukki
 
         ClassLoader classLoader = platform.getClass().getClassLoader();
         ComponentCreator creator = platform.getCreator();
+
+        if (platform.getInjector().get("i18n-platform-commands", CustomMEOCI18n.class).isPresent()) {
+            return;
+        }
 
         manifest.withDepend(BeanManifest.of(classLoader, I18nCommandsMessages.class, creator, false).name("i18n-platform-commands"));
     }

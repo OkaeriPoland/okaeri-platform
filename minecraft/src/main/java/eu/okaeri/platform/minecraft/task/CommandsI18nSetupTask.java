@@ -5,6 +5,7 @@ import eu.okaeri.configs.OkaeriConfig;
 import eu.okaeri.i18n.configs.extended.CustomMEOCI18n;
 import eu.okaeri.i18n.extended.PrefixProvider;
 import eu.okaeri.platform.core.OkaeriPlatform;
+import eu.okaeri.platform.core.annotation.Messages;
 import eu.okaeri.platform.core.plan.ExecutionTask;
 import eu.okaeri.platform.minecraft.commands.I18nCommandsTextHandler;
 
@@ -22,7 +23,8 @@ public class CommandsI18nSetupTask implements ExecutionTask<OkaeriPlatform> {
         AtomicReference<PrefixProvider> prefixProvider = new AtomicReference<>();
 
         // read all available configs
-        platform.getInjector().allOf(OkaeriConfig.class)
+        platform.getInjector().streamInjectableOf(OkaeriConfig.class)
+            .filter(injectable -> injectable.getType().getAnnotation(Messages.class) == null)
             .forEach(injectable -> configProviders.put(injectable.getName(), injectable.getObject()));
 
         // read all available i18n
