@@ -78,8 +78,10 @@ public class OkaeriWebApplication implements OkaeriPlatform {
 
         plan.add(POST_SETUP, new BeanManifestCreateTask());
         plan.add(POST_SETUP, new BeanManifestExecuteTask());
+        plan.add(POST_SETUP, new CommandsRegisterTask());
         plan.add(POST_SETUP, new JavalinSetupTask());
-        plan.add(POST_SETUP, new PlatformBannerStartupTask());
+
+        plan.add(PRE_STARTUP, new PlatformBannerStartupTask());
 
         plan.add(STARTUP, new JavalinStartTask());
 

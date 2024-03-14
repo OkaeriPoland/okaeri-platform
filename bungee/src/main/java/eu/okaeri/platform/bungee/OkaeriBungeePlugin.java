@@ -83,6 +83,7 @@ public class OkaeriBungeePlugin extends Plugin implements OkaeriPlatform {
         plan.add(POST_SETUP, new BungeeCommandsI18nManifestTask());
         plan.add(POST_SETUP, new BeanManifestExecuteTask());
         plan.add(POST_SETUP, new CommandsI18nSetupTask());
+        plan.add(POST_SETUP, new CommandsRegisterTask());
 
         plan.add(SHUTDOWN, new BungeeSchedulerShutdownTask());
         plan.add(SHUTDOWN, new CloseableShutdownTask(Persistence.class));

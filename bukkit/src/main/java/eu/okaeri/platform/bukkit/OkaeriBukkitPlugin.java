@@ -90,6 +90,7 @@ public class OkaeriBukkitPlugin extends JavaPlugin implements OkaeriPlatform {
         plan.add(POST_SETUP, new BukkitCommandsI18nManifestTask());
         plan.add(POST_SETUP, new BeanManifestExecuteTask());
         plan.add(POST_SETUP, new CommandsI18nSetupTask());
+        plan.add(POST_SETUP, new CommandsRegisterTask());
 
         plan.add(SHUTDOWN, new CloseableShutdownTask(Persistence.class));
         plan.add(SHUTDOWN, new CloseableShutdownTask(Commands.class));

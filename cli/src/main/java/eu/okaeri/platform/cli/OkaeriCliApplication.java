@@ -75,7 +75,9 @@ public class OkaeriCliApplication implements OkaeriPlatform {
 
         plan.add(POST_SETUP, new BeanManifestCreateTask());
         plan.add(POST_SETUP, new BeanManifestExecuteTask());
-        plan.add(POST_SETUP, new PlatformBannerStartupTask());
+        plan.add(POST_SETUP, new CommandsRegisterTask());
+
+        plan.add(PRE_STARTUP, new PlatformBannerStartupTask());
 
         plan.add(SHUTDOWN, new CloseableShutdownTask(Persistence.class));
         plan.add(SHUTDOWN, new CloseableShutdownTask(Commands.class));
