@@ -82,7 +82,9 @@ public class I18nCommandsTextHandler implements TextHandler {
     @Override
     public String resolve(@NonNull CommandData data, @NonNull Invocation invocation, @NonNull String text) {
 
+        text = this.resolve(text); // resolve static variables first
         Set<String> variables = findVariables(CONTEXT_VAR_PATTERN, text);
+
         if (variables.isEmpty()) {
             return text;
         }
