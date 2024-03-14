@@ -8,8 +8,11 @@ import eu.okaeri.platform.core.OkaeriPlatform;
 import eu.okaeri.platform.core.annotation.Messages;
 import eu.okaeri.platform.core.plan.ExecutionTask;
 import eu.okaeri.platform.minecraft.commands.I18nCommandsTextHandler;
+import lombok.NonNull;
 
+import java.util.ArrayList;
 import java.util.LinkedHashMap;
+import java.util.ListIterator;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicReference;
 
@@ -35,14 +38,28 @@ public class CommandsI18nSetupTask implements ExecutionTask<OkaeriPlatform> {
         platform.getInjector().get("i18n", CustomMEOCI18n.class)
             .ifPresent(i18n -> prefixProvider.set(i18n.getPrefixProvider()));
 
-        // update prefix provider of commands to the main one
+        // update prefix provider of commands to the primary one
         if (prefixProvider.get() != null) {
             platform.getInjector().get("i18n-platform-commands", CustomMEOCI18n.class)
                 .ifPresent(i18n -> i18n.setPrefixProvider(prefixProvider.get()));
         }
 
-        // inject all i18n into commands to allow ${key} access
+        // inject configs/i18n into commands to allow #{key}/${key} access
         platform.getInjector().get("commands", Commands.class)
-            .ifPresent(commands -> commands.textHandler(new I18nCommandsTextHandler(configProviders, i18nCommandsProviders)));
+            .ifPresent(commands -> commands.textHandler(new I18nCommandsTextHandler(
+                // last added take priority
+                reverseLinkedHashMap(configProviders),
+                reverseLinkedHashMap(i18nCommandsProviders)
+            )));
+    }
+
+    private static <K, V> Map<K, V> reverseLinkedHashMap(@NonNull Map<K, V> source) {
+        Map<K, V> output = new LinkedHashMap<>();
+        ListIterator<Map.Entry<K, V>> iterator = new ArrayList<>(source.entrySet()).listIterator(source.size());
+        while (iterator.hasPrevious()) {
+            Map.Entry<K, V> previous = iterator.previous();
+            output.put(previous.getKey(), previous.getValue());
+        }
+        return output;
     }
 }
