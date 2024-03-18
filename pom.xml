@@ -28,7 +28,7 @@
         <maven.compiler.source>8</maven.compiler.source>
         <maven.compiler.target>8</maven.compiler.target>
 
-        <library.okaeri-commands.version>0.9.2</library.okaeri-commands.version>
+        <library.okaeri-commands.version>0.9.3</library.okaeri-commands.version>
         <library.okaeri-configs.version>5.0.1</library.okaeri-configs.version>
         <library.okaeri-i18n.version>5.1.0</library.okaeri-i18n.version>
         <library.okaeri-commons.version>0.2.23</library.okaeri-commons.version>
