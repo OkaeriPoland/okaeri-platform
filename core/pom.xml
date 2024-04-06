@@ -5,7 +5,7 @@
     <parent>
         <artifactId>okaeri-platform</artifactId>
         <groupId>eu.okaeri</groupId>
-        <version>0.4.19</version>
+        <version>0.4.20</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
