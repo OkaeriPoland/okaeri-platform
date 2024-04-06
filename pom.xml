@@ -30,7 +30,7 @@
 
         <library.okaeri-commands.version>0.9.5</library.okaeri-commands.version>
         <library.okaeri-configs.version>5.0.1</library.okaeri-configs.version>
-        <library.okaeri-i18n.version>5.1.0</library.okaeri-i18n.version>
+        <library.okaeri-i18n.version>5.1.1</library.okaeri-i18n.version>
         <library.okaeri-commons.version>0.2.23</library.okaeri-commons.version>
         <library.okaeri-injector.version>2.1.0</library.okaeri-injector.version>
         <library.okaeri-validator.version>2.0.4</library.okaeri-validator.version>
