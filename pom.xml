@@ -15,6 +15,7 @@
         <module>minecraft</module>
         <module>bukkit</module>
         <module>bungee</module>
+        <module>velocity</module>
         <!-- standalone -->
         <module>standalone</module>
         <module>web</module>

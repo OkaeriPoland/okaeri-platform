@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <parent>
+        <artifactId>okaeri-platform</artifactId>
+        <groupId>eu.okaeri</groupId>
+        <version>0.4.20</version>
+    </parent>
+    <modelVersion>4.0.0</modelVersion>
+
+    <artifactId>okaeri-platform-velocity</artifactId>
+
+    <dependencies>
+        <!-- core -->
+        <dependency>
+            <groupId>eu.okaeri</groupId>
+            <artifactId>okaeri-platform-minecraft</artifactId>
+            <version>0.4.20</version>
+        </dependency>
+
+        <!-- tasker -->
+<!--        <dependency>-->
+<!--            <groupId>eu.okaeri</groupId>-->
+<!--            <artifactId>okaeri-tasker-velocity</artifactId>-->
+<!--            <version>${library.okaeri-tasker.version}</version>-->
+<!--        </dependency>-->
+
+        <!-- configs -->
+<!--        <dependency>-->
+<!--            <groupId>eu.okaeri</groupId>-->
+<!--            <artifactId>okaeri-configs-yaml-velocity</artifactId>-->
+<!--            <version>${library.okaeri-configs.version}</version>-->
+<!--        </dependency>-->
+<!--        <dependency>-->
+<!--            <groupId>eu.okaeri</groupId>-->
+<!--            <artifactId>okaeri-configs-serdes-velocity</artifactId>-->
+<!--            <version>${library.okaeri-configs.version}</version>-->
+<!--        </dependency>-->
+
+        <!-- messages -->
+<!--        <dependency>-->
+<!--            <groupId>eu.okaeri</groupId>-->
+<!--            <artifactId>okaeri-placeholders-velocity</artifactId>-->
+<!--            <version>${library.okaeri-placeholders.version}</version>-->
+<!--        </dependency>-->
+
+        <!-- commands -->
+<!--        <dependency>-->
+<!--            <groupId>eu.okaeri</groupId>-->
+<!--            <artifactId>okaeri-commands-velocity</artifactId>-->
+<!--            <version>${library.okaeri-commands.version}</version>-->
+<!--        </dependency>-->
+<!--        <dependency>-->
+<!--            <groupId>eu.okaeri</groupId>-->
+<!--            <artifactId>okaeri-commands-injector</artifactId>-->
+<!--            <version>${library.okaeri-commands.version}</version>-->
+<!--        </dependency>-->
+
+        <!-- i18n -->
+<!--        <dependency>-->
+<!--            <groupId>eu.okaeri</groupId>-->
+<!--            <artifactId>okaeri-i18n-minecraft-velocity</artifactId>-->
+<!--            <version>${library.okaeri-i18n.version}</version>-->
+<!--        </dependency>-->
+
+        <!-- velocity -->
+        <dependency>
+            <groupId>com.velocitypowered</groupId>
+            <artifactId>velocity-api</artifactId>
+            <version>3.3.0-SNAPSHOT</version>
+            <scope>provided</scope>
+        </dependency>
+    </dependencies>
+
+    <repositories>
+        <repository>
+            <id>papermc</id>
+            <url>https://repo.papermc.io/repository/maven-public/</url>
+        </repository>
+    </repositories>
+
+</project>
