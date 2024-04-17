@@ -2,13 +2,15 @@ package eu.okaeri.platform.core.component.manifest;
 
 import eu.okaeri.commons.classpath.ClasspathResourceType;
 import eu.okaeri.commons.classpath.ClasspathScanner;
+import eu.okaeri.injector.Injectable;
 import eu.okaeri.injector.Injector;
 import eu.okaeri.injector.annotation.Inject;
 import eu.okaeri.platform.core.OkaeriPlatform;
 import eu.okaeri.platform.core.annotation.*;
 import eu.okaeri.platform.core.component.ExternalResourceProvider;
 import eu.okaeri.platform.core.component.creator.ComponentCreator;
-import lombok.*;
+import lombok.Data;
+import lombok.NonNull;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
@@ -22,6 +24,7 @@ import java.util.stream.Collectors;
 public class BeanManifest {
 
     private static final boolean DEBUG = Boolean.parseBoolean(System.getProperty("okaeri.platform.debug", "false"));
+    private static final int MAX_RESOLVE_FAIL = Integer.parseInt(System.getProperty("okaeri.platform.maxResolveFail", "100"));
     private static final Logger LOGGER = Logger.getLogger(BeanManifest.class.getName());
 
     public static BeanManifest of(@NonNull Parameter parameter) {
@@ -339,13 +342,43 @@ public class BeanManifest {
                     int newValue = this.failCounter.getOrDefault(dependencyPair, 0) + 1;
                     this.failCounter.put(dependencyPair, newValue);
 
-                    if (newValue > 100) {
+                    if (newValue > MAX_RESOLVE_FAIL) {
                         this.failCounter.entrySet().stream()
                             .sorted(Collections.reverseOrder(Map.Entry.comparingByValue()))
                             .filter(entry -> entry.getValue() > 10)
                             .forEach((entry) -> LOGGER.severe(entry.getKey() + " - " + entry.getValue() + " fails"));
-                        throw new RuntimeException("Failed to resolve component/bean " + dependClass + " (" + depend.getName() + "=" + depend.getSource() + ") in " + this.getType() + ":\n"
-                            + injector.stream().map(i -> "- '" + i.getName() + "' -> " + i.getType()).collect(Collectors.joining("\n")));
+
+                        String dependDependencies = "- (unknown)";
+                        if (depend.getSource() == BeanSource.INJECT) {
+
+                            BeanManifest manifest = BeanManifest.of(this.getClass().getClassLoader(), depend.getType(), creator, false);
+                            manifest.invokeInjectDependencies(injector);
+
+                            if (manifest.getDepends().isEmpty()) {
+                                dependDependencies = "- (none)";
+                            } else {
+                                dependDependencies = manifest.getDepends().stream()
+                                    .map(d -> {
+                                        if (d.getSource() == BeanSource.INJECT && d.getObject() == null) {
+                                            List<String> similarNames = injector.allOf(d.getType()).stream()
+                                                .map(Injectable::getName)
+                                                .collect(Collectors.toList());
+                                            Collections.reverse(similarNames);
+                                            return "- '" + d.getName() + "' -> " + d.getType() + " (" + "empty, similar by type: [" + String.join(", ", similarNames) + "])";
+                                        }
+                                        return "- '" + d.getName() + "' -> " + d.getType() + " (" + (d.getObject() == null ? "empty" : "filled") + ")";
+                                    })
+                                    .collect(Collectors.joining("\n"));
+                            }
+                        }
+
+                        String injectorContents = injector.stream()
+                            .map(i -> "- '" + i.getName() + "' -> " + i.getType())
+                            .collect(Collectors.joining("\n"));
+
+                        throw new RuntimeException("Failed to resolve component/bean " + dependClass + " (" + depend.getName() + "=" + depend.getSource() + ") in " + this.getType() + "!" +
+                            "\n" + dependClass.getSimpleName() + " dependencies (as component): \n" + dependDependencies +
+                            "\nInjector contents: \n" + injectorContents);
                     }
 
                     return false;
