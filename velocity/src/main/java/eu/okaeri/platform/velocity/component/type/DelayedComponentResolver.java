@@ -45,7 +45,7 @@ public class DelayedComponentResolver implements ComponentResolver {
         int delay = delayed.time();
         TimeUnit timeUnit = delayed.timeUnit();
 
-        this.scheduler.schedule(runnable, delay, timeUnit);
+        this.scheduler.delay(runnable, delay, timeUnit);
 
         long took = System.currentTimeMillis() - start;
         creator.log(ComponentHelper.buildComponentMessage()

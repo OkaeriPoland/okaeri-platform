@@ -10,17 +10,20 @@ import com.velocitypowered.api.proxy.ProxyServer;
 import eu.okaeri.commands.Commands;
 import eu.okaeri.configs.serdes.commons.SerdesCommons;
 import eu.okaeri.configs.serdes.okaeri.SerdesOkaeri;
+import eu.okaeri.configs.yaml.snakeyaml.YamlSnakeYamlConfigurer;
 import eu.okaeri.injector.Injector;
 import eu.okaeri.persistence.Persistence;
+import eu.okaeri.persistence.document.ConfigurerProvider;
 import eu.okaeri.platform.core.OkaeriPlatform;
+import eu.okaeri.platform.core.component.ComponentHelper;
 import eu.okaeri.platform.core.component.creator.ComponentCreator;
 import eu.okaeri.platform.core.placeholder.SimplePlaceholdersFactory;
 import eu.okaeri.platform.core.plan.ExecutionPlan;
 import eu.okaeri.platform.core.plan.ExecutionResult;
 import eu.okaeri.platform.core.plan.ExecutionTask;
 import eu.okaeri.platform.core.plan.task.*;
-import eu.okaeri.platform.velocity.component.BungeeComponentCreator;
-import eu.okaeri.platform.velocity.component.BungeeCreatorRegistry;
+import eu.okaeri.platform.velocity.component.VelocityComponentCreator;
+import eu.okaeri.platform.velocity.component.VelocityCreatorRegistry;
 import eu.okaeri.platform.velocity.i18n.PlayerLocaleProvider;
 import eu.okaeri.platform.velocity.plan.VelocitySchedulerShutdownTask;
 import eu.okaeri.platform.velocity.scheduler.PlatformScheduler;
@@ -58,20 +61,22 @@ public class OkaeriVelocityPlugin implements OkaeriPlatform {
         plan.add(PRE_SETUP, (ExecutionTask<OkaeriVelocityPlugin>) platform -> {
             platform.registerInjectable("proxy", this.proxy);
             platform.registerInjectable("dataFolder", this.dataFolder);
-//            platform.registerInjectable("jarFile", platform.getFile());
+            platform.registerInjectable("dataFolder", this.dataFolder.toFile());
+            platform.registerInjectable("jarFile", ComponentHelper.getJarFile(this.getClass()));
             platform.registerInjectable("logger", this.logger);
+            platform.registerInjectable("plugin", this.plugin);
             platform.registerInjectable("plugin", platform);
 //            platform.registerInjectable("placeholders", VelocityPlaceholders.create(true));
             platform.registerInjectable("scheduler", new PlatformScheduler(this.plugin, this.proxy.getScheduler()));
             platform.registerInjectable("pluginManager", this.proxy.getPluginManager());
-//            platform.registerInjectable("defaultConfigurerProvider", (ConfigurerProvider) YamlVelocityConfigurer::new);
+            platform.registerInjectable("defaultConfigurerProvider", (ConfigurerProvider) YamlSnakeYamlConfigurer::new);
             platform.registerInjectable("defaultConfigurerSerdes", new Class[]{SerdesCommons.class, SerdesOkaeri.class});
             platform.registerInjectable("defaultPlaceholdersFactory", new SimplePlaceholdersFactory());
             platform.registerInjectable("i18nLocaleProvider", new PlayerLocaleProvider());
         });
 
 //        plan.add(PRE_SETUP, new VelocityCommandsSetupTask());
-        plan.add(SETUP, new CreatorSetupTask(BungeeComponentCreator.class, BungeeCreatorRegistry.class), "creator");
+        plan.add(SETUP, new CreatorSetupTask(VelocityComponentCreator.class, VelocityCreatorRegistry.class), "creator");
 
 //        plan.add(POST_SETUP, new VelocityExternalResourceProviderSetupTask());
         plan.add(POST_SETUP, new BeanManifestCreateTask());

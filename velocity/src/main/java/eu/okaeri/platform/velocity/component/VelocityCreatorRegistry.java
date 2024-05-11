@@ -8,10 +8,10 @@ import eu.okaeri.platform.velocity.component.type.DelayedComponentResolver;
 import eu.okaeri.platform.velocity.component.type.ScheduledComponentResolver;
 import eu.okaeri.platform.velocity.component.type.listener.ListenerComponentResolver;
 
-public class BungeeCreatorRegistry extends ComponentCreatorRegistry {
+public class VelocityCreatorRegistry extends ComponentCreatorRegistry {
 
     @Inject
-    public BungeeCreatorRegistry(Injector injector) {
+    public VelocityCreatorRegistry(Injector injector) {
         super(injector);
         // custom first
         this.register(ConfigurationComponentResolver.class);
@@ -19,7 +19,7 @@ public class BungeeCreatorRegistry extends ComponentCreatorRegistry {
         this.register(DocumentCollectionComponentResolver.class);
         this.register(ListenerComponentResolver.class);
 //        this.register(MessagesComponentResolver.class);
-        this.register(CommandComponentResolver.class);
+//        this.register(CommandComponentResolver.class);
         this.register(ScheduledComponentResolver.class);
         // generic last
         this.register(BeanComponentResolver.class);

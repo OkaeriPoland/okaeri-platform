@@ -32,6 +32,17 @@
 <!--            <artifactId>okaeri-configs-yaml-velocity</artifactId>-->
 <!--            <version>${library.okaeri-configs.version}</version>-->
 <!--        </dependency>-->
+        <dependency>
+            <groupId>eu.okaeri</groupId>
+            <artifactId>okaeri-configs-yaml-snakeyaml</artifactId>
+            <version>${library.okaeri-configs.version}</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.yaml</groupId>
+                    <artifactId>snakeyaml</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
 <!--        <dependency>-->
 <!--            <groupId>eu.okaeri</groupId>-->
 <!--            <artifactId>okaeri-configs-serdes-velocity</artifactId>-->

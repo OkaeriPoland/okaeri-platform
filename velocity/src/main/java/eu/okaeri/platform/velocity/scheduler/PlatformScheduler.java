@@ -45,4 +45,11 @@ public class PlatformScheduler {
             .repeat(rate, timeUnit)
             .schedule();
     }
+
+    public ScheduledTask delay(Runnable runnable, long delay, TimeUnit timeUnit) {
+        return this.scheduler
+            .buildTask(this.plugin, runnable)
+            .delay(delay, timeUnit)
+            .schedule();
+    }
 }

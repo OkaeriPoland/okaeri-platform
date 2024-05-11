@@ -5,66 +5,30 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>org.example</groupId>
-    <artifactId>web-test</artifactId>
+    <artifactId>velocity-test</artifactId>
     <version>1.0-SNAPSHOT</version>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <maven.compiler.source>11</maven.compiler.source>
-        <maven.compiler.target>11</maven.compiler.target>
+        <maven.compiler.source>17</maven.compiler.source>
+        <maven.compiler.target>17</maven.compiler.target>
     </properties>
 
     <dependencies>
         <!-- base platform -->
         <dependency>
             <groupId>eu.okaeri</groupId>
-            <artifactId>okaeri-platform-web</artifactId>
+            <artifactId>okaeri-platform-velocity</artifactId>
             <version>0.4.20</version>
             <scope>compile</scope>
         </dependency>
 
-        <!-- json configurer for redis/mongo/jdbc backends -->
+        <!-- velocity -->
         <dependency>
-            <groupId>eu.okaeri</groupId>
-            <artifactId>okaeri-configs-json-simple</artifactId>
-            <version>5.0.1</version>
-            <scope>compile</scope>
-        </dependency>
-
-        <!-- additional redis backend -->
-        <dependency>
-            <groupId>eu.okaeri</groupId>
-            <artifactId>okaeri-persistence-redis</artifactId>
-            <version>2.0.3</version>
-            <scope>compile</scope>
-        </dependency>
-
-        <!-- additional mongo backend -->
-        <dependency>
-            <groupId>eu.okaeri</groupId>
-            <artifactId>okaeri-persistence-mongo</artifactId>
-            <version>2.0.3</version>
-            <scope>compile</scope>
-        </dependency>
-
-        <!-- additional jdbc backend with the clients of choice (mariadb/mysql here) -->
-        <dependency>
-            <groupId>eu.okaeri</groupId>
-            <artifactId>okaeri-persistence-jdbc</artifactId>
-            <version>2.0.3</version>
-            <scope>compile</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.mariadb.jdbc</groupId>
-            <artifactId>mariadb-java-client</artifactId>
-            <version>2.7.3</version>
-            <scope>compile</scope>
-        </dependency>
-        <dependency>
-            <groupId>com.h2database</groupId>
-            <artifactId>h2</artifactId>
-            <version>1.4.200</version>
-            <scope>compile</scope>
+            <groupId>com.velocitypowered</groupId>
+            <artifactId>velocity-api</artifactId>
+            <version>3.3.0-SNAPSHOT</version>
+            <scope>provided</scope>
         </dependency>
 
         <!-- lombok for cleaner examples -->
@@ -77,7 +41,7 @@
     </dependencies>
 
     <build>
-        <finalName>okaeriplatformtest-web-${project.version}</finalName>
+        <finalName>okaeriplatformtest-velocity-${project.version}</finalName>
         <defaultGoal>clean package</defaultGoal>
         <resources>
             <resource>
@@ -95,18 +59,6 @@
                     <compilerArgs>
                         <arg>-parameters</arg>
                     </compilerArgs>
-                </configuration>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-jar-plugin</artifactId>
-                <version>2.4</version>
-                <configuration>
-                    <archive>
-                        <manifest>
-                            <mainClass>org.example.okaeriplatformtest.ExampleWebApplication</mainClass>
-                        </manifest>
-                    </archive>
                 </configuration>
             </plugin>
             <plugin>
@@ -130,6 +82,13 @@
                             <resource>META-INF/services/java.sql.Driver</resource>
                         </transformer>
                     </transformers>
+                    <relocations>
+                        <!-- platform -->
+                        <relocation>
+                            <pattern>eu.okaeri.</pattern>
+                            <shadedPattern>org.example.okaeriplatformtest.libs.platform.</shadedPattern>
+                        </relocation>
+                    </relocations>
                 </configuration>
             </plugin>
         </plugins>
@@ -139,6 +98,10 @@
         <repository>
             <id>okaeri-repo</id>
             <url>https://storehouse.okaeri.eu/repository/maven-public/</url>
+        </repository>
+        <repository>
+            <id>papermc</id>
+            <url>https://repo.papermc.io/repository/maven-public/</url>
         </repository>
     </repositories>
 

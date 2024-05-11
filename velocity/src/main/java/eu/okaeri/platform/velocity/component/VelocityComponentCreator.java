@@ -8,12 +8,12 @@ import lombok.NonNull;
 
 import java.util.Arrays;
 
-public class BungeeComponentCreator extends ComponentCreator {
+public class VelocityComponentCreator extends ComponentCreator {
 
     private final OkaeriVelocityPlugin plugin;
 
     @Inject
-    public BungeeComponentCreator(@NonNull OkaeriVelocityPlugin plugin, @NonNull ComponentCreatorRegistry creatorRegistry) {
+    public VelocityComponentCreator(@NonNull OkaeriVelocityPlugin plugin, @NonNull ComponentCreatorRegistry creatorRegistry) {
         super(creatorRegistry);
         this.plugin = plugin;
     }
