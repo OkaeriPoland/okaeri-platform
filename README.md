@@ -26,6 +26,7 @@ Whole ecosystems built on top of the best okaeri packages.
 ─ core
   └─ minecraft
      ├─ bukkit
+     ├─ velocity
      └─ bungee
   └─ standalone
      ├─ web
@@ -35,6 +36,7 @@ Whole ecosystems built on top of the best okaeri packages.
 ```
 - **Minecraft**
   - [bukkit](https://github.com/OkaeriPoland/okaeri-platform/tree/master/bukkit): your platform of choice for best Spigot/Paper development experience (*beta - possible breaking changes*)
+  - [velocity](https://github.com/OkaeriPoland/okaeri-platform/tree/master/velocity): your platform of choice unified Velocity development experience (*alpha - missing features, possible breaking changes*)
   - [bungee](https://github.com/OkaeriPoland/okaeri-platform/tree/master/bungee): your platform of choice for best BungeeCord development experience (*beta - possible breaking changes*)
 - **Standalone**
   - [web](https://github.com/OkaeriPoland/okaeri-platform/tree/master/web): best used as web side of other platforms but can be used fully standalone (*beta - basic features, possible breaking changes*)
