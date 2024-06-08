@@ -19,21 +19,8 @@ import java.util.List;
 @Header("itself and the color for dynamic fields e.g. {xyz}.")
 @Header(" ")
 @Header("Available colors:")
-@Header("&4 - DARK_RED")
-@Header("&c - RED")
-@Header("&6 - GOLD")
-@Header("&e - YELLOW")
-@Header("&2 - DARK_GREEN")
-@Header("&a - GREEN")
-@Header("&b - AQUA")
-@Header("&3 - DARK_AQUA")
-@Header("&1 - DARK_BLUE")
-@Header("&9 - BLUE")
-@Header("&d - LIGHT_PURPLE")
-@Header("&5 - DARK_PURPLE")
-@Header("&f - WHITE")
-@Header("&8 - DARK_GRAY")
-@Header("&0 - BLACK")
+@Header("- black, dark_blue, dark_green, dark_aqua, dark_red, dark_purple, gold, gray, dark_gray, blue, green, aqua, red, light_purple, yellow, or white")
+@Header("- any hex color in CSS format")
 public class I18nColorsConfig extends OkaeriConfig {
 
     private List<I18nColorMatcher> matchers = Arrays.asList(

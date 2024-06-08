@@ -43,13 +43,18 @@
                 </exclusion>
             </exclusions>
         </dependency>
+        <dependency>
+            <groupId>eu.okaeri</groupId>
+            <artifactId>okaeri-configs-serdes-adventure</artifactId>
+            <version>${library.okaeri-configs.version}</version>
+        </dependency>
+
+        <!-- messages -->
 <!--        <dependency>-->
 <!--            <groupId>eu.okaeri</groupId>-->
 <!--            <artifactId>okaeri-configs-serdes-velocity</artifactId>-->
 <!--            <version>${library.okaeri-configs.version}</version>-->
 <!--        </dependency>-->
-
-        <!-- messages -->
 <!--        <dependency>-->
 <!--            <groupId>eu.okaeri</groupId>-->
 <!--            <artifactId>okaeri-placeholders-velocity</artifactId>-->

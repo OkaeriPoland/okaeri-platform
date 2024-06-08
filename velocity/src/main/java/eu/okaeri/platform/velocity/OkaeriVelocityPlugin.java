@@ -8,12 +8,14 @@ import com.velocitypowered.api.plugin.PluginContainer;
 import com.velocitypowered.api.plugin.annotation.DataDirectory;
 import com.velocitypowered.api.proxy.ProxyServer;
 import eu.okaeri.commands.Commands;
+import eu.okaeri.configs.serdes.adventure.SerdesAdventure;
 import eu.okaeri.configs.serdes.commons.SerdesCommons;
 import eu.okaeri.configs.serdes.okaeri.SerdesOkaeri;
 import eu.okaeri.configs.yaml.snakeyaml.YamlSnakeYamlConfigurer;
 import eu.okaeri.injector.Injector;
 import eu.okaeri.persistence.Persistence;
 import eu.okaeri.persistence.document.ConfigurerProvider;
+import eu.okaeri.placeholders.Placeholders;
 import eu.okaeri.platform.core.OkaeriPlatform;
 import eu.okaeri.platform.core.component.ComponentHelper;
 import eu.okaeri.platform.core.component.creator.ComponentCreator;
@@ -27,11 +29,13 @@ import eu.okaeri.platform.velocity.component.VelocityCreatorRegistry;
 import eu.okaeri.platform.velocity.i18n.PlayerLocaleProvider;
 import eu.okaeri.platform.velocity.plan.VelocitySchedulerShutdownTask;
 import eu.okaeri.platform.velocity.scheduler.PlatformScheduler;
+import eu.okaeri.platform.velocity.util.VelocityUnsafe;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
 import org.slf4j.Logger;
 
+import java.io.File;
 import java.nio.file.Path;
 import java.util.Arrays;
 
@@ -40,14 +44,15 @@ import static eu.okaeri.platform.core.plan.ExecutionPhase.*;
 
 public class OkaeriVelocityPlugin implements OkaeriPlatform {
 
+    private final @Getter File file = ComponentHelper.getJarFile(this.getClass());
     private @Getter @Setter Injector injector;
     private @Getter @Setter ComponentCreator creator;
     private ExecutionPlan plan;
 
-    private @Inject ProxyServer proxy;
-    private @Inject PluginContainer plugin;
-    private @Inject @DataDirectory Path dataFolder;
-    private @Inject Logger logger;
+    private @Inject @Getter ProxyServer proxy;
+    private @Inject @Getter PluginContainer container;
+    private @Inject @Getter @DataDirectory Path dataFolder;
+    private @Inject @Getter Logger logger;
 
     @Override
     public void log(@NonNull String message) {
@@ -62,15 +67,15 @@ public class OkaeriVelocityPlugin implements OkaeriPlatform {
             platform.registerInjectable("proxy", this.proxy);
             platform.registerInjectable("dataFolder", this.dataFolder);
             platform.registerInjectable("dataFolder", this.dataFolder.toFile());
-            platform.registerInjectable("jarFile", ComponentHelper.getJarFile(this.getClass()));
+            platform.registerInjectable("jarFile", this.getFile());
             platform.registerInjectable("logger", this.logger);
-            platform.registerInjectable("plugin", this.plugin);
+            platform.registerInjectable("plugin", this.container);
             platform.registerInjectable("plugin", platform);
-//            platform.registerInjectable("placeholders", VelocityPlaceholders.create(true));
-            platform.registerInjectable("scheduler", new PlatformScheduler(this.plugin, this.proxy.getScheduler()));
+            platform.registerInjectable("placeholders", Placeholders.create(true)); // FIXME: velocity placeholders
+            platform.registerInjectable("scheduler", new PlatformScheduler(this.container, this.proxy.getScheduler()));
             platform.registerInjectable("pluginManager", this.proxy.getPluginManager());
             platform.registerInjectable("defaultConfigurerProvider", (ConfigurerProvider) YamlSnakeYamlConfigurer::new);
-            platform.registerInjectable("defaultConfigurerSerdes", new Class[]{SerdesCommons.class, SerdesOkaeri.class});
+            platform.registerInjectable("defaultConfigurerSerdes", new Class[]{SerdesCommons.class, SerdesOkaeri.class, SerdesAdventure.class});
             platform.registerInjectable("defaultPlaceholdersFactory", new SimplePlaceholdersFactory());
             platform.registerInjectable("i18nLocaleProvider", new PlayerLocaleProvider());
         });
@@ -92,6 +97,7 @@ public class OkaeriVelocityPlugin implements OkaeriPlatform {
 
     @Subscribe
     public void onEnable(ProxyInitializeEvent event) {
+        VelocityUnsafe.PROXY = this.proxy; /// mmmm
         // execute using plan
         this.log("Loading " + this.getClass().getSimpleName());
         ExecutionResult result = ExecutionPlan.dispatch(this);
