@@ -13,6 +13,10 @@ public @interface Messages {
 
     String path() default "i18n";
     Class<? extends Configurer> provider() default DEFAULT.class;
+    /**
+     * @deprecated Unused. Replaced with {@link Configurer#getExtensions()} call.
+     */
+    @Deprecated
     String suffix() default ".yml";
     String defaultLocale() default "en";
     boolean unpack() default true;

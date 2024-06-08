@@ -64,7 +64,6 @@ public class MessagesComponentResolver implements ComponentResolver {
         Messages messages = beanClazz.getAnnotation(Messages.class);
 
         String path = messages.path();
-        String suffix = messages.suffix();
         Class<? extends Configurer> provider = messages.provider();
         Locale defaultLocale = Locale.forLanguageTag(messages.defaultLocale());
         boolean unpack = messages.unpack();
@@ -107,7 +106,7 @@ public class MessagesComponentResolver implements ComponentResolver {
                 is.close();
 
                 String name = file.getName();
-                String localeName = name.substring(0, name.length() - suffix.length());
+                String localeName = name.substring(0, name.indexOf("."));
 
                 Locale locale = Locale.forLanguageTag(localeName);
                 packedLocales.put(locale, new String(baos.toByteArray(), StandardCharsets.UTF_8));
@@ -124,6 +123,12 @@ public class MessagesComponentResolver implements ComponentResolver {
 
         // load file locales
         try {
+            // resolve suffix
+            List<String> extensions = ((provider == Messages.DEFAULT.class)
+                ? this.defaultConfigurerProvider.get()
+                : injector.createInstance(provider)).getExtensions();
+            String suffix = "." + (extensions.isEmpty() ? "bin" : extensions.get(0));
+
             LocaleConfig template = LocaleConfigManager.createTemplate(beanClazz);
             File[] files = directory.listFiles((dir, name) -> name.toLowerCase(Locale.ROOT).endsWith(suffix));
             if (files == null) files = new File[0];
@@ -198,7 +203,6 @@ public class MessagesComponentResolver implements ComponentResolver {
                 .name(beanClazz.getSimpleName())
                 .took(took)
                 .meta("path", path)
-                .meta("suffix", suffix)
                 .meta("provider", provider.getSimpleName())
                 .footer("  > " + loadedLocales.stream().map(Locale::toString).collect(Collectors.joining(", ")))
                 .build());
