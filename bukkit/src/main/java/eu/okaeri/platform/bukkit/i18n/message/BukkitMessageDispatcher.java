@@ -65,7 +65,7 @@ public class BukkitMessageDispatcher implements MessageDispatcher<Message> {
         return this;
     }
 
-    private BukkitMessageDispatcher with(@NonNull Map<String, Object> fields) {
+    public BukkitMessageDispatcher with(@NonNull Map<String, Object> fields) {
         this.fields.putAll(fields);
         return this;
     }
