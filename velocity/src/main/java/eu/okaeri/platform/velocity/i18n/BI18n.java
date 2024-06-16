@@ -13,7 +13,10 @@ import eu.okaeri.platform.velocity.i18n.message.VelocityMessageDispatcher;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
+import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
+import net.kyori.adventure.text.format.TextColor;
+import net.kyori.adventure.text.minimessage.MiniMessage;
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 
 import java.nio.file.Files;
@@ -82,9 +85,16 @@ public class BI18n extends MessageMEOCI18n {
         return this.getColorsConfig().getMatchers().stream()
             .filter(matcher -> matcher.getPattern().matcher(fieldName).matches())
             .map(matcher -> MessageColors.of(
-                String.valueOf(matcher.getMessageColor()),
-                String.valueOf(matcher.getFieldsColor())
+                textColorToLegacySection(matcher.getMessageColor()),
+                textColorToLegacySection(matcher.getFieldsColor())
             ))
             .findAny();
+    }
+
+    // mmm... legacy
+    private static String textColorToLegacySection(@NonNull TextColor color) {
+        Component component = MiniMessage.miniMessage().deserialize("<" + color + ">*");
+        String legacy = LegacyComponentSerializer.legacySection().serialize(component);
+        return legacy.substring(0, legacy.length() - 1); // remove * added before to force coloring at the end
     }
 }
