@@ -159,7 +159,11 @@ public class MessagesComponentResolver implements ComponentResolver {
             String suffix = "." + (extensions.isEmpty() ? "bin" : extensions.get(0));
 
             LocaleConfig template = LocaleConfigManager.createTemplate(beanClazz);
-            List<Path> files = Files.list(directory).filter(p -> p.endsWith(suffix)).collect(Collectors.toList());
+            List<Path> files = Files.exists(directory)
+                ? Files.list(directory)
+                .filter(p -> p.endsWith(suffix))
+                .collect(Collectors.toList())
+                : Collections.emptyList();
 
             BI18n i18n = new BI18n(colorsConfig, this.defaultPlaceholdersFactory);
             i18n.setPrefixField(messages.prefix().field());
