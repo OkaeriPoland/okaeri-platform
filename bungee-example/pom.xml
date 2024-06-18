@@ -19,7 +19,7 @@
         <dependency>
             <groupId>eu.okaeri</groupId>
             <artifactId>okaeri-platform-bungee</artifactId>
-            <version>0.4.26</version>
+            <version>0.4.28</version>
             <scope>compile</scope>
         </dependency>
 
