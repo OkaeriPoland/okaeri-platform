@@ -12,6 +12,7 @@ import eu.okaeri.commands.velocity.CommandsVelocity;
 import eu.okaeri.platform.core.commands.PlatformGuardianContextProvider;
 import eu.okaeri.platform.core.plan.ExecutionTask;
 import eu.okaeri.platform.velocity.OkaeriVelocityPlugin;
+import eu.okaeri.platform.velocity.commands.VelocityCommandsResultHandler;
 import eu.okaeri.tasker.core.Tasker;
 import eu.okaeri.validator.OkaeriValidator;
 import eu.okaeri.validator.policy.NullPolicy;
@@ -27,8 +28,11 @@ public class VelocityCommandsSetupTask implements ExecutionTask<OkaeriVelocityPl
     @Override
     public void execute(OkaeriVelocityPlugin platform) {
 
-        // create bukkit commands
+        // create velocity commands
         Commands commands = CommandsVelocity.of(this.proxy, platform.getContainer());
+
+        // register platform specific result handler
+        commands.resultHandler(new VelocityCommandsResultHandler());
 
         // use injector in commands
         commands.registerExtension(new CommandsInjector(platform.getInjector()));

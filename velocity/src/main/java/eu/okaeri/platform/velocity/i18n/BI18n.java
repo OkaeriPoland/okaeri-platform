@@ -5,6 +5,7 @@ import eu.okaeri.i18n.configs.extended.MessageMEOCI18n;
 import eu.okaeri.i18n.extended.MessageColors;
 import eu.okaeri.i18n.message.Message;
 import eu.okaeri.i18n.message.SimpleMessage;
+import eu.okaeri.i18n.minecraft.adventure.AdventureMessage;
 import eu.okaeri.placeholders.Placeholders;
 import eu.okaeri.placeholders.message.CompiledMessage;
 import eu.okaeri.platform.core.i18n.message.MessageAssembler;
@@ -32,7 +33,7 @@ public class BI18n extends MessageMEOCI18n {
     private final @Getter I18nColorsConfig colorsConfig;
     private final @Getter PlaceholdersFactory placeholdersFactory;
 
-    private @Getter @Setter MessageAssembler messageAssembler = SimpleMessage::of;
+    private @Getter @Setter MessageAssembler messageAssembler = AdventureMessage::of;
 
     public BI18n(@NonNull I18nColorsConfig colorsConfig, @NonNull PlaceholdersFactory placeholdersFactory) {
         this.colorsConfig = colorsConfig;
