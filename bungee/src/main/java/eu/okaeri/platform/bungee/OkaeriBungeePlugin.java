@@ -25,6 +25,7 @@ import eu.okaeri.platform.core.plan.ExecutionResult;
 import eu.okaeri.platform.core.plan.ExecutionTask;
 import eu.okaeri.platform.core.plan.task.*;
 import eu.okaeri.platform.minecraft.task.CommandsI18nSetupTask;
+import eu.okaeri.tasker.bungee.BungeeTasker;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
@@ -68,6 +69,7 @@ public class OkaeriBungeePlugin extends Plugin implements OkaeriPlatform {
             platform.registerInjectable("plugin", platform);
             platform.registerInjectable("placeholders", BungeePlaceholders.create(true));
             platform.registerInjectable("scheduler", new PlatformScheduler(platform, platform.getProxy().getScheduler()));
+            platform.registerInjectable("tasker", BungeeTasker.newPool(platform));
             platform.registerInjectable("pluginManager", platform.getProxy().getPluginManager());
             platform.registerInjectable("defaultConfigurerProvider", (ConfigurerProvider) YamlBungeeConfigurer::new);
             platform.registerInjectable("defaultConfigurerSerdes", new Class[]{SerdesCommons.class, SerdesOkaeri.class, SerdesBungee.class});
