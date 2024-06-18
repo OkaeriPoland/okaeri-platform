@@ -24,13 +24,17 @@ import eu.okaeri.platform.core.plan.ExecutionPlan;
 import eu.okaeri.platform.core.plan.ExecutionResult;
 import eu.okaeri.platform.core.plan.ExecutionTask;
 import eu.okaeri.platform.core.plan.task.*;
+import eu.okaeri.platform.minecraft.task.CommandsI18nSetupTask;
 import eu.okaeri.platform.velocity.component.VelocityComponentCreator;
 import eu.okaeri.platform.velocity.component.VelocityCreatorRegistry;
 import eu.okaeri.platform.velocity.i18n.PlayerLocaleProvider;
+import eu.okaeri.platform.velocity.plan.VelocityCommandsI18nManifestTask;
+import eu.okaeri.platform.velocity.plan.VelocityCommandsSetupTask;
 import eu.okaeri.platform.velocity.plan.VelocityExternalResourceProviderSetupTask;
 import eu.okaeri.platform.velocity.plan.VelocitySchedulerShutdownTask;
 import eu.okaeri.platform.velocity.scheduler.PlatformScheduler;
 import eu.okaeri.platform.velocity.util.VelocityUnsafe;
+import eu.okaeri.tasker.velocity.VelocityTasker;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
@@ -74,6 +78,7 @@ public class OkaeriVelocityPlugin implements OkaeriPlatform {
             platform.registerInjectable("plugin", platform);
             platform.registerInjectable("placeholders", Placeholders.create(true)); // FIXME: velocity placeholders
             platform.registerInjectable("scheduler", new PlatformScheduler(this.container, this.proxy.getScheduler()));
+            platform.registerInjectable("tasker", VelocityTasker.newPool(this.proxy, this.container));
             platform.registerInjectable("pluginManager", this.proxy.getPluginManager());
             platform.registerInjectable("defaultConfigurerProvider", (ConfigurerProvider) YamlSnakeYamlConfigurer::new);
             platform.registerInjectable("defaultConfigurerSerdes", new Class[]{SerdesCommons.class, SerdesOkaeri.class, SerdesAdventure.class});
@@ -81,15 +86,15 @@ public class OkaeriVelocityPlugin implements OkaeriPlatform {
             platform.registerInjectable("i18nLocaleProvider", new PlayerLocaleProvider());
         });
 
-//        plan.add(PRE_SETUP, new VelocityCommandsSetupTask());
+        plan.add(PRE_SETUP, new VelocityCommandsSetupTask(this.proxy));
         plan.add(SETUP, new CreatorSetupTask(VelocityComponentCreator.class, VelocityCreatorRegistry.class), "creator");
 
         plan.add(POST_SETUP, new VelocityExternalResourceProviderSetupTask());
         plan.add(POST_SETUP, new BeanManifestCreateTask());
-//        plan.add(POST_SETUP, new VelocityCommandsI18nManifestTask());
+        plan.add(POST_SETUP, new VelocityCommandsI18nManifestTask());
         plan.add(POST_SETUP, new BeanManifestExecuteTask());
-//        plan.add(POST_SETUP, new CommandsI18nSetupTask());
-//        plan.add(POST_SETUP, new CommandsRegisterTask());
+        plan.add(POST_SETUP, new CommandsI18nSetupTask());
+        plan.add(POST_SETUP, new CommandsRegisterTask());
 
         plan.add(SHUTDOWN, new VelocitySchedulerShutdownTask());
         plan.add(SHUTDOWN, new CloseableShutdownTask(Persistence.class));

@@ -20,18 +20,13 @@
         </dependency>
 
         <!-- tasker -->
-<!--        <dependency>-->
-<!--            <groupId>eu.okaeri</groupId>-->
-<!--            <artifactId>okaeri-tasker-velocity</artifactId>-->
-<!--            <version>${library.okaeri-tasker.version}</version>-->
-<!--        </dependency>-->
+        <dependency>
+            <groupId>eu.okaeri</groupId>
+            <artifactId>okaeri-tasker-velocity</artifactId>
+            <version>${library.okaeri-tasker.version}</version>
+        </dependency>
 
         <!-- configs -->
-<!--        <dependency>-->
-<!--            <groupId>eu.okaeri</groupId>-->
-<!--            <artifactId>okaeri-configs-yaml-velocity</artifactId>-->
-<!--            <version>${library.okaeri-configs.version}</version>-->
-<!--        </dependency>-->
         <dependency>
             <groupId>eu.okaeri</groupId>
             <artifactId>okaeri-configs-yaml-snakeyaml</artifactId>
@@ -62,16 +57,16 @@
 <!--        </dependency>-->
 
         <!-- commands -->
-<!--        <dependency>-->
-<!--            <groupId>eu.okaeri</groupId>-->
-<!--            <artifactId>okaeri-commands-velocity</artifactId>-->
-<!--            <version>${library.okaeri-commands.version}</version>-->
-<!--        </dependency>-->
-<!--        <dependency>-->
-<!--            <groupId>eu.okaeri</groupId>-->
-<!--            <artifactId>okaeri-commands-injector</artifactId>-->
-<!--            <version>${library.okaeri-commands.version}</version>-->
-<!--        </dependency>-->
+        <dependency>
+            <groupId>eu.okaeri</groupId>
+            <artifactId>okaeri-commands-velocity</artifactId>
+            <version>${library.okaeri-commands.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>eu.okaeri</groupId>
+            <artifactId>okaeri-commands-injector</artifactId>
+            <version>${library.okaeri-commands.version}</version>
+        </dependency>
 
         <!-- i18n -->
 <!--        <dependency>-->
