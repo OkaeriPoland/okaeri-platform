@@ -52,6 +52,17 @@
                 </exclusion>
             </exclusions>
         </dependency>
+        <dependency>
+            <groupId>eu.okaeri</groupId>
+            <artifactId>okaeri-commands-tasker</artifactId>
+            <version>${library.okaeri-commands.version}</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>eu.okaeri</groupId>
+                    <artifactId>okaeri-tasker</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
 
         <!-- commons -->
         <dependency>
@@ -107,6 +118,13 @@
             <groupId>eu.okaeri</groupId>
             <artifactId>okaeri-validator</artifactId>
             <version>${library.okaeri-validator.version}</version>
+        </dependency>
+
+        <!-- tasker -->
+        <dependency>
+            <groupId>eu.okaeri</groupId>
+            <artifactId>okaeri-tasker-core</artifactId>
+            <version>${library.okaeri-tasker.version}</version>
         </dependency>
     </dependencies>
 

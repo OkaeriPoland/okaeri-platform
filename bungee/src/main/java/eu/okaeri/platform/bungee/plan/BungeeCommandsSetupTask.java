@@ -6,10 +6,10 @@ import eu.okaeri.commands.bungee.CommandsBungee;
 import eu.okaeri.commands.guard.GuardAccessHandler;
 import eu.okaeri.commands.handler.access.MultiAccessHandler;
 import eu.okaeri.commands.injector.CommandsInjector;
+import eu.okaeri.commands.tasker.CommandsTasker;
 import eu.okaeri.commands.validator.CommandsValidator;
 import eu.okaeri.platform.bungee.OkaeriBungeePlugin;
 import eu.okaeri.platform.bungee.commands.BungeeCommandsResultHandler;
-import eu.okaeri.platform.bungee.commands.BungeeCommandsTasker;
 import eu.okaeri.platform.core.commands.PlatformGuardianContextProvider;
 import eu.okaeri.platform.core.plan.ExecutionTask;
 import eu.okaeri.tasker.core.Tasker;
@@ -46,7 +46,7 @@ public class BungeeCommandsSetupTask implements ExecutionTask<OkaeriBungeePlugin
 
         // allow @Chain in commands
         platform.getInjector().get("tasker", Tasker.class)
-            .ifPresent(tasker -> commands.registerExtension(new BungeeCommandsTasker(tasker)));
+            .ifPresent(tasker -> commands.registerExtension(new CommandsTasker(tasker)));
 
         // register commands injectable
         platform.registerInjectable("commands", commands);
