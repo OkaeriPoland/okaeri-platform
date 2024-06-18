@@ -27,6 +27,7 @@ import eu.okaeri.platform.core.plan.task.*;
 import eu.okaeri.platform.velocity.component.VelocityComponentCreator;
 import eu.okaeri.platform.velocity.component.VelocityCreatorRegistry;
 import eu.okaeri.platform.velocity.i18n.PlayerLocaleProvider;
+import eu.okaeri.platform.velocity.plan.VelocityExternalResourceProviderSetupTask;
 import eu.okaeri.platform.velocity.plan.VelocitySchedulerShutdownTask;
 import eu.okaeri.platform.velocity.scheduler.PlatformScheduler;
 import eu.okaeri.platform.velocity.util.VelocityUnsafe;
@@ -83,7 +84,7 @@ public class OkaeriVelocityPlugin implements OkaeriPlatform {
 //        plan.add(PRE_SETUP, new VelocityCommandsSetupTask());
         plan.add(SETUP, new CreatorSetupTask(VelocityComponentCreator.class, VelocityCreatorRegistry.class), "creator");
 
-//        plan.add(POST_SETUP, new VelocityExternalResourceProviderSetupTask());
+        plan.add(POST_SETUP, new VelocityExternalResourceProviderSetupTask());
         plan.add(POST_SETUP, new BeanManifestCreateTask());
 //        plan.add(POST_SETUP, new VelocityCommandsI18nManifestTask());
         plan.add(POST_SETUP, new BeanManifestExecuteTask());
