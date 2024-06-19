@@ -6,7 +6,6 @@ import eu.okaeri.commands.annotation.Command;
 import eu.okaeri.commands.annotation.Executor;
 import eu.okaeri.commands.service.CommandService;
 import eu.okaeri.commands.tasker.annotation.Chain;
-import eu.okaeri.commands.velocity.annotation.Async;
 import eu.okaeri.commands.velocity.annotation.Permission;
 import eu.okaeri.commands.velocity.response.VelocityResponse;
 import eu.okaeri.configs.exception.OkaeriException;
@@ -15,7 +14,6 @@ import eu.okaeri.tasker.core.chain.TaskerChain;
 import net.kyori.adventure.text.Component;
 import org.slf4j.Logger;
 
-@Async
 @Command(label = "opt")
 public class ExampleCommand implements CommandService {
 
@@ -34,6 +32,12 @@ public class ExampleCommand implements CommandService {
         }
 
         return VelocityResponse.ok("The configuration reloaded.");
+    }
+
+    @Executor
+    @Permission("okaeri.platform.hello")
+    public Component hello(CommandSource sender) {
+        return Component.text("Hello from " + Thread.currentThread().getName() + "!");
     }
 
     @Executor
