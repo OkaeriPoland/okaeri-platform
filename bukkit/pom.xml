@@ -56,6 +56,11 @@
         </dependency>
         <dependency>
             <groupId>eu.okaeri</groupId>
+            <artifactId>okaeri-placeholders-bukkit-placeholderapi</artifactId>
+            <version>${library.okaeri-placeholders.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>eu.okaeri</groupId>
             <artifactId>okaeri-placeholders-reflect</artifactId>
             <version>${library.okaeri-placeholders.version}</version>
         </dependency>
