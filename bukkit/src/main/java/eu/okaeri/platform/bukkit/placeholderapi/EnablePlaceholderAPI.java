@@ -1,4 +1,4 @@
-package eu.okaeri.platform.bukkit.plan;
+package eu.okaeri.platform.bukkit.placeholderapi;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;

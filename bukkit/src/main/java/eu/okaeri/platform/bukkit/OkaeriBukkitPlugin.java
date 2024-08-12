@@ -18,7 +18,7 @@ import eu.okaeri.platform.bukkit.i18n.PlayerLocaleProvider;
 import eu.okaeri.platform.bukkit.plan.BukkitCommandsI18nManifestTask;
 import eu.okaeri.platform.bukkit.plan.BukkitCommandsSetupTask;
 import eu.okaeri.platform.bukkit.plan.BukkitExternalResourceProviderSetupTask;
-import eu.okaeri.platform.bukkit.plan.BukkitPlaceholderApiTask;
+import eu.okaeri.platform.bukkit.placeholderapi.BukkitPlaceholderApiTask;
 import eu.okaeri.platform.bukkit.scheduler.PlatformScheduler;
 import eu.okaeri.platform.core.OkaeriPlatform;
 import eu.okaeri.platform.core.component.creator.ComponentCreator;

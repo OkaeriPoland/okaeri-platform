@@ -1,4 +1,4 @@
-package eu.okaeri.platform.bukkit.plan;
+package eu.okaeri.platform.bukkit.placeholderapi;
 
 import eu.okaeri.placeholders.Placeholders;
 import eu.okaeri.placeholders.bukkit.placeholderapi.PlaceholderApiPlaceholders;
