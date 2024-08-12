@@ -12,6 +12,10 @@ public class BukkitPlaceholderApiTask implements ExecutionTask<OkaeriBukkitPlugi
     @Override
     public void execute(OkaeriBukkitPlugin platform) {
 
+        if (!platform.getClass().isAnnotationPresent(EnablePlaceholderAPI.class)) {
+            return;
+        }
+
         if (platform.getServer().getPluginManager().getPlugin("PlaceholderAPI") == null) {
             return;
         }
