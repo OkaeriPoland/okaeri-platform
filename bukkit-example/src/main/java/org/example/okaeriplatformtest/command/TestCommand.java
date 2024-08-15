@@ -16,6 +16,7 @@ import eu.okaeri.injector.annotation.Inject;
 import eu.okaeri.placeholders.message.CompiledMessage;
 import eu.okaeri.platform.bukkit.i18n.BI18n;
 import eu.okaeri.platform.core.annotation.Bean;
+import eu.okaeri.tasker.bukkit.chain.BukkitTaskerChain;
 import eu.okaeri.tasker.core.chain.TaskerChain;
 import org.bukkit.*;
 import org.bukkit.command.CommandSender;
@@ -72,9 +73,9 @@ public class TestCommand implements CommandService {
     // for other places use @Inject Tasker
     // and create chain manually
     //
-    public TaskerChain<?> chains(@Chain("name"/* or empty if not queued */) TaskerChain<?> chain) {
+    public TaskerChain<?> chains(@Chain("name"/* or empty if not queued */) BukkitTaskerChain<?> chain) {
         return chain
-            .supplyAsync(() -> {
+            .supply(() -> {
                 String threadName = Thread.currentThread().getName();
                 return "some async data from " + threadName;
             })

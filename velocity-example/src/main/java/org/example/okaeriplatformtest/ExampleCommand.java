@@ -14,6 +14,9 @@ import eu.okaeri.tasker.core.chain.TaskerChain;
 import net.kyori.adventure.text.Component;
 import org.slf4j.Logger;
 
+import static eu.okaeri.tasker.core.TaskerDsl.accept;
+import static eu.okaeri.tasker.core.TaskerDsl.supply;
+
 @Command(label = "opt")
 public class ExampleCommand implements CommandService {
 
@@ -44,7 +47,7 @@ public class ExampleCommand implements CommandService {
     @Permission("okaeri.platform.tasker")
     public TaskerChain<?> tasker(CommandSource sender, @Chain TaskerChain<?> chain) {
         return chain
-            .supplyAsync(() -> Component.text("Hello from " + Thread.currentThread().getName() + "!"))
-            .acceptAsync(sender::sendMessage);
+            .$(supply(() -> Component.text("Hello from " + Thread.currentThread().getName() + "!")))
+            .$(accept(sender::sendMessage));
     }
 }

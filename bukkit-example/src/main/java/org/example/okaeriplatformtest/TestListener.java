@@ -5,7 +5,7 @@ import eu.okaeri.commons.bukkit.teleport.QueuedTeleports;
 import eu.okaeri.injector.annotation.Inject;
 import eu.okaeri.platform.bukkit.scheduler.PlatformScheduler;
 import eu.okaeri.platform.core.annotation.Component;
-import eu.okaeri.tasker.core.Tasker;
+import eu.okaeri.tasker.bukkit.BukkitTasker;
 import org.bukkit.Location;
 import org.bukkit.Server;
 import org.bukkit.command.CommandSender;
@@ -30,7 +30,7 @@ public class TestListener implements Listener {
     private @Inject Server server;
     private @Inject PlatformScheduler scheduler;
     private @Inject TestConfig config;
-    private @Inject Tasker tasker;
+    private @Inject BukkitTasker tasker;
 
     private @Inject QueuedTeleports queuedTeleports;
     private @Inject PlayerRepository playerPersistence;
@@ -54,14 +54,14 @@ public class TestListener implements Listener {
         // range from minor for flat storages and major for databases
         // okaeri platform provides easy to use fluent scheduler api
         this.tasker.newChain()
-            .supplyAsync(() -> this.playerPersistence.get(event.getPlayer())) // read example
+            .supply(() -> this.playerPersistence.get(event.getPlayer())) // read example
             .acceptSync(playerProperties -> {
                 Instant lastJoined = playerProperties.getLastJoined(); // get current value
                 event.getPlayer().sendMessage("Your last join time: " + lastJoined);
                 playerProperties.setLastJoined(Instant.now()); // update value
                 playerProperties.setLastJoinedLocation(event.getPlayer().getLocation()); // bukkit types thanks to SerdesBukkit work too
             })
-            .acceptAsync(playerProperties -> {
+            .accept(playerProperties -> {
                 // save player properties
                 // normally this may not be required if data is not required to be saved immediately, see PlayerPersistence notes
                 playerProperties.save();
