@@ -37,7 +37,7 @@
         <library.okaeri-validator.version>2.0.4</library.okaeri-validator.version>
         <library.okaeri-placeholders.version>5.1.0</library.okaeri-placeholders.version>
         <library.okaeri-persistence.version>2.0.4</library.okaeri-persistence.version>
-        <library.okaeri-tasker.version>3.0.1-beta.2</library.okaeri-tasker.version>
+        <library.okaeri-tasker.version>3.0.2-beta.5</library.okaeri-tasker.version>
         <library.okaeri-acl.version>0.1.4</library.okaeri-acl.version>
     </properties>
 
