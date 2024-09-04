@@ -12,7 +12,8 @@ public class BukkitPlaceholderApiTask implements ExecutionTask<OkaeriBukkitPlugi
     @Override
     public void execute(OkaeriBukkitPlugin platform) {
 
-        if (!platform.getClass().isAnnotationPresent(EnablePlaceholderAPI.class)) {
+        EnablePlaceholderAPI enablePlaceholderAPI = platform.getClass().getAnnotation(EnablePlaceholderAPI.class);
+        if (enablePlaceholderAPI == null) {
             return;
         }
 
@@ -26,10 +27,12 @@ public class BukkitPlaceholderApiTask implements ExecutionTask<OkaeriBukkitPlugi
             } catch (Throwable throwable) {
                 platform.getLogger().log(Level.WARNING, "Failed to register PlaceholderAPI placeholders (PlaceholderAPI via okaeri-placeholders)", throwable);
             }
-            try {
-                PlaceholderApiPlaceholders.registerBridge(platform, placeholders);
-            } catch (Throwable throwable) {
-                platform.getLogger().log(Level.WARNING, "Failed to register PlaceholderAPI bridge (okaeri-placeholders via PlaceholderAPI)", throwable);
+            if (enablePlaceholderAPI.export()) {
+                try {
+                    PlaceholderApiPlaceholders.registerBridge(platform, placeholders);
+                } catch (Throwable throwable) {
+                    platform.getLogger().log(Level.WARNING, "Failed to register PlaceholderAPI bridge (okaeri-placeholders via PlaceholderAPI)", throwable);
+                }
             }
         });
     }
