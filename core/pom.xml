@@ -86,6 +86,12 @@
             <groupId>eu.okaeri</groupId>
             <artifactId>okaeri-configs-serdes-okaeri</artifactId>
             <version>${library.okaeri-configs.version}</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>eu.okaeri</groupId>
+                    <artifactId>okaeri-commons-core</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>eu.okaeri</groupId>
@@ -104,6 +110,12 @@
             <groupId>eu.okaeri</groupId>
             <artifactId>okaeri-i18n-configs</artifactId>
             <version>${library.okaeri-i18n.version}</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>eu.okaeri</groupId>
+                    <artifactId>okaeri-configs-core</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
 
         <!-- injector -->
