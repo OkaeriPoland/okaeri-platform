@@ -72,6 +72,7 @@ public class OkaeriCliApplication implements OkaeriPlatform {
         plan.add(PRE_SETUP, platform -> platform.registerInjectable("args", args));
         plan.add(SETUP, new CommandsSetupTask(new OkaeriCommands()));
         plan.add(SETUP, new CreatorSetupTask(ApplicationComponentCreator.class, ApplicationCreatorRegistry.class));
+        plan.add(SETUP, new ScanRequirementSetupTask());
 
         plan.add(POST_SETUP, new BeanManifestCreateTask());
         plan.add(POST_SETUP, new BeanManifestExecuteTask());

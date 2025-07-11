@@ -9,6 +9,7 @@ import eu.okaeri.platform.core.OkaeriPlatform;
 import eu.okaeri.platform.core.annotation.*;
 import eu.okaeri.platform.core.component.ExternalResourceProvider;
 import eu.okaeri.platform.core.component.creator.ComponentCreator;
+import eu.okaeri.platform.core.component.creator.ScanRequirementHandler;
 import lombok.Data;
 import lombok.NonNull;
 
@@ -160,6 +161,11 @@ public class BeanManifest {
     }
 
     public static List<BeanManifest> of(@NonNull ClassLoader classLoader, @NonNull Class<?> parent, @NonNull Scan scan, @NonNull ComponentCreator creator) {
+
+        ScanRequirementHandler requirementHandler = creator.getScanRequirementHandler();
+        if (!requirementHandler.meetsRequirement(parent, scan, Arrays.asList(scan.requires()))) {
+            return Collections.emptyList();
+        }
 
         List<String> exclusions = Arrays.asList(scan.exclusions());
         String value = scan.value();

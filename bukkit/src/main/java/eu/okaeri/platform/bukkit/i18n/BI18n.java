@@ -78,7 +78,10 @@ public class BI18n extends MessageMEOCI18n {
     protected Optional<MessageColors> matchColors(@NonNull String fieldName) {
         return this.getColorsConfig().getMatchers().stream()
             .filter(matcher -> matcher.getPattern().matcher(fieldName).matches())
-            .map(matcher -> MessageColors.of(String.valueOf(matcher.getMessageColor()), String.valueOf(matcher.getFieldsColor())))
+            .map(matcher -> MessageColors.of(
+                String.valueOf(matcher.getMessageColor()),
+                String.valueOf(matcher.getFieldsColor()))
+            )
             .findAny();
     }
 }

@@ -88,6 +88,7 @@ public class OkaeriVelocityPlugin implements OkaeriPlatform {
 
         plan.add(PRE_SETUP, new VelocityCommandsSetupTask(this.proxy));
         plan.add(SETUP, new CreatorSetupTask(VelocityComponentCreator.class, VelocityCreatorRegistry.class), "creator");
+        plan.add(SETUP, new ScanRequirementSetupTask());
 
         plan.add(POST_SETUP, new VelocityExternalResourceProviderSetupTask());
         plan.add(POST_SETUP, new BeanManifestCreateTask());

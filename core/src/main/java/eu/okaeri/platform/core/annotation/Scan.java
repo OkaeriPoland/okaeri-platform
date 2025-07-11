@@ -9,6 +9,7 @@ public @interface Scan {
 
     String value() default "";
     String[] exclusions() default {};
+    String[] requires() default {};
     boolean deep() default false;
 
     @Target(ElementType.TYPE)

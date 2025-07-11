@@ -3,10 +3,7 @@ package eu.okaeri.platform.core.component.creator;
 import eu.okaeri.injector.Injector;
 import eu.okaeri.platform.core.component.manifest.BeanManifest;
 import eu.okaeri.platform.core.component.manifest.BeanSource;
-import lombok.AccessLevel;
-import lombok.Getter;
-import lombok.NonNull;
-import lombok.RequiredArgsConstructor;
+import lombok.*;
 
 import java.lang.reflect.Method;
 import java.util.*;
@@ -19,6 +16,7 @@ public abstract class ComponentCreator {
 
     private @Getter @NonNull final ComponentCreatorRegistry registry;
     private @Getter(AccessLevel.PROTECTED) @NonNull final Map<String, Integer> statisticsMap = new TreeMap<>();
+    private @Getter @Setter ScanRequirementHandler scanRequirementHandler;
 
     public void increaseStatistics(String identifier, int count) {
         this.getStatisticsMap().put(identifier, this.getStatisticsMap().getOrDefault(identifier, 0) + 1);

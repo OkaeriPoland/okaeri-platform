@@ -14,11 +14,12 @@ import eu.okaeri.placeholders.bukkit.BukkitPlaceholders;
 import eu.okaeri.placeholders.reflect.ReflectPlaceholders;
 import eu.okaeri.platform.bukkit.component.BukkitComponentCreator;
 import eu.okaeri.platform.bukkit.component.BukkitCreatorRegistry;
+import eu.okaeri.platform.bukkit.component.BukkitScanRequirementHandler;
 import eu.okaeri.platform.bukkit.i18n.PlayerLocaleProvider;
+import eu.okaeri.platform.bukkit.placeholderapi.BukkitPlaceholderApiTask;
 import eu.okaeri.platform.bukkit.plan.BukkitCommandsI18nManifestTask;
 import eu.okaeri.platform.bukkit.plan.BukkitCommandsSetupTask;
 import eu.okaeri.platform.bukkit.plan.BukkitExternalResourceProviderSetupTask;
-import eu.okaeri.platform.bukkit.placeholderapi.BukkitPlaceholderApiTask;
 import eu.okaeri.platform.bukkit.scheduler.PlatformScheduler;
 import eu.okaeri.platform.core.OkaeriPlatform;
 import eu.okaeri.platform.core.component.creator.ComponentCreator;
@@ -81,11 +82,13 @@ public class OkaeriBukkitPlugin extends JavaPlugin implements OkaeriPlatform {
             platform.registerInjectable("defaultPlaceholdersFactory", new SimplePlaceholdersFactory());
             platform.registerInjectable("i18nLocaleProvider", new PlayerLocaleProvider());
             platform.registerInjectable("guardian", ReflectGuardian.create(ReflectPlaceholders.create()));
+            platform.registerInjectable("scanRequirementHandler", new BukkitScanRequirementHandler(this));
         });
 
         plan.add(SETUP, new BukkitPlaceholderApiTask());
         plan.add(SETUP, new BukkitCommandsSetupTask());
         plan.add(SETUP, new CreatorSetupTask(BukkitComponentCreator.class, BukkitCreatorRegistry.class));
+        plan.add(SETUP, new ScanRequirementSetupTask());
 
         plan.add(POST_SETUP, new BukkitExternalResourceProviderSetupTask());
         plan.add(POST_SETUP, new BeanManifestCreateTask());
