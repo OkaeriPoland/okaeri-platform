@@ -30,7 +30,7 @@
         <maven.compiler.target>8</maven.compiler.target>
 
         <library.okaeri-commands.version>0.9.13</library.okaeri-commands.version>
-        <library.okaeri-configs.version>5.0.11</library.okaeri-configs.version>
+        <library.okaeri-configs.version>5.0.12</library.okaeri-configs.version>
         <library.okaeri-i18n.version>5.1.2</library.okaeri-i18n.version>
         <library.okaeri-commons.version>0.2.28</library.okaeri-commons.version>
         <library.okaeri-injector.version>2.1.0</library.okaeri-injector.version>
