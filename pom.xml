@@ -29,15 +29,15 @@
         <maven.compiler.source>8</maven.compiler.source>
         <maven.compiler.target>8</maven.compiler.target>
 
-        <library.okaeri-commands.version>0.9.9</library.okaeri-commands.version>
-        <library.okaeri-configs.version>5.0.8</library.okaeri-configs.version>
-        <library.okaeri-i18n.version>5.1.1</library.okaeri-i18n.version>
-        <library.okaeri-commons.version>0.2.27</library.okaeri-commons.version>
+        <library.okaeri-commands.version>0.9.13</library.okaeri-commands.version>
+        <library.okaeri-configs.version>5.0.11</library.okaeri-configs.version>
+        <library.okaeri-i18n.version>5.1.2</library.okaeri-i18n.version>
+        <library.okaeri-commons.version>0.2.28</library.okaeri-commons.version>
         <library.okaeri-injector.version>2.1.0</library.okaeri-injector.version>
-        <library.okaeri-validator.version>2.0.4</library.okaeri-validator.version>
+        <library.okaeri-validator.version>2.0.5</library.okaeri-validator.version>
         <library.okaeri-placeholders.version>5.1.1</library.okaeri-placeholders.version>
-        <library.okaeri-persistence.version>3.0.1-beta.2</library.okaeri-persistence.version>
-        <library.okaeri-tasker.version>3.0.2-beta.5</library.okaeri-tasker.version>
+        <library.okaeri-persistence.version>3.0.1-beta.4</library.okaeri-persistence.version>
+        <library.okaeri-tasker.version>3.0.2-beta.8</library.okaeri-tasker.version>
         <library.okaeri-acl.version>0.1.4</library.okaeri-acl.version>
     </properties>
 
@@ -45,7 +45,7 @@
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
-            <version>1.18.32</version>
+            <version>1.18.38</version>
             <scope>provided</scope>
         </dependency>
     </dependencies>
@@ -55,11 +55,11 @@
             <plugins>
                 <plugin>
                     <artifactId>maven-surefire-plugin</artifactId>
-                    <version>3.0.0-M7</version>
+                    <version>3.5.3</version>
                 </plugin>
                 <plugin>
                     <artifactId>maven-compiler-plugin</artifactId>
-                    <version>3.10.1</version>
+                    <version>3.14.0</version>
                     <configuration>
                         <compilerArgs>
                             <arg>-parameters</arg>
@@ -68,7 +68,7 @@
                 </plugin>
                 <plugin>
                     <artifactId>maven-source-plugin</artifactId>
-                    <version>3.2.1</version>
+                    <version>3.3.1</version>
                     <executions>
                         <execution>
                             <id>attach-sources</id>
@@ -80,7 +80,7 @@
                 </plugin>
                 <plugin>
                     <artifactId>maven-javadoc-plugin</artifactId>
-                    <version>3.4.0</version>
+                    <version>3.11.2</version>
                     <configuration>
                         <doclint>all,-missing</doclint>
                     </configuration>
@@ -95,14 +95,6 @@
                 </plugin>
             </plugins>
         </pluginManagement>
-        <plugins>
-            <plugin>
-                <artifactId>maven-source-plugin</artifactId>
-            </plugin>
-            <plugin>
-                <artifactId>maven-javadoc-plugin</artifactId>
-            </plugin>
-        </plugins>
     </build>
 
     <repositories>

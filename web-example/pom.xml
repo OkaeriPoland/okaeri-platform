@@ -27,7 +27,7 @@
         <dependency>
             <groupId>eu.okaeri</groupId>
             <artifactId>okaeri-configs-json-simple</artifactId>
-            <version>5.0.6</version>
+            <version>5.0.11</version>
             <scope>compile</scope>
         </dependency>
 
@@ -35,7 +35,7 @@
         <dependency>
             <groupId>eu.okaeri</groupId>
             <artifactId>okaeri-persistence-redis</artifactId>
-            <version>3.0.1-beta.2</version>
+            <version>3.0.1-beta.4</version>
             <scope>compile</scope>
         </dependency>
 
@@ -43,7 +43,7 @@
         <dependency>
             <groupId>eu.okaeri</groupId>
             <artifactId>okaeri-persistence-mongo</artifactId>
-            <version>3.0.1-beta.2</version>
+            <version>3.0.1-beta.4</version>
             <scope>compile</scope>
         </dependency>
 
@@ -51,7 +51,7 @@
         <dependency>
             <groupId>eu.okaeri</groupId>
             <artifactId>okaeri-persistence-jdbc</artifactId>
-            <version>3.0.1-beta.2</version>
+            <version>3.0.1-beta.4</version>
             <scope>compile</scope>
         </dependency>
         <dependency>
@@ -71,7 +71,7 @@
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
-            <version>1.18.32</version>
+            <version>1.18.38</version>
             <scope>provided</scope>
         </dependency>
     </dependencies>
