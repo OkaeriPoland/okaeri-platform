@@ -20,6 +20,8 @@ import eu.okaeri.tasker.bukkit.chain.BukkitTaskerChain;
 import eu.okaeri.tasker.core.chain.TaskerChain;
 import org.bukkit.*;
 import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Entity;
+import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.example.okaeriplatformtest.ExamplePlugin;
 import org.example.okaeriplatformtest.config.TestConfig;
@@ -35,6 +37,8 @@ import java.util.concurrent.ThreadLocalRandom;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
+
+import static eu.okaeri.tasker.bukkit.BukkitTaskerLite.join;
 
 @Async
 @Command(label = "testcmd", aliases = "testing")
@@ -73,6 +77,7 @@ public class TestCommand implements CommandService {
     // for other places use @Inject Tasker
     // and create chain manually
     //
+    @Executor
     public TaskerChain<?> chains(@Chain("name"/* or empty if not queued */) BukkitTaskerChain<?> chain) {
         return chain
             .supply(() -> {
@@ -83,6 +88,13 @@ public class TestCommand implements CommandService {
                 String threadName = Thread.currentThread().getName();
                 Bukkit.broadcastMessage("received: " + data + " in " + threadName);
             }); // do not execute if returning, will be executed by platform
+    }
+
+    @Executor
+    // @Chain("test") // specify shared chain (queue) name [optional]
+    public String fancychain(@Context Player sender) {
+        Entity entity = join(() -> sender.getWorld().spawnEntity(sender.getLocation(), EntityType.CHICKEN));
+        return "Spawned " + entity + " but responding from " + Thread.currentThread().getName();
     }
 
     // testcmd|testing greet|greeting

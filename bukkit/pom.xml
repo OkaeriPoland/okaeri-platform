@@ -73,6 +73,17 @@
         </dependency>
         <dependency>
             <groupId>eu.okaeri</groupId>
+            <artifactId>okaeri-commands-tasker-bukkit</artifactId>
+            <version>${library.okaeri-commands.version}</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>eu.okaeri</groupId>
+                    <artifactId>okaeri-tasker</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>eu.okaeri</groupId>
             <artifactId>okaeri-commands-brigadier</artifactId>
             <version>${library.okaeri-commands.version}</version>
         </dependency>

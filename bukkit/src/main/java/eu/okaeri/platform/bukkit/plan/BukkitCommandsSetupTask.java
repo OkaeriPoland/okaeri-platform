@@ -7,12 +7,14 @@ import eu.okaeri.commands.bukkit.CommandsBukkit;
 import eu.okaeri.commands.guard.GuardAccessHandler;
 import eu.okaeri.commands.handler.access.MultiAccessHandler;
 import eu.okaeri.commands.injector.CommandsInjector;
+import eu.okaeri.commands.tasker.CommandsBukkitTasker;
 import eu.okaeri.commands.tasker.CommandsTasker;
 import eu.okaeri.commands.validator.CommandsValidator;
 import eu.okaeri.platform.bukkit.OkaeriBukkitPlugin;
 import eu.okaeri.platform.bukkit.commands.BukkitCommandsResultHandler;
 import eu.okaeri.platform.core.commands.PlatformGuardianContextProvider;
 import eu.okaeri.platform.core.plan.ExecutionTask;
+import eu.okaeri.tasker.bukkit.BukkitTasker;
 import eu.okaeri.tasker.core.Tasker;
 import eu.okaeri.validator.OkaeriValidator;
 import eu.okaeri.validator.policy.NullPolicy;
@@ -53,8 +55,13 @@ public class BukkitCommandsSetupTask implements ExecutionTask<OkaeriBukkitPlugin
         }
 
         // allow @Chain in commands
-        platform.getInjector().get("tasker", Tasker.class)
-            .ifPresent(tasker -> commands.registerExtension(new CommandsTasker(tasker)));
+        platform.getInjector().get("tasker", Tasker.class).ifPresent(tasker -> {
+            if (tasker instanceof BukkitTasker) {
+                commands.registerExtension(new CommandsBukkitTasker((BukkitTasker) tasker));
+            } else {
+                commands.registerExtension(new CommandsTasker(tasker));
+            }
+        });
 
         // register commands injectable
         platform.registerInjectable("commands", commands);
