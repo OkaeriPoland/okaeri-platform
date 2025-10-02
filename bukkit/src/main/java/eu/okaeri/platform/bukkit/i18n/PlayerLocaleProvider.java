@@ -13,6 +13,7 @@ import java.util.Locale;
 @AllArgsConstructor
 public class PlayerLocaleProvider implements LocaleProvider<Player> {
 
+    private static final String FORCED_LOCALE = System.getProperty("okaeri.platform.forcedLocale");
     private Locale fallbackLocale = null;
 
     @Override
@@ -22,6 +23,10 @@ public class PlayerLocaleProvider implements LocaleProvider<Player> {
 
     @Override
     public Locale getLocale(@NonNull Player player) {
+
+        if (FORCED_LOCALE != null) {
+            return Locale.forLanguageTag(FORCED_LOCALE);
+        }
 
         String localeString = UnsafeBukkitCommons.getLocaleString(player);
         if (localeString == null) {

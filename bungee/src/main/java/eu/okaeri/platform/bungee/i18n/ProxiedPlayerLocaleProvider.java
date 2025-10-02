@@ -12,6 +12,7 @@ import java.util.Locale;
 @AllArgsConstructor
 public class ProxiedPlayerLocaleProvider implements LocaleProvider<ProxiedPlayer> {
 
+    private static final String FORCED_LOCALE = System.getProperty("okaeri.platform.forcedLocale");
     private Locale fallbackLocale = null;
 
     @Override
@@ -21,6 +22,11 @@ public class ProxiedPlayerLocaleProvider implements LocaleProvider<ProxiedPlayer
 
     @Override
     public Locale getLocale(@NonNull ProxiedPlayer player) {
+
+        if (FORCED_LOCALE != null) {
+            return Locale.forLanguageTag(FORCED_LOCALE);
+        }
+
         return player.getLocale() == null ? this.fallbackLocale : player.getLocale();
     }
 }
