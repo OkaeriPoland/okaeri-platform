@@ -77,8 +77,8 @@ public class ConfigurationComponentResolver implements ComponentResolver {
 
             OkaeriConfig config = ConfigManager.create(configType, (it) -> {
                 it.configure(opt -> {
-                    opt.validator(new OkaeriValidator(defaultNotNull));
                     opt.configurer(configurer, serdesPacks);
+                    opt.validator(new OkaeriValidator(defaultNotNull));
                     opt.bindFile(new File(this.dataFolder, resolvedPath));
                     opt.errorComments(true);
                 });
