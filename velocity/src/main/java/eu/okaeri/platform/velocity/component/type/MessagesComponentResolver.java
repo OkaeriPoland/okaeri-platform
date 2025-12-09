@@ -3,7 +3,7 @@ package eu.okaeri.platform.velocity.component.type;
 import com.velocitypowered.api.plugin.PluginContainer;
 import eu.okaeri.configs.ConfigManager;
 import eu.okaeri.configs.configurer.Configurer;
-import eu.okaeri.configs.serdes.OkaeriSerdesPack;
+import eu.okaeri.configs.serdes.OkaeriSerdes;
 import eu.okaeri.i18n.configs.LocaleConfig;
 import eu.okaeri.i18n.configs.LocaleConfigManager;
 import eu.okaeri.i18n.locale.LocaleProvider;
@@ -52,7 +52,7 @@ public class MessagesComponentResolver implements ComponentResolver {
 
     private @Inject PlaceholdersFactory defaultPlaceholdersFactory;
     private @Inject ConfigurerProvider defaultConfigurerProvider;
-    private @Inject Class<? extends OkaeriSerdesPack>[] defaultConfigurerSerdes;
+    private @Inject Class<? extends OkaeriSerdes>[] defaultConfigurerSerdes;
     private @Inject LocaleProvider<?> i18nLocaleProvider;
     private @Inject PluginContainer plugin;
     private @Inject OkaeriVelocityPlugin platform;
@@ -131,10 +131,10 @@ public class MessagesComponentResolver implements ComponentResolver {
         }
 
         // prepare serdes
-        OkaeriSerdesPack[] serdesPacks = Stream.of(this.defaultConfigurerSerdes)
+        OkaeriSerdes[] serdesPacks = Stream.of(this.defaultConfigurerSerdes)
             .map(injector::createInstance)
             .distinct()
-            .toArray(OkaeriSerdesPack[]::new);
+            .toArray(OkaeriSerdes[]::new);
 
         // find applicable message assembler
         MessageAssembler messageAssembler = injector.get(path, MessageAssembler.class)

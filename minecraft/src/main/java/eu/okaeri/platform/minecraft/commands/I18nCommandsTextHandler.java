@@ -68,7 +68,7 @@ public class I18nCommandsTextHandler implements TextHandler {
                         GenericsDeclaration.of(value),
                         String.class,
                         GenericsDeclaration.of(String.class),
-                        SerdesContext.of(config.getConfigurer())
+                        SerdesContext.of(config.getConfigurer(), null, null)
                     );
                     text = text.replace("#{" + variable + "}", resolved);
                     break;

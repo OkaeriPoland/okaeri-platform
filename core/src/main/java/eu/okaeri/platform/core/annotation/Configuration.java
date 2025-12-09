@@ -1,7 +1,7 @@
 package eu.okaeri.platform.core.annotation;
 
 import eu.okaeri.configs.configurer.Configurer;
-import eu.okaeri.configs.serdes.OkaeriSerdesPack;
+import eu.okaeri.configs.serdes.OkaeriSerdes;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -14,7 +14,7 @@ public @interface Configuration {
 
     String path() default "config.{ext}";
     Class<? extends Configurer> provider() default DEFAULT.class;
-    Class<? extends OkaeriSerdesPack>[] serdes() default {};
+    Class<? extends OkaeriSerdes>[] serdes() default {};
     boolean defaultNotNull() default true;
 
     abstract class DEFAULT extends Configurer {

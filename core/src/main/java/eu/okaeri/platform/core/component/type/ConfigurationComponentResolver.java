@@ -3,7 +3,7 @@ package eu.okaeri.platform.core.component.type;
 import eu.okaeri.configs.ConfigManager;
 import eu.okaeri.configs.OkaeriConfig;
 import eu.okaeri.configs.configurer.Configurer;
-import eu.okaeri.configs.serdes.OkaeriSerdesPack;
+import eu.okaeri.configs.serdes.OkaeriSerdes;
 import eu.okaeri.configs.validator.okaeri.OkaeriValidator;
 import eu.okaeri.injector.Injector;
 import eu.okaeri.injector.annotation.Inject;
@@ -38,7 +38,7 @@ public class ConfigurationComponentResolver implements ComponentResolver {
     }
 
     private @Inject ConfigurerProvider defaultConfigurerProvider;
-    private @Inject Class<? extends OkaeriSerdesPack>[] defaultConfigurerSerdes;
+    private @Inject Class<? extends OkaeriSerdes>[] defaultConfigurerSerdes;
     private @Inject File dataFolder;
 
     @Override
@@ -67,17 +67,21 @@ public class ConfigurationComponentResolver implements ComponentResolver {
                 ? this.defaultConfigurerProvider.get()
                 : injector.createInstance(provider);
 
-            OkaeriSerdesPack[] serdesPacks = Stream.concat(Stream.of(this.defaultConfigurerSerdes), Arrays.stream(configuration.serdes()))
+            OkaeriSerdes[] serdesPacks = Stream.concat(Stream.of(this.defaultConfigurerSerdes), Arrays.stream(configuration.serdes()))
                 .map(injector::createInstance)
                 .distinct()
-                .toArray(OkaeriSerdesPack[]::new);
+                .toArray(OkaeriSerdes[]::new);
 
             String extension = configurer.getExtensions().isEmpty() ? "bin" : configurer.getExtensions().get(0);
             String resolvedPath = path.replace("{ext}", extension);
 
             OkaeriConfig config = ConfigManager.create(configType, (it) -> {
-                it.withBindFile(new File(this.dataFolder, resolvedPath));
-                it.withConfigurer(new OkaeriValidator(configurer, defaultNotNull), serdesPacks);
+                it.configure(opt -> {
+                    opt.validator(new OkaeriValidator(defaultNotNull));
+                    opt.configurer(configurer, serdesPacks);
+                    opt.bindFile(new File(this.dataFolder, resolvedPath));
+                    opt.errorComments(true);
+                });
                 it.saveDefaults();
                 it.load(true);
             });

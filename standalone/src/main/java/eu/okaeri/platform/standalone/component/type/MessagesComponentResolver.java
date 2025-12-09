@@ -2,7 +2,7 @@ package eu.okaeri.platform.standalone.component.type;
 
 import eu.okaeri.configs.ConfigManager;
 import eu.okaeri.configs.configurer.Configurer;
-import eu.okaeri.configs.serdes.OkaeriSerdesPack;
+import eu.okaeri.configs.serdes.OkaeriSerdes;
 import eu.okaeri.i18n.configs.LocaleConfig;
 import eu.okaeri.i18n.configs.LocaleConfigManager;
 import eu.okaeri.i18n.configs.simple.MessageOCI18n;
@@ -42,7 +42,7 @@ public class MessagesComponentResolver implements ComponentResolver {
 
     private @Inject PlaceholdersFactory defaultPlaceholdersFactory; // TODO: make use of this
     private @Inject ConfigurerProvider defaultConfigurerProvider;
-    private @Inject Class<? extends OkaeriSerdesPack>[] defaultConfigurerSerdes;
+    private @Inject Class<? extends OkaeriSerdes>[] defaultConfigurerSerdes;
     private @Inject LocaleProvider<?> i18nLocaleProvider;
 
     private @Inject("dataFolder") File dataFolder;
@@ -116,10 +116,10 @@ public class MessagesComponentResolver implements ComponentResolver {
         }
 
         // prepare serdes
-        OkaeriSerdesPack[] serdesPacks = Stream.of(this.defaultConfigurerSerdes)
+        OkaeriSerdes[] serdesPacks = Stream.of(this.defaultConfigurerSerdes)
             .map(injector::createInstance)
             .distinct()
-            .toArray(OkaeriSerdesPack[]::new);
+            .toArray(OkaeriSerdes[]::new);
 
         // load file locales
         try {
