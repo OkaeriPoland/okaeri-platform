@@ -5,8 +5,6 @@ import eu.okaeri.commands.service.CommandData;
 import eu.okaeri.commands.service.Invocation;
 import eu.okaeri.configs.OkaeriConfig;
 import eu.okaeri.configs.migrate.view.RawConfigView;
-import eu.okaeri.configs.schema.GenericsDeclaration;
-import eu.okaeri.configs.serdes.SerdesContext;
 import eu.okaeri.i18n.configs.extended.CustomMEOCI18n;
 import eu.okaeri.validator.annotation.Nullable;
 import lombok.Getter;
@@ -62,15 +60,10 @@ public class I18nCommandsTextHandler implements TextHandler {
             }
 
             for (OkaeriConfig config : sources) {
-                Object value = new RawConfigView(config).get(variable);
+                RawConfigView raw = new RawConfigView(config);
+                String value = raw.get(variable, String.class);
                 if (value != null) {
-                    String resolved = config.getConfigurer().resolveType(value,
-                        GenericsDeclaration.of(value),
-                        String.class,
-                        GenericsDeclaration.of(String.class),
-                        SerdesContext.of(config.getConfigurer(), null, null)
-                    );
-                    text = text.replace("#{" + variable + "}", resolved);
+                    text = text.replace("#{" + variable + "}", value);
                     break;
                 }
             }
