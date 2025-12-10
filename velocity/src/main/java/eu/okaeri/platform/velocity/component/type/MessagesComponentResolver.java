@@ -9,7 +9,6 @@ import eu.okaeri.i18n.configs.LocaleConfigManager;
 import eu.okaeri.i18n.locale.LocaleProvider;
 import eu.okaeri.injector.Injector;
 import eu.okaeri.injector.annotation.Inject;
-import eu.okaeri.persistence.document.ConfigurerProvider;
 import eu.okaeri.placeholders.Placeholders;
 import eu.okaeri.platform.core.annotation.Messages;
 import eu.okaeri.platform.core.component.ComponentHelper;
@@ -51,7 +50,7 @@ public class MessagesComponentResolver implements ComponentResolver {
     }
 
     private @Inject PlaceholdersFactory defaultPlaceholdersFactory;
-    private @Inject ConfigurerProvider defaultConfigurerProvider;
+    private @Inject Configurer defaultConfigurer;
     private @Inject Class<? extends OkaeriSerdes>[] defaultConfigurerSerdes;
     private @Inject LocaleProvider<?> i18nLocaleProvider;
     private @Inject PluginContainer plugin;
@@ -142,7 +141,7 @@ public class MessagesComponentResolver implements ComponentResolver {
 
         // gather colors config
         I18nColorsConfig colorsConfig = ConfigManager.create(I18nColorsConfig.class, (it) -> {
-            Configurer configurer = (provider == Messages.DEFAULT.class) ? this.defaultConfigurerProvider.get() : injector.createInstance(provider);
+            Configurer configurer = (provider == Messages.DEFAULT.class) ? this.defaultConfigurer : injector.createInstance(provider);
             String colorsExt = configurer.getExtensions().isEmpty() ? "bin" : configurer.getExtensions().get(0);
             it.withConfigurer(configurer, serdesPacks);
             it.withBindFile(directory.resolve("colors." + colorsExt));
@@ -154,7 +153,7 @@ public class MessagesComponentResolver implements ComponentResolver {
         try {
             // resolve suffix
             List<String> extensions = ((provider == Messages.DEFAULT.class)
-                ? this.defaultConfigurerProvider.get()
+                ? this.defaultConfigurer
                 : injector.createInstance(provider)).getExtensions();
             String suffix = "." + (extensions.isEmpty() ? "bin" : extensions.get(0));
 
@@ -188,7 +187,7 @@ public class MessagesComponentResolver implements ComponentResolver {
                 Locale locale = Locale.forLanguageTag(localeName);
                 // create configurer
                 Configurer configurer = (provider == Messages.DEFAULT.class)
-                    ? this.defaultConfigurerProvider.get()
+                    ? this.defaultConfigurer
                     : injector.createInstance(provider);
                 // register
                 LocaleConfig localeConfig = LocaleConfigManager.create(beanClazz, configurer, file.toFile(), !defaultLocale.equals(locale));
@@ -206,7 +205,7 @@ public class MessagesComponentResolver implements ComponentResolver {
                 if (loadedLocales.contains(locale)) continue;
                 // create configurer
                 Configurer configurer = (provider == Messages.DEFAULT.class)
-                    ? this.defaultConfigurerProvider.get()
+                    ? this.defaultConfigurer
                     : injector.createInstance(provider);
                 // register
                 LocaleConfig localeConfig = ConfigManager.create(beanClazz, (it) -> {
@@ -223,7 +222,7 @@ public class MessagesComponentResolver implements ComponentResolver {
             if (!loadedLocales.contains(defaultLocale)) {
                 // create configurer
                 Configurer configurer = (provider == Messages.DEFAULT.class)
-                    ? this.defaultConfigurerProvider.get()
+                    ? this.defaultConfigurer
                     : injector.createInstance(provider);
                 // register default locale based on interface values
                 LocaleConfig defaultLocaleConfig = ConfigManager.create(beanClazz, it -> {

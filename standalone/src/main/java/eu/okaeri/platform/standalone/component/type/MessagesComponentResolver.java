@@ -9,7 +9,6 @@ import eu.okaeri.i18n.configs.simple.MessageOCI18n;
 import eu.okaeri.i18n.locale.LocaleProvider;
 import eu.okaeri.injector.Injector;
 import eu.okaeri.injector.annotation.Inject;
-import eu.okaeri.persistence.document.ConfigurerProvider;
 import eu.okaeri.placeholders.Placeholders;
 import eu.okaeri.platform.core.annotation.Messages;
 import eu.okaeri.platform.core.component.ComponentHelper;
@@ -41,7 +40,7 @@ public class MessagesComponentResolver implements ComponentResolver {
     }
 
     private @Inject PlaceholdersFactory defaultPlaceholdersFactory; // TODO: make use of this
-    private @Inject ConfigurerProvider defaultConfigurerProvider;
+    private @Inject Configurer defaultConfigurer;
     private @Inject Class<? extends OkaeriSerdes>[] defaultConfigurerSerdes;
     private @Inject LocaleProvider<?> i18nLocaleProvider;
 
@@ -125,7 +124,7 @@ public class MessagesComponentResolver implements ComponentResolver {
         try {
             // resolve suffix
             List<String> extensions = ((provider == Messages.DEFAULT.class)
-                ? this.defaultConfigurerProvider.get()
+                ? this.defaultConfigurer
                 : injector.createInstance(provider)).getExtensions();
             String suffix = "." + (extensions.isEmpty() ? "bin" : extensions.get(0));
 
@@ -149,7 +148,7 @@ public class MessagesComponentResolver implements ComponentResolver {
                 Locale locale = Locale.forLanguageTag(localeName);
                 // create configurer
                 Configurer configurer = (provider == Messages.DEFAULT.class)
-                    ? this.defaultConfigurerProvider.get()
+                    ? this.defaultConfigurer
                     : injector.createInstance(provider);
                 // register
                 LocaleConfig localeConfig = LocaleConfigManager.create(beanClazz, configurer, file, !defaultLocale.equals(locale));
@@ -167,7 +166,7 @@ public class MessagesComponentResolver implements ComponentResolver {
                 if (loadedLocales.contains(locale)) continue;
                 // create configurer
                 Configurer configurer = (provider == Messages.DEFAULT.class)
-                    ? this.defaultConfigurerProvider.get()
+                    ? this.defaultConfigurer
                     : injector.createInstance(provider);
                 // register
                 LocaleConfig localeConfig = ConfigManager.create(beanClazz, (it) -> {
@@ -184,7 +183,7 @@ public class MessagesComponentResolver implements ComponentResolver {
             if (!loadedLocales.contains(defaultLocale)) {
                 // create configurer
                 Configurer configurer = (provider == Messages.DEFAULT.class)
-                    ? this.defaultConfigurerProvider.get()
+                    ? this.defaultConfigurer
                     : injector.createInstance(provider);
                 // register default locale based on interface values
                 LocaleConfig defaultLocaleConfig = ConfigManager.create(beanClazz, it -> {

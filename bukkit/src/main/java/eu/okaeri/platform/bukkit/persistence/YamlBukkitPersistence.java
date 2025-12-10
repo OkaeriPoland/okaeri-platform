@@ -15,7 +15,7 @@ import java.io.File;
 public final class YamlBukkitPersistence {
 
     public static DocumentPersistence of(@NonNull File storage) {
-        return new DocumentPersistence(new FlatPersistence(storage, YamlBukkitConfigurer::new, new SerdesBukkit()));
+        return new DocumentPersistence(new FlatPersistence(storage, new YamlBukkitConfigurer(), new SerdesBukkit()));
     }
 
     public static DocumentPersistence of(@NonNull Plugin plugin) {

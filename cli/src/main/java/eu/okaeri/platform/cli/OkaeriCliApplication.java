@@ -7,7 +7,6 @@ import eu.okaeri.configs.serdes.okaeri.SerdesOkaeri;
 import eu.okaeri.configs.yaml.snakeyaml.YamlSnakeYamlConfigurer;
 import eu.okaeri.injector.Injector;
 import eu.okaeri.persistence.Persistence;
-import eu.okaeri.persistence.document.ConfigurerProvider;
 import eu.okaeri.placeholders.Placeholders;
 import eu.okaeri.platform.core.OkaeriPlatform;
 import eu.okaeri.platform.core.component.ComponentHelper;
@@ -63,7 +62,7 @@ public class OkaeriCliApplication implements OkaeriPlatform {
             platform.registerInjectable("logger", platform.getLogger());
             platform.registerInjectable("app", platform);
             platform.registerInjectable("placeholders", Placeholders.create(true));
-            platform.registerInjectable("defaultConfigurerProvider", (ConfigurerProvider) YamlSnakeYamlConfigurer::new);
+            platform.registerInjectable("defaultConfigurer", new YamlSnakeYamlConfigurer());
             platform.registerInjectable("defaultConfigurerSerdes", new Class[]{SerdesCommons.class, SerdesOkaeri.class});
             platform.registerInjectable("defaultPlaceholdersFactory", new SimplePlaceholdersFactory());
             platform.registerInjectable("i18nLocaleProvider", new SystemLocaleProvider());

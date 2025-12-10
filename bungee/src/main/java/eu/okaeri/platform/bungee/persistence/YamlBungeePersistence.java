@@ -14,7 +14,7 @@ import java.io.File;
 public final class YamlBungeePersistence {
 
     public static DocumentPersistence of(@NonNull File storage) {
-        return new DocumentPersistence(new FlatPersistence(storage, YamlBungeeConfigurer::new));
+        return new DocumentPersistence(new FlatPersistence(storage, new YamlBungeeConfigurer()));
     }
 
     public static DocumentPersistence of(@NonNull Plugin plugin) {

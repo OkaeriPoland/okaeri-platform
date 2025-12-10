@@ -9,7 +9,6 @@ import eu.okaeri.configs.yaml.bukkit.YamlBukkitConfigurer;
 import eu.okaeri.configs.yaml.bukkit.serdes.SerdesBukkit;
 import eu.okaeri.injector.Injector;
 import eu.okaeri.persistence.Persistence;
-import eu.okaeri.persistence.document.ConfigurerProvider;
 import eu.okaeri.placeholders.bukkit.BukkitPlaceholders;
 import eu.okaeri.placeholders.reflect.ReflectPlaceholders;
 import eu.okaeri.platform.bukkit.component.BukkitComponentCreator;
@@ -77,7 +76,7 @@ public class OkaeriBukkitPlugin extends JavaPlugin implements OkaeriPlatform {
             platform.registerInjectable("scheduler", new PlatformScheduler(platform, platform.getServer().getScheduler()));
             platform.registerInjectable("tasker", BukkitTasker.newPool(platform));
             platform.registerInjectable("pluginManager", platform.getServer().getPluginManager());
-            platform.registerInjectable("defaultConfigurerProvider", (ConfigurerProvider) YamlBukkitConfigurer::new);
+            platform.registerInjectable("defaultConfigurer", new YamlBukkitConfigurer());
             platform.registerInjectable("defaultConfigurerSerdes", new Class[]{SerdesCommons.class, SerdesOkaeri.class, SerdesBukkit.class, SerdesOkaeriBukkit.class});
             platform.registerInjectable("defaultPlaceholdersFactory", new SimplePlaceholdersFactory());
             platform.registerInjectable("i18nLocaleProvider", new PlayerLocaleProvider());
