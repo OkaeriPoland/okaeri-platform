@@ -335,7 +335,7 @@ public class BeanManifest {
 
             if ((depend.getObject() == null) && (depend.getSource() == BeanSource.INJECT)) {
 
-                Optional<?> injectable = injector.getExact(depend.getName(), depend.getType());
+                Optional<?> injectable = injector.getInjectable(depend.getName(), depend.getType());
 
                 if (!injectable.isPresent()) {
 
