@@ -72,7 +72,7 @@ public class OkaeriBukkitPlugin extends JavaPlugin implements OkaeriPlatform {
             platform.registerInjectable("jarFile", platform.getFile());
             platform.registerInjectable("logger", platform.getLogger());
             platform.registerInjectable("plugin", platform);
-            platform.registerInjectable("placeholders", BukkitPlaceholders.create(true));
+            platform.registerInjectable("placeholders", BukkitPlaceholders.create());
             platform.registerInjectable("scheduler", new PlatformScheduler(platform, platform.getServer().getScheduler()));
             platform.registerInjectable("tasker", BukkitTasker.newPool(platform));
             platform.registerInjectable("pluginManager", platform.getServer().getPluginManager());

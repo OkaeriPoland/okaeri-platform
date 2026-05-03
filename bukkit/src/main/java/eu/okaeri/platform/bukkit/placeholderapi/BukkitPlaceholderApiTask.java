@@ -23,7 +23,7 @@ public class BukkitPlaceholderApiTask implements ExecutionTask<OkaeriBukkitPlugi
 
         platform.getInjector().getExact("placeholders", Placeholders.class).ifPresent(placeholders -> {
             try {
-                placeholders.registerPlaceholders(new PlaceholderApiPlaceholders());
+                placeholders.with(new PlaceholderApiPlaceholders());
             } catch (Throwable throwable) {
                 platform.getLogger().log(Level.WARNING, "Failed to register PlaceholderAPI placeholders (PlaceholderAPI via okaeri-placeholders)", throwable);
             }

@@ -65,7 +65,7 @@ public class OkaeriWebApplication implements OkaeriPlatform {
             platform.registerInjectable("app", platform);
             platform.registerInjectable("javalin", platform.getJavalin());
             platform.registerInjectable("jetty", Objects.requireNonNull(platform.getJavalin().jettyServer()));
-            platform.registerInjectable("placeholders", Placeholders.create(true));
+            platform.registerInjectable("placeholders", Placeholders.create());
             platform.registerInjectable("defaultConfigurer", new YamlSnakeYamlConfigurer());
             platform.registerInjectable("defaultConfigurerSerdes", new Class[]{SerdesCommons.class, SerdesOkaeri.class, SerdesWeb.class});
             platform.registerInjectable("defaultPlaceholdersFactory", new SimplePlaceholdersFactory());

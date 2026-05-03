@@ -66,7 +66,7 @@ public class OkaeriBungeePlugin extends Plugin implements OkaeriPlatform {
             platform.registerInjectable("jarFile", platform.getFile());
             platform.registerInjectable("logger", platform.getLogger());
             platform.registerInjectable("plugin", platform);
-            platform.registerInjectable("placeholders", BungeePlaceholders.create(true));
+            platform.registerInjectable("placeholders", BungeePlaceholders.create());
             platform.registerInjectable("scheduler", new PlatformScheduler(platform, platform.getProxy().getScheduler()));
             platform.registerInjectable("tasker", BungeeTasker.newPool(platform));
             platform.registerInjectable("pluginManager", platform.getProxy().getPluginManager());

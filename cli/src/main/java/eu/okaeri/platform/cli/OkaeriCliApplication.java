@@ -61,7 +61,7 @@ public class OkaeriCliApplication implements OkaeriPlatform {
             platform.registerInjectable("jarFile", platform.getFile());
             platform.registerInjectable("logger", platform.getLogger());
             platform.registerInjectable("app", platform);
-            platform.registerInjectable("placeholders", Placeholders.create(true));
+            platform.registerInjectable("placeholders", Placeholders.create());
             platform.registerInjectable("defaultConfigurer", new YamlSnakeYamlConfigurer());
             platform.registerInjectable("defaultConfigurerSerdes", new Class[]{SerdesCommons.class, SerdesOkaeri.class});
             platform.registerInjectable("defaultPlaceholdersFactory", new SimplePlaceholdersFactory());

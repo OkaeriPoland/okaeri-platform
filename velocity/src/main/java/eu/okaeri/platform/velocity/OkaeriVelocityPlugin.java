@@ -75,7 +75,7 @@ public class OkaeriVelocityPlugin implements OkaeriPlatform {
             platform.registerInjectable("logger", this.logger);
             platform.registerInjectable("plugin", this.container);
             platform.registerInjectable("plugin", platform);
-            platform.registerInjectable("placeholders", Placeholders.create(true)); // FIXME: velocity placeholders
+            platform.registerInjectable("placeholders", Placeholders.create()); // FIXME: velocity placeholders
             platform.registerInjectable("scheduler", new PlatformScheduler(this.container, this.proxy.getScheduler()));
             platform.registerInjectable("tasker", VelocityTasker.newPool(this.proxy, this.container));
             platform.registerInjectable("pluginManager", this.proxy.getPluginManager());
