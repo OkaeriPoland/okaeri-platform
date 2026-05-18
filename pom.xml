@@ -36,7 +36,7 @@
         <library.okaeri-injector.version>2.1.0</library.okaeri-injector.version>
         <library.okaeri-validator.version>2.0.5</library.okaeri-validator.version>
         <library.okaeri-placeholders.version>6.0.0-beta.7</library.okaeri-placeholders.version>
-        <library.okaeri-persistence.version>3.0.1-beta.19</library.okaeri-persistence.version>
+        <library.okaeri-persistence.version>3.0.1-beta.20</library.okaeri-persistence.version>
         <library.okaeri-tasker.version>3.0.3-beta.3</library.okaeri-tasker.version>
         <library.okaeri-acl.version>0.1.4</library.okaeri-acl.version>
     </properties>
